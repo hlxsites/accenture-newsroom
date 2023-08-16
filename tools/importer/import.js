@@ -28,7 +28,6 @@ const createMetadataBlock = (main, document, url) => {
   const publishedDate = document.head.querySelector('meta[property="datepublic"]');
   if (publishedDate) meta.PublishedDate = publishedDate.content;
 
-
   // Tags metadata
   const industryTagsContainer = document.querySelector('#tek-wrap-rightrail .wrap-industry ul');
   if (industryTagsContainer) {
@@ -69,6 +68,7 @@ const makeProxySrcs = (main, host = 'https://newsroom.accenture.com') => {
       u.searchParams.append('host', u.origin);
       img.src = `http://localhost:3001${u.pathname}${u.search}`;
     } catch (error) {
+      // eslint-disable-next-line no-console
       console.warn(`Unable to make proxy src for ${img.src}: ${error.message}`);
     }
   });
@@ -103,7 +103,7 @@ export default {
 
     // Remove Footer
     const footer = main.querySelector('#block-footer');
-    if (footer) footer.remove();    
+    if (footer) footer.remove();
 
     // make proxy srcs for images
     makeProxySrcs(main);
@@ -116,7 +116,7 @@ export default {
     // main page import - "element" is provided, i.e. a docx will be created
     results.push({
       element: main,
-      path: new URL(url).pathname,
+      path: new URL(url).pathname.replace('.htm', ''),
     });
 
     return results;
