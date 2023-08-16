@@ -25,7 +25,7 @@ const createMetadataBlock = (main, document, url) => {
   }
 
   // Published date
-  const publishedDate = document.head.querySelector('meta[property="datepublic"]');
+  const publishedDate = document.head.querySelector('meta[name="datepublic"]');
   if (publishedDate) meta.PublishedDate = publishedDate.content;
 
   // Tags metadata
@@ -35,7 +35,7 @@ const createMetadataBlock = (main, document, url) => {
     industryTagsContainer.querySelectorAll('li').forEach((li) => {
       industryTags.push(li.textContent.trim());
     });
-    meta.IndustryTags = industryTags.join(', ');
+    meta.Industry = industryTags.join(', ');
   }
 
   const subjectTagsContainer = document.querySelector('#tek-wrap-rightrail .wrap-subject ul');
@@ -44,7 +44,7 @@ const createMetadataBlock = (main, document, url) => {
     subjectTagsContainer.querySelectorAll('li').forEach((li) => {
       subjectTags.push(li.textContent.trim());
     });
-    meta.SubjectTags = subjectTags.join(', ');
+    meta.Subject = subjectTags.join(', ');
   }
   // helper to create the metadata block
   const block = WebImporter.Blocks.getMetadataBlock(document, meta);
