@@ -24,6 +24,7 @@
   --body-font-family: 'Graphik Regular', 'Open Sans', sans-serif;
   --heading-font-family: 'Graphik Black', 'Open Sans', sans-serif;
   --subheading-font-family: 'Graphik Bold', 'Open Sans', sans-serif;
+  --header-font-family: 'Graphik Regular', Arial, Sans-Serif;
   --fixed-font-family: menlo, consolas, 'Liberation Mono', monospace;
 
   /* body sizes */
@@ -41,7 +42,7 @@
   --heading-font-size-xs: 18px;
 
   /* nav height */
-  --nav-height: 64px;
+  --nav-height: 50px;
 
 }
 
