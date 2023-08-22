@@ -23,8 +23,10 @@
   /* fonts */
   --body-font-family: 'Graphik Regular', 'Open Sans', sans-serif;
   --heading-font-family: 'Graphik Black', 'Open Sans', sans-serif;
+  --navheading-font-family: 'Graphik Semibold', 'Open Sans', sans-serif;
   --subheading-font-family: 'Graphik Bold', 'Open Sans', sans-serif;
-  --header-font-family: 'Graphik Regular', Arial, Sans-Serif;
+  --header-font-family-regular: 'Graphik Regular', Arial, Sans-Serif;
+  --header-font-family: 'Graphik', Arial, Sans-Serif;
   --fixed-font-family: menlo, consolas, 'Liberation Mono', monospace;
 
   /* body sizes */
