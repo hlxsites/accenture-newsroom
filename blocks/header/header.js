@@ -8,30 +8,6 @@ import {
 const KEY_ENTER = 'Enter';
 
 /**
- * Helper function to create DOM elements
- * @param {string} tag DOM element to be created
- * @param {object} attributes attributes to be added
- * @param html {HTMLElement | SVGAElement | string} Additional html to be appended to tag
- */
-
-export function createTag(tag, attributes = {}, html = undefined) {
-  const el = document.createElement(tag);
-  if (html) {
-    if (html instanceof HTMLElement || html instanceof SVGElement) {
-      el.append(html);
-    } else {
-      el.insertAdjacentHTML('beforeend', html);
-    }
-  }
-  if (attributes) {
-    Object.entries(attributes).forEach(([key, val]) => {
-      el.setAttribute(key, val);
-    });
-  }
-  return el;
-}
-
-/**
  * collapses all open nav sections
  * @param {Element} sections The container element
  */
@@ -99,7 +75,8 @@ export default async function decorate(block) {
       if (navSection.querySelector('strong')) {
         const sectionHeading = navSection.querySelector('strong');
         const headingParent = sectionHeading.parentElement;
-        const sectionHeadingNew = createTag('div', { class: 'nav-heading' });
+        const sectionHeadingNew = document.createElement('div');
+        sectionHeadingNew.classList.add('nav-heading');
         sectionHeadingNew.innerHTML = sectionHeading.innerHTML;
         headingParent.replaceChild(sectionHeadingNew, sectionHeading);
       }
@@ -158,10 +135,11 @@ export default async function decorate(block) {
   });
 
   // hamburger for mobile
-  const hamburger = createTag('a', {
-    class: 'nav-hamburger', role: 'button', tabindex: '0', 'aria-label': 'Menu',
-  });
-  hamburger.innerHTML = '<div class="nav-hamburger-icon"></div>';
+  const hamburger = document.createElement('div');
+    hamburger.classList.add('nav-hamburger');
+    hamburger.innerHTML = `<button type="button" aria-controls="nav" aria-label="Open navigation">
+        <span class="nav-hamburger-icon"></span>
+      </button>`;
   hamburger.addEventListener('click', () => {
     const expanded = nav.getAttribute('aria-expanded') === 'true';
     document.body.style.overflowY = expanded ? '' : 'hidden';
