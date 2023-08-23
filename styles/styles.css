@@ -59,6 +59,12 @@
   }
 }
 
+@media (min-width: 1000px) {
+  :root {
+    --nav-height: 69px;
+  }
+}
+
 body {
   font-size: var(--body-font-size-default);
   margin: 0;

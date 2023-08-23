@@ -75,10 +75,11 @@ export default async function decorate(block) {
       if (navSection.querySelector('strong')) {
         const sectionHeading = navSection.querySelector('strong');
         const headingParent = sectionHeading.parentElement;
-        const sectionHeadingNew = document.createElement('div');
-        sectionHeadingNew.classList.add('nav-heading');
-        sectionHeadingNew.innerHTML = sectionHeading.innerHTML;
-        headingParent.replaceChild(sectionHeadingNew, sectionHeading);
+        // const sectionHeadingNew = document.createElement('div');
+        // sectionHeadingNew.classList.add('nav-heading');
+        headingParent.innerHTML = sectionHeading.innerHTML;
+        // headingParent.replaceChild(sectionHeadingNew, sectionHeading);
+        headingParent.classList.add('nav-heading-container');
       }
 
       navSection.addEventListener('click', (event) => {
