@@ -7,7 +7,7 @@ import {
 
 const KEY_ENTER = 'Enter';
 
-const desktopMedia = window.matchMedia('(min-width: 1000px)');
+const isDesktop = window.matchMedia('(min-width: 1000px)');
 
 /**
  * collapses all open nav sections
@@ -119,7 +119,7 @@ export default async function decorate(block) {
         });
 
         levelTwo.addEventListener('click', (event) => {
-          if (!desktopMedia.matches) {
+          if (!isDesktop.matches) {
             toggleSection(levelTwo);
           }
           event.stopPropagation();
