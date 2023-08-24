@@ -2,6 +2,7 @@ footer {
   padding: 2rem;
   background-color: var(--overlay-background-color);
   font-size: var(--body-font-size-s);
+  position: relative;
 }
 
 footer .footer {
@@ -11,4 +12,158 @@ footer .footer {
 
 footer .footer p {
   margin: 0;
+}
+
+footer .columns > div {
+  align-items: baseline;
+}
+
+/* Pre Footer */
+footer .pre-footer a {
+  font-family: var(--graphik-semibold);
+  font-size: var(--body-font-size-xs);
+  font-weight: 600;
+  line-height: 1.15;
+  color: #004dff;
+  text-transform: uppercase;
+  text-decoration: none;
+}
+
+footer .pre-footer a::after {
+  font-family: var(--icomoon);
+  content: "\e900";
+  font-size: 40px;
+  font-weight: 200;
+  position: relative;
+  top: 10px;
+}
+
+footer .pre-footer ul {
+  padding: 0;
+}
+
+footer .pre-footer ul li {
+  padding: 0;
+  margin: 0;
+  list-style-type: none;
+}
+
+/* Footer black background */
+footer .footer-black {
+  position: absolute;
+  left: 0;
+  color: var(--secondary-text-color);
+  background-color: var(--highlight-background-color);
+  width: 100vw;
+}
+
+footer .footer-black > div {
+  padding: 2rem;
+}
+
+footer .footer-black > div:last-of-type {
+  padding-top: unset;
+}
+
+footer .footer-black .acn-logo {
+  display: block;
+  content: ' ';
+  height: 76px;
+  width: 46px;
+  background: transparent url('../../icons/acn-brand-icon.svg') no-repeat;
+}
+
+footer .footer-black .columns:not(.columns.copyright) > div {
+  align-items: baseline;
+  margin-top: 0.625rem;
+  margin-bottom: 1.4rem
+}
+
+footer .footer-black .columns:not(.columns.copyright) {
+  border-bottom: 1px solid var(--secondary-text-color);
+}
+
+footer .footer-black .columns ul {
+  display: flex;
+  align-items: baseline;
+  flex-flow: row wrap;
+  column-gap: 30px;
+  padding: unset;
+  margin: unset;
+}
+
+footer .footer-black .columns ul li {
+  list-style: none;
+}
+
+footer .footer-black .columns ul li a {
+  display: flex;
+  font-size: var(--body-font-size-xxs);
+  line-height: 50px;
+  color: var(--secondary-text-color);
+  text-transform: uppercase;
+  text-decoration: underline;
+}
+
+footer .footer-black .columns ul li a:hover {
+  color: white;
+}
+
+footer .footer-black .columns ul li a span.icon {
+  position: relative;
+  height: 35px;
+  width: 35px;
+  border: 2px solid var(--secondary-text-color);
+  border-radius: 100%;
+  color: var(--secondary-text-color);
+}
+
+footer .footer-black .columns ul li a span.icon:hover {
+  border: 2px solid white;
+  color: white;
+}
+
+footer .footer-black .columns ul li a span.icon svg {
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  display: block;
+  font-size: 15px;
+}
+
+/* stylelint-disable-next-line no-descending-specificity */
+footer .footer-black .columns.copyright > div > div,
+footer .footer-black .columns.copyright ul li a {
+  font-size: var(--body-font-size-xxxs);
+  font-weight: 400;
+  text-transform: none;
+}
+
+@media (min-width: 900px) {
+  footer .pre-footer {
+    padding-bottom: 95px;
+  }
+
+  footer .footer-black .columns:not(.columns.copyright) > div {
+    align-items: center;
+  }
+
+  footer .footer-black .columns:not(.columns.copyright) > div > div:last-child > ul {
+    justify-content: end;
+  }
+
+  footer .footer-black .columns.copyright > div > div:last-child {
+    display: contents;
+  }
+
+  footer .footer-black .acn-logo {
+    display: block;
+    content: '';
+    height: 46px;
+    max-width: 46px;
+    background: transparent url('../../icons/acn-brand-icon.svg') no-repeat;
+  }
 }

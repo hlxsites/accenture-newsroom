@@ -48,7 +48,7 @@ header nav .nav-sections > ul > li.nav-drop {
   padding: 7px 15px;
   line-height: 40px;
   font-size: 1rem;
-  font-family: var(--navheading-font-family);
+  font-family: var(--graphik-semibold);
   border-top: 0.063em solid #e3e3e3;
   border-bottom: 0.063em solid #e3e3e3;
   position: relative;
@@ -111,7 +111,7 @@ header nav[aria-expanded='true'] .nav-sections > ul > li.nav-drop li.level-two.s
   border-top: 1px solid #e3e3e3;
   font-size: 1.125rem;
   line-height: 40px;
-  font-family: var(--navheading-font-family);
+  font-family: var(--graphik-semibold);
 }
 
 header nav[aria-expanded='true'] .nav-sections > ul > li.nav-drop li.level-two.sub-menu[aria-expanded='true'] ul {
@@ -447,7 +447,7 @@ header nav[aria-expanded="true"] .nav-tools {
   header nav .nav-sections > ul > li.nav-drop[aria-expanded="true"] > ul.sub-menu-container li.sub-menu {
     border-bottom: 0.06em solid #e3e3e3;
     padding: 20px 0 0;
-    font-family: var(--navheading-font-family);
+    font-family: var(--graphik-semibold);
     font-size: 1rem;
     color: #000;
     text-decoration: none;

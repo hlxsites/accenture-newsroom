@@ -17,16 +17,18 @@
   --link-hover-color: #008;
   --background-color: #fff;
   --overlay-background-color: #eee;
-  --highlight-background-color: #ccc;
+  --highlight-background-color: black;
   --text-color: #000;
+  --secondary-text-color: #a7a7a7;
 
   /* fonts */
   --body-font-family: 'Graphik Regular', 'Open Sans', sans-serif;
   --heading-font-family: 'Graphik Black', 'Open Sans', sans-serif;
-  --navheading-font-family: 'Graphik Semibold', 'Open Sans', sans-serif;
   --subheading-font-family: 'Graphik Bold', 'Open Sans', sans-serif;
   --header-font-family-regular: 'Graphik Regular', Arial, Sans-Serif;
   --header-font-family: 'Graphik', Arial, Sans-Serif;
+  --graphik-semibold: 'Graphik Semibold', 'Open Sans', sans-serif;
+  --icomoon: icomoon, menlo, consolas, 'Liberation Mono', monospace;
   --fixed-font-family: menlo, consolas, 'Liberation Mono', monospace;
 
   /* body sizes */
@@ -34,6 +36,8 @@
   --body-font-size-m: 22px;
   --body-font-size-s: 18px;
   --body-font-size-xs: 16px;
+  --body-font-size-xxs: 14px;
+  --body-font-size-xxxs: 11px;
 
   /* heading sizes */
   --heading-font-size-xxl: 48px;

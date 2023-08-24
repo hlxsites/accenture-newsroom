@@ -1,4 +1,6 @@
-import { readBlockConfig, decorateIcons } from '../../scripts/lib-franklin.js';
+import {
+  readBlockConfig, decorateIcons, decorateSections, loadBlocks,
+} from '../../scripts/lib-franklin.js';
 
 /**
  * loads and decorates the footer
@@ -19,7 +21,17 @@ export default async function decorate(block) {
     const footer = document.createElement('div');
     footer.innerHTML = html;
 
+    decorateSections(footer);
+    loadBlocks(footer);
     decorateIcons(footer);
+
+    // Footer logo
+    const col = footer.querySelector('.section.footer-black .columns > div > div');
+    if (col.textContent === 'Logo') {
+      col.textContent = '';
+      col.classList.add('acn-logo');
+    }
+
     block.append(footer);
   }
 }
