@@ -344,7 +344,8 @@ header nav[aria-expanded="true"] .nav-tools {
     align-self: unset;
   }
 
-  header nav .nav-sections .nav-drop {
+  header nav .nav-sections .nav-drop:hover {
+    border-bottom: 4px solid #000;
     cursor: pointer;
   }
 
@@ -362,6 +363,7 @@ header nav[aria-expanded="true"] .nav-tools {
     font-family: var(--header-font-family-regular);
     height: 68px;
     padding: 20px 20px 0;
+    border: none;
     box-sizing: border-box;
   }
 
@@ -375,6 +377,7 @@ header nav[aria-expanded="true"] .nav-tools {
   }
 
   header nav .nav-sections > ul > li[aria-expanded="true"] > ul {
+    cursor: default;
     display: flex;
     gap: unset;
     flex-flow: wrap;
@@ -385,6 +388,8 @@ header nav[aria-expanded="true"] .nav-tools {
     background-color: var(--background-color);
     -webkit-box-shadow: 0 10px 10px -10px #000;
     box-shadow: 0 10px 10px -10px #000;
+    border-top: .5px solid #cccccc;
+    border-left: .5px solid #cccccc;
   }
 
   header nav .nav-sections > ul > li.nav-drop[aria-expanded="true"] > ul.sub-menu-container > li.sub-menu {

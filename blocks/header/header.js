@@ -7,6 +7,8 @@ import {
 
 const KEY_ENTER = 'Enter';
 
+const desktopMedia = window.matchMedia('(min-width: 1000px)');
+
 /**
  * collapses all open nav sections
  * @param {Element} sections The container element
@@ -63,6 +65,15 @@ export default async function decorate(block) {
     }
   });
 
+  // link the home page to brand logo
+  const navBrand = nav.querySelector('.nav-brand');
+  const navBrandLink = document.createElement('a');
+  navBrandLink.setAttribute('href', 'https://www.accenture.com/us-en');
+  navBrandLink.setAttribute('aria-label', 'Home');
+  navBrandLink.innerHTML = navBrand.innerHTML;
+  navBrand.innerHTML = '';
+  navBrand.appendChild(navBrandLink);
+
   const navSections = navChildren[1];
   if (navSections) {
     navSections.querySelectorAll(':scope > ul > li').forEach((navSection) => {
@@ -108,7 +119,9 @@ export default async function decorate(block) {
         });
 
         levelTwo.addEventListener('click', (event) => {
-          toggleSection(levelTwo);
+          if (!desktopMedia.matches) {
+            toggleSection(levelTwo);
+          }
           event.stopPropagation();
         });
         levelTwo.addEventListener('keydown', (event) => {
