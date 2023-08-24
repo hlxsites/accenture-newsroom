@@ -2,7 +2,6 @@ import {
   readBlockConfig,
   decorateButtons,
   decorateIcons,
-  loadBlocks,
 } from '../../scripts/lib-franklin.js';
 
 const KEY_ENTER = 'Enter';
@@ -93,7 +92,7 @@ export default async function decorate(block) {
         headingParent.classList.add('nav-heading-container');
       }
 
-      navSection.addEventListener('click', (event) => {
+      navSection.addEventListener('click', () => {
         toggleSection(navSection);
       });
       navSection.addEventListener('keydown', (event) => {
@@ -152,10 +151,10 @@ export default async function decorate(block) {
 
   // hamburger for mobile
   const hamburger = document.createElement('div');
-    hamburger.classList.add('nav-hamburger');
-    hamburger.innerHTML = `<button type="button" aria-controls="nav" aria-label="Open navigation">
-        <span class="nav-hamburger-icon"></span>
-      </button>`;
+  hamburger.classList.add('nav-hamburger');
+  hamburger.innerHTML = `<button type="button" aria-controls="nav" aria-label="Open navigation">
+      <span class="nav-hamburger-icon"></span>
+    </button>`;
   hamburger.addEventListener('click', () => {
     const expanded = nav.getAttribute('aria-expanded') === 'true';
     document.body.style.overflowY = expanded ? '' : 'hidden';
