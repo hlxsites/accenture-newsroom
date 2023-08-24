@@ -99,7 +99,9 @@ export default async function decorate(block) {
         // add back button to level 2
         levelTwo.querySelectorAll(':scope > ul').forEach((levelThree) => {
           const levelTwoElement = levelThree.parentElement;
+          const levelTwoUl = levelTwoElement.parentElement;
           levelTwoElement.classList.add('sub-menu');
+          levelTwoUl.classList.add('sub-menu-container');
           const backButton = document.createElement('span');
           backButton.classList.add('menu-back-button');
           levelTwoElement.prepend(backButton);
