@@ -1,0 +1,99 @@
+.section.newslist-container {
+  padding: 64px 15px;
+}
+
+.newslist.block {
+  width: 90%;
+  margin-left: 10px;
+  padding-top: 25px;
+}
+
+.newslist .newslist-container .newslist-item {
+  border: 1px solid #cccccc;
+  border-top: 4px solid #6c2cb9;
+  padding: 15px;
+  margin-bottom: 50px;
+}
+
+.newslist .newslist-container .newslist-item h4 {
+  font-family: var(--graphik-semibold);
+  font-size: 20px;
+  font-weight: 600;
+  color: #000;
+  margin-top: 0;
+  margin-bottom: 13px;
+  line-height: 1.2;
+}
+
+.newslist .newslist-container .newslist-item h4 a {
+  font-family: var(--graphik-semibold);
+  font-size: 18px;
+  font-weight: 600;
+  color: #000;
+  margin-bottom: 13px;
+  line-height: 1.2;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.newslist .newslist-container .newslist-item .newslist-item-description {
+  font-family: var(--header-font-family);
+  font-size: 14px;
+  color: #000;
+  margin-bottom: 20px;
+  padding: 0 0 20px;
+  line-height: 1.83;
+}
+
+.newslist .newslist-container .newslist-item .newslist-item-footer a {
+  font-family: var(--graphik-semibold);
+  text-transform: uppercase;
+  font-size: 16px;
+  font-weight: 600;
+  color: #004dff;
+}
+
+.newslist .newslist-container .newslist-item .newslist-item-footer a .read-more-arrow {
+  display: inline-block;
+  height: 20px;
+  width: 40px;
+  line-height: 20px;
+  background: transparent url(/icons/arrow-icon.svg) no-repeat 0px -8px;
+}
+
+.newslist .newslist-container .newslist-item .newslist-item-footer .newslist-item-publisheddate {
+  font-family: var(--graphik-semibold);
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.33;
+  color: #000;
+  float: right;
+  padding: 9px 0;
+  text-transform: uppercase;
+}
+
+@media (min-width: 1000px) {
+  .newslist.block {
+    width: 100%;
+  }
+
+  .newslist .newslist-container {
+    display: grid;
+    grid-template-columns: 1fr 1fr; /* Two equal-width columns */
+    column-gap: 30px; /* Add some gap between columns */
+    margin: 0 auto; /* Center the grid container horizontally */
+  }
+
+  .newslist .newslist-container .newslist-item {
+    position: relative;
+  }
+
+  .newslist .newslist-container .newslist-item .newslist-item-footer {
+    display: flex;
+    width: 94%;
+    justify-content: space-between;
+    position: absolute;
+    bottom: 0;
+    margin-bottom: 10px;
+  } 
+}
