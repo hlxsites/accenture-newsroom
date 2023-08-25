@@ -22,10 +22,28 @@ function collapseAllNavSections(sections) {
   });
 }
 
+function closeNav(e) {
+  const escapePressed = e.code === 'Escape';
+  const nav = document.querySelector('header nav');
+  const navSections = nav.querySelector('.nav-sections');
+  const navSectionExpanded = navSections.querySelector('[aria-expanded="true"]');
+  const outSideNavClicked = !e.target.closest('header nav');
+  if (navSectionExpanded && (escapePressed || outSideNavClicked)) {
+    // eslint-disable-next-line no-use-before-define
+    collapseAllNavSections(navSections);
+    navSectionExpanded.focus();
+  }
+}
+
 function toggleSection(section) {
   const expanded = section.getAttribute('aria-expanded') === 'true';
   collapseAllNavSections(section.closest('ul').parentElement);
   section.setAttribute('aria-expanded', expanded ? 'false' : 'true');
+  if (!expanded && isDesktop.matches) {
+    document.addEventListener('click', closeNav);
+  } else {
+    document.removeEventListener('click', closeNav);
+  }
 }
 
 /**
@@ -138,16 +156,10 @@ export default async function decorate(block) {
     });
   }
 
-  // add page scroll listener to know when header turns to sticky
-  const header = block.parentNode;
-  window.addEventListener('scroll', () => {
-    const scrollAmount = window.scrollY;
-    if (scrollAmount > header.offsetHeight) {
-      header.classList.add('is-sticky');
-    } else {
-      header.classList.remove('is-sticky');
-    }
-  });
+  if (isDesktop.matches) {
+    // collapse menu on escape press
+    window.addEventListener('keydown', closeNav);
+  }
 
   // hamburger for mobile
   const hamburger = document.createElement('div');
