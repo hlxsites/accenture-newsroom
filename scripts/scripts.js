@@ -11,22 +11,49 @@ import {
   waitForLCP,
   loadBlocks,
   loadCSS,
+  getMetadata,
 } from './lib-franklin.js';
 
 const LCP_BLOCKS = []; // add your LCP blocks to the list
 
+// DOM helper
+export function createEl(name, attributes = {}, content = '', parentEl = null) {
+  const el = document.createElement(name);
+
+  Object.keys(attributes).forEach((key) => {
+    el.setAttribute(key, attributes[key]);
+  });
+  if (content) {
+    if (typeof content === 'string') {
+      el.innerHTML = content;
+    } else if (content instanceof NodeList) {
+      content.forEach((itemEl) => {
+        el.append(itemEl);
+      });
+    } else if (content instanceof HTMLCollection) {
+      Array.from(content).forEach((itemEl) => {
+        el.append(itemEl);
+      });
+    } else {
+      el.append(content);
+    }
+  }
+  if (parentEl) {
+    parentEl.append(el);
+  }
+  return el;
+}
+
 /**
- * Builds hero block and prepends to main in a new section.
+ * Builds aside block and attaches it to main in a new section.
  * @param {Element} main The container element
  */
-function buildHeroBlock(main) {
-  const h1 = main.querySelector('h1');
-  const picture = main.querySelector('picture');
-  // eslint-disable-next-line no-bitwise
-  if (h1 && picture && (h1.compareDocumentPosition(picture) & Node.DOCUMENT_POSITION_PRECEDING)) {
+function buildAsideBlock(main) {
+  const template = getMetadata('template');
+  if (template === 'Article') {
     const section = document.createElement('div');
-    section.append(buildBlock('hero', { elems: [picture, h1] }));
-    main.prepend(section);
+    section.append(buildBlock('aside', { elems: [] }));
+    main.append(section);
   }
 }
 
@@ -48,7 +75,7 @@ async function loadFonts() {
  */
 function buildAutoBlocks(main) {
   try {
-    buildHeroBlock(main);
+    buildAsideBlock(main);
   } catch (error) {
     // eslint-disable-next-line no-console
     console.error('Auto Blocking failed', error);

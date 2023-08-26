@@ -4,8 +4,8 @@ const createMetadataBlock = (main, document, url) => {
   // add the template
   if (url.includes('/news/')) {
     meta.Template = 'Article';
-  } else {
-    meta.Template = 'Unknown';
+  } else if (url.startsWith('/industry/') || url.startsWith('/subjects/')) {
+    meta.Template = 'Category';
   }
 
   const title = document.head.querySelector('meta[property="og:title"]');
@@ -18,10 +18,10 @@ const createMetadataBlock = (main, document, url) => {
 
   const desc = document.head.querySelector('meta[property="og:description"]');
   if (desc) {
-    meta.Description = desc.content;
+    meta.Description = desc.content.replace(/&ndash;/g, '-');
   } else {
     const description = document.head.querySelector('meta[name="description"]');
-    if (description) meta.Description = description.content;
+    if (description) meta.Description = description.content.replace(/&ndash;/g, '-');
   }
 
   // Published date
@@ -100,10 +100,19 @@ export default {
     if (loginWarning) loginWarning.remove();
     const nonMediaWarning = main.querySelector('#nonmediawarning');
     if (nonMediaWarning) nonMediaWarning.remove();
+    const noscripts = main.querySelectorAll('noscript');
+    if (noscripts && noscripts.length > 0) {
+      noscripts.forEach((noscript) => {
+        noscript.remove();
+      });
+    }
 
     // Remove Footer
     const footer = main.querySelector('#block-footer');
     if (footer) footer.remove();
+
+    // replace nbsps and ndash
+    main.innerHTML = main.innerHTML.replace(/&nbsp;/g, ' ').replace(/&ndash;/g, '-').replace('<div style="text-align: center; background-image: none;"># # #</div>', '<br># # #');
 
     // make proxy srcs for images
     makeProxySrcs(main);

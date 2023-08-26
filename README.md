@@ -1,9 +1,9 @@
-# Your Project's Title...
-Your project's description...
+# Accenture Newsroom
+Accenture Newsroom on AEM Franklin
 
 ## Environments
-- Preview: https://main--{repo}--{owner}.hlx.page/
-- Live: https://main--{repo}--{owner}.hlx.live/
+- Preview: https://main--accenture-newsroom--hlxsites.hlx.page/
+- Live: https://main--accenture-newsroom--hlxsites.hlx.live/
 
 ## Installation
 

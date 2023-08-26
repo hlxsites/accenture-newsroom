@@ -17,7 +17,8 @@
   --link-hover-color: #008;
   --background-color: #fff;
   --overlay-background-color: #eee;
-  --highlight-background-color: black;
+  --highlight-background-color: #a7a7a7;
+  --footer-background-color: black;
   --text-color: #000;
   --secondary-text-color: #a7a7a7;
 
@@ -269,6 +270,39 @@ main .section {
   .section > div {
     max-width: 1200px;
     margin: auto;
+  }
+
+  body.article main {
+    max-width: 1200px;
+    margin: auto;
+    position: relative;
+  }
+
+  body.article main .section:not(.aside-container) {
+    max-width: 60%;    
+  }
+
+  body.article main .section.aside-container {
+    position: absolute;
+    top: 0;
+    right: 5%;
+    padding-top: calc(var(--nav-height) + 50px);
+    max-width: 25%;
+  }
+}
+
+
+@media (min-width: 1200px) {
+  body.article main .section:not(.aside-container) {
+    max-width: 800px;    
+  }
+
+  body.article main .section.aside-container {
+    position: absolute;
+    top: 0;
+    right: 0;
+    padding-top: calc(var(--nav-height) + 50px);
+    max-width: 350px;
   }
 }
 
