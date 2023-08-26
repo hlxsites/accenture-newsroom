@@ -99,12 +99,80 @@ function addParam(name, value) {
   return `${window.location.pathname}?${usp.toString()}`;
 }
 
+/**
+ * Creates start, mid and end groups of page numbers for pagination
+ * @param {*} totalPages
+ * @param {*} currentPage
+ * @returns
+ */
+function getPaginationGroups(totalPages, currentPage) {
+  const MAX_ENTRIES = 7;
+  if (totalPages <= MAX_ENTRIES) {
+    const r = [];
+    for (let i = 1; i <= totalPages; i++) {
+      r.push(i);
+    }
+    return r;
+  }
+
+  const start = [];
+  const mid  = [];
+  const end = [];
+
+  // Include initial pages
+  if (currentPage < 5) {
+    for (let i = 1; i < Math.min(totalPages, 5); i++) {
+      start.push(i);
+    }
+  } else {
+    start.push(1);
+    start.push(2);
+  }
+
+  // Include middle page numbers with current, previous, and next page numbers
+  if (currentPage >= 5 && currentPage < totalPages) {
+    for (let i = currentPage-1; i <= Math.min(currentPage + 1, totalPages); i++) {
+      mid.push(i);
+    }
+  }
+
+  // Include last two page numbers
+  if (currentPage < totalPages - 2) {
+    end.push(totalPages - 1);
+    end.push(totalPages);
+  }
+  const result = [start, mid, end];
+  if (result.length < MAX_ENTRIES) {
+    let diff = MAX_ENTRIES - (start.length + mid.length + end.length);
+    // add a few more numbers from the previous of zero set
+    if (end.length === 0) {
+      let midSetFirstElement = mid[0];
+      if (!midSetFirstElement) {
+        mid.push(currentPage);
+        midSetFirstElement = currentPage;
+        diff = diff - 1;
+      }
+      for (let i = 1; i <= diff; i++) {
+        // add to the start of mid array
+        mid.unshift(midSetFirstElement - i);
+      }
+    } else if (mid.length === 0) {
+      const startSetSize = start.length;
+      for (let i = 1; i <= diff; i++) {
+        start.push(startSetSize + i);
+      }
+    }
+  }
+
+  return result;
+}
+
 export default async function decorate(block) {
   const limit = 10;
   // get request parameter page as limit
   const usp = new URLSearchParams(window.location.search);
-  const pageOffset = parseInt(usp.get('page'), 10) || 0;
-  const offset = pageOffset * 10;
+  const pageOffset = parseInt(usp.get('page'), 10) || 1;
+  const offset = (Math.max(pageOffset, 1) - 1) * 10;
   const l = offset + limit;
   const cfg = readBlockConfig(block);
   const key = Object.keys(cfg)[0];
@@ -150,6 +218,10 @@ export default async function decorate(block) {
     header.innerText = value;
     newsListContainer.append(header);
   }
+  // simulate more content for testing
+  shortIndex = [...shortIndex, ...shortIndex, ...shortIndex, ...shortIndex, ...shortIndex];
+  shortIndex = [...shortIndex, ...shortIndex, ...shortIndex, ...shortIndex, ...shortIndex];
+  shortIndex = [...shortIndex, ...shortIndex, ...shortIndex, ...shortIndex, ...shortIndex];
 
   const range = document.createRange();
   for (let i = offset; i < l && i < shortIndex.length; i += 1) {
@@ -203,20 +275,54 @@ export default async function decorate(block) {
     const item = range.createContextualFragment(itemHtml);
     newsListContainer.append(item);
   }
+  block.innerHTML = newsListContainer.outerHTML;
 
   // add pagination information
-  if (shortIndex.length > l || pageOffset > 0) {
-    const prevUrl = addParam('page', parseInt(pageOffset, 10) - 1);
-    const nextUrl = addParam('page', parseInt(pageOffset, 10) + 1);
-    const prev = pageOffset > 0 ? `<a href="${prevUrl}">‹ previous</a>` : '';
-    const next = shortIndex.length > l ? `<a href="${nextUrl}">next ›</a>` : '';
-    const paginationHtml = `
-      <div class="pagination">
-        ${prev}  <b>${parseInt(pageOffset, 10) + 1} of ${Math.ceil(shortIndex.length / 10)}</b> ${next}
-      </div>
-    `;
-    newsListContainer.append(range.createContextualFragment(paginationHtml));
+  if (shortIndex.length > 10) {
+    const totalPages = Math.ceil(shortIndex.length / 10);
+    const paginationGroups = getPaginationGroups(totalPages, pageOffset);
+    console.log(paginationGroups);
+    const paginationContainer = document.createElement('div');
+    paginationContainer.classList.add('newslist-pagination-container');
+    for (let i = 0; i < paginationGroups.length; i++) {
+      const pageGroup = paginationGroups[i];
+      pageGroup.forEach((pageNumber) => {
+        const pageUrl = addParam('page', pageNumber);
+        const pageLink = document.createElement('a');
+        pageLink.classList.add('pagination-link');
+        pageLink.setAttribute('href', pageUrl);
+        pageLink.innerText = pageNumber;
+        if (pageNumber === pageOffset) {
+          pageLink.classList.add('current-page');
+        }
+        paginationContainer.append(pageLink);
+      });
+      if (i < paginationGroups.length - 1 && paginationGroups[i+1].length > 0) {
+        const ellipsis = document.createElement('a');
+        ellipsis.setAttribute('href', '#');
+        ellipsis.classList.add('pagination-ellipsis');
+        ellipsis.innerText = '...';
+        paginationContainer.append(ellipsis);
+      }
+    }
+    const prev = document.createElement('a');
+    if (pageOffset == 1) {
+      prev.setAttribute('aria-disabled', 'true')
+    } else {
+      prev.setAttribute('href', addParam('page', pageOffset - 1));
+    }
+    prev.classList.add('pagination-prev');
+    prev.innerHTML = `<span class="pagination-prev-arrow"/>`;
+    paginationContainer.prepend(prev);
+    const next = document.createElement('a');
+    if (pageOffset == totalPages) {
+      next.setAttribute('aria-disabled', 'true')
+    } else {
+      next.setAttribute('href', addParam('page', pageOffset + 1));
+    } 
+    next.innerHTML = `<span class="pagination-next-arrow"/>`;
+    next.classList.add('pagination-next');
+    paginationContainer.append(next);
+    block.append(paginationContainer);
   }
-
-  block.innerHTML = newsListContainer.outerHTML;
 }
