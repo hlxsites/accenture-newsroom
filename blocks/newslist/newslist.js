@@ -80,6 +80,17 @@ function filterByQuery(index, query) {
   });
 }
 
+function filterByDate(index, fromDate, toDate) {
+  if (!fromDate || !toDate) return index;
+  const from = new Date(fromDate);
+  const to = new Date(toDate);
+  if (from > to) return [];
+  return index.filter((e) => {
+    const date = new Date(parseInt(e.publisheddatems));
+    return date >= from && date <= to;
+  });
+}
+
 /**
  * appends the given param to the existing params of the url
  */
@@ -161,6 +172,8 @@ export default async function decorate(block) {
   const limit = 10;
   // get request parameter page as limit
   const usp = new URLSearchParams(window.location.search);
+  const fromDate = usp.get('from_date');
+  const toDate = usp.get('to_date');
   const pageOffset = parseInt(usp.get('page'), 10) || 1;
   const offset = (Math.max(pageOffset, 1) - 1) * 10;
   const l = offset + limit;
@@ -181,7 +194,7 @@ export default async function decorate(block) {
     searchHeader.classList.add('search-header-container');
     const form = `
       <form action="/search" method="get" id="search-form">
-        <input type="text" id="search-input" title="Keywords" name="q" value="${query}" size="40" maxlength="60">
+        <input type="text" id="search-input" title="Keywords" placeholder="Keywords" name="q" value="${query}" size="40" maxlength="60">
         <input type="submit" value="Search">
       </form>
     `;
@@ -198,24 +211,26 @@ export default async function decorate(block) {
       searchHeader.innerHTML = form;
     }
     newsListContainer.append(searchHeader);
-  } else if (key) {
-    if (!value && usp.get('id')) {
-      value = usp.get('id').toLowerCase();
-    } else if (!value && !usp.get('id')) {
-      block.remove();
-      return;
+  } else {
+    // prepend search form and date picker
+    const newsListHeader = document.createElement('div');
+    newsListHeader.classList.add('newslist-header-container');
+    newsListHeader.innerHTML = `
+    <label for="newslist-search-input">Search</label>
+      <form action="/search" method="get" id="newslist-search-form">
+        <input type="text" id="newslist-search-input" title="Keywords" name="q" value="" size="40" maxlength="60">
+        <input type="submit" value="Search">
+      </form>
+      <label for="newslist-filter-input">Filter News</label>
+      <form action="${location.pathname}" method="get" id="filter-form">
+        <input type="date" id="newslist-filter-input" title="Date" name="date" value="" size="40" maxlength="60">
+        <input type="submit" value="Filter">
+      </form>
+    `;
+    newsListContainer.append(newsListHeader);
+    if (fromDate && toDate) {
+      shortIndex = filterByDate(index, fromDate, toDate);
     }
-    if (key === 'featured-tech') {
-      shortIndex = index.filter((e) => (e[key.trim()].toLowerCase()
-        .includes(value.trim().toLowerCase())));
-    } else {
-      shortIndex = index.filter((e) => (e[key.trim()].toLowerCase()
-        === value.trim().toLowerCase()));
-    }
-
-    const header = document.createElement('h2');
-    header.innerText = value;
-    newsListContainer.append(header);
   }
   // simulate more content for testing
   shortIndex = [...shortIndex, ...shortIndex, ...shortIndex, ...shortIndex, ...shortIndex];
