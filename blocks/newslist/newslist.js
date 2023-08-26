@@ -18,7 +18,7 @@ function replaceEmptyValues(data) {
 
 function skipInternalPaths(jsonData) {
   const internalPaths = ['/search', '/'];
-  const regexp = [/drafts\/.*/, /sponsor\/.*/, /content\/.*/];
+  const regexp = [/drafts\/.*/];
   return jsonData.filter((row) => {
     if (internalPaths.includes(row.path)) {
       return false;
@@ -61,24 +61,14 @@ function getHumanReadableDate(dateString) {
   });
 }
 
-function convertToKebabCase(str) {
-  return str.toLowerCase().replace(/\s+/g, '-');
-}
-
 function filterByQuery(index, query) {
-  if (!query) return index;
+  if (!query) return [];
   const queryTokens = query.split(' ');
   return index.filter((e) => {
     const title = e.title.toLowerCase();
-    const subtitle = e.subtitle.toLowerCase();
     const description = e.description.toLowerCase();
     return queryTokens.every((token) => {
-      if (subtitle.includes(token)) {
-        e.matchedToken = `... ${subtitle} ...`;
-        return true;
-      }
       if (description.includes(token)) {
-        e.matchedToken = `... ${description} ...`;
         return true;
       }
       if (title.includes(token)) {
@@ -184,20 +174,29 @@ export default async function decorate(block) {
   newsListContainer.classList.add('newslist-container');
 
   if (isSearch) {
+    newsListContainer.classList.add('search-results-container');
     const query = usp.get('q') || '';
     shortIndex = filterByQuery(index, query);
     const searchHeader = document.createElement('div');
     searchHeader.classList.add('search-header-container');
-    searchHeader.innerHTML = `
-      <h2>Search Results</h2>
+    const form = `
       <form action="/search" method="get" id="search-form">
-        <div class="search-container" >
-          <label for="edit-keys">Enter your keywords </label>
-          <input type="text" id="search-input" name="q" value="${query}" size="40" maxlength="255">
-        </div>
+        <input type="text" id="search-input" title="Keywords" name="q" value="${query}" size="40" maxlength="60">
         <input type="submit" value="Search">
       </form>
     `;
+    if (query) {
+      searchHeader.innerHTML = `
+      ${form}
+      <h2>Results for "${query}"</h2>
+      <div class="search-sub-header">
+        <h3> ALL RESULTS </h3>
+        <div class="search-sub-header-right">
+        Showing ${offset + 1} - ${Math.min(l, shortIndex.length)} of ${shortIndex.length} results
+      `;
+    } else {
+      searchHeader.innerHTML = form;
+    }
     newsListContainer.append(searchHeader);
   } else if (key) {
     if (!value && usp.get('id')) {
@@ -229,29 +228,17 @@ export default async function decorate(block) {
     let itemHtml;
     if (isSearch) {
       itemHtml = `
-      <div class="search-resultslist-item">
-        <div class="search-resultslist-item-header">
+      <div class="search-results-item">
+        <div class="search-results-item-published-date">
+          ${getHumanReadableDate(e.publisheddatems)}
+        </div>
+        <div class="search-results-item-title">
           <a href="${e.path}">${e.title}</a>
         </div>
-        <div class="search-resultslist-item-content">${e.matchedToken || e.subtitle}</div>
-        <div class="search-resultslist-item-details">
-          <a href="/users/${convertToKebabCase(e.author)}">${e.author}</a> - ${getHumanReadableDate(e.publisheddate)}
-        </div>
+        <div class="search-results-item-content">${e.description}</div>
       </div>
 
       `;
-    } else if (key && value) {
-      itemHtml = `
-      <div class="resultslist-item">
-        <div class="resultslist-item-header">
-          <a href="${e.path}">${e.title}</a>
-        </div>
-        <div class="resultslist-item-content">${e.subtitle}</div>
-        <div class="resultslist-item-details">
-          ${e.publisheddate} &nbsp;&nbsp;
-        </div>
-      </div>
-    `;
     } else {
       itemHtml = `
         <div class="newslist-item">
