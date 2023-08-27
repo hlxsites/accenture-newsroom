@@ -78,7 +78,9 @@ export default async function decorate(block) {
     if (sectionName === 'brand') {
       decorateButtons(section, { decorateClasses: false });
     } else if (sectionName === 'tools') {
-      decorateButtons(section);
+      section.innerHTML = `
+        <a href="/search" title="Search"> <div class="search-icon"></div> </a>
+      `;
     }
   });
 

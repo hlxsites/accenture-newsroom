@@ -30,6 +30,24 @@ header nav[aria-expanded="true"] {
   padding: 0;
 }
 
+header .nav-tools .search-icon {
+  font-size: 25px;
+}
+
+header .nav-tools .search-icon::before {
+  content: '';
+  display: inline-block;
+  font-family: var(--ionicons);
+  font-style: normal;
+  font-weight: normal;
+  font-variant: normal;
+  text-transform: none;
+  text-rendering: auto;
+  line-height: 1;
+  color: #000;
+  -webkit-font-smoothing: antialiased;
+}
+
 header .nav-brand {
   grid-area: brand;
   font-size: var(--heading-font-size-s);

@@ -216,15 +216,16 @@ export default async function decorate(block) {
     const newsListHeader = document.createElement('div');
     newsListHeader.classList.add('newslist-header-container');
     newsListHeader.innerHTML = `
-    <label for="newslist-search-input">Search</label>
       <form action="/search" method="get" id="newslist-search-form">
+        <label for="newslist-search-input">Search</label>
         <input type="text" id="newslist-search-input" title="Keywords" name="q" value="" size="40" maxlength="60">
         <input type="submit" value="Search">
       </form>
-      <label for="newslist-filter-input">Filter News</label>
+      
       <form action="${location.pathname}" method="get" id="filter-form">
-        <input type="date" id="newslist-filter-input" title="Date" name="date" value="" size="40" maxlength="60">
-        <input type="submit" value="Filter">
+        <label for="newslist-filter-input">Filter News</label>
+        <input type="text" id="newslist-filter-input" title="Date Range" name="date" value="DATERANGE" size="40" maxlength="60" disabled>
+        <input type="submit" value="" disabled>
       </form>
     `;
     newsListContainer.append(newsListHeader);

@@ -210,6 +210,37 @@
   line-height: 1.6;
 }
 
+#filter-form {
+  width: 190px;
+}
+
+#filter-form input[type='submit'] {
+  cursor: pointer;
+  width: 40px;
+  height: 40px;
+  color: transparent;
+  border: none;
+  background: url('/icons/calendar-icon.svg') no-repeat center;
+  margin-left: -50px;
+  margin-top: 5px;
+}
+
+#newslist-filter-input {
+  font-family: var(--graphik-semibold);
+  font-style: normal;
+  font-size: 18px;
+  font-weight: 600;
+  line-height: 37px;
+  width: 265px;
+  padding-left: 10px;
+  padding-right: 50px;
+  border: 1px solid #979797;
+  margin-left: 10px;
+  height: 50px;
+  color: #000;
+  text-transform: uppercase;
+}
+
 @media (min-width: 1000px) {
   .newslist.block {
     width: 100%;
@@ -225,6 +256,7 @@
   .newslist .newslist-container .newslist-header-container {
     grid-column: 1 / span 2;
     display: flex;
+    justify-content: space-between;
   }
 
   .newslist .newslist-container .newslist-header-container form {
@@ -249,11 +281,12 @@
     color: transparent;
     border: none;
     background: url('/icons/search-color-icon.svg') no-repeat center;
-    margin-left: -40px;
+    margin-left: -50px;
     margin-top: 5px;
   }
 
   #newslist-search-input {
+    width: 410px;
     height: 50px;
     margin-left: 10px;
     border: 1px solid #979797;
@@ -273,8 +306,12 @@
     font-weight: 400;
   }
 
-  #newslist-filter-input {
-    margin-left: 10px;
+  #filter-form {
+    width: 50%;
+  }
+
+  #filter-form label {
+    width: 120px;
   }
 
   .newslist .newslist-container .newslist-item {
