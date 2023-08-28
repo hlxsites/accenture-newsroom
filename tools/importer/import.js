@@ -44,7 +44,7 @@ const createMetadataBlock = (main, document, url) => {
     subjectTagsContainer.querySelectorAll('li').forEach((li) => {
       subjectTags.push(li.textContent.trim());
     });
-    meta.Subjects = subjectTags.join(', ');
+    meta.Subject = subjectTags.join(', ');
   }
   // helper to create the metadata block
   const block = WebImporter.Blocks.getMetadataBlock(document, meta);
