@@ -55,7 +55,7 @@ async function fetchIndex(indexURL = '/query-index.json') {
 
 function getHumanReadableDate(dateString) {
   if (!dateString) return dateString;
-  const date = new Date(parseInt(dateString));
+  const date = new Date(parseInt(dateString, 10));
   // display the date with two digits.
 
   return date.toLocaleDateString('en-US', {
@@ -90,7 +90,7 @@ function filterByDate(index, fromDate, toDate) {
   const to = new Date(toDate);
   if (from > to) return [];
   return index.filter((e) => {
-    const date = new Date(parseInt(e.publisheddatems));
+    const date = new Date(parseInt(e.publisheddatems, 10));
     return date >= from && date <= to;
   });
 }
@@ -119,19 +119,19 @@ function getPaginationGroups(totalPages, currentPage) {
   const MAX_ENTRIES = 7;
   if (totalPages <= MAX_ENTRIES) {
     const r = [];
-    for (let i = 1; i <= totalPages; i++) {
+    for (let i = 1; i <= totalPages; i += 1) {
       r.push(i);
     }
     return r;
   }
 
   const start = [];
-  const mid  = [];
+  const mid = [];
   const end = [];
 
   // Include initial pages
   if (currentPage < 5) {
-    for (let i = 1; i < Math.min(totalPages, 5); i++) {
+    for (let i = 1; i < Math.min(totalPages, 5); i += 1) {
       start.push(i);
     }
   } else {
@@ -141,7 +141,7 @@ function getPaginationGroups(totalPages, currentPage) {
 
   // Include middle page numbers with current, previous, and next page numbers
   if (currentPage >= 5 && currentPage < totalPages) {
-    for (let i = currentPage-1; i <= Math.min(currentPage + 1, totalPages); i++) {
+    for (let i = currentPage - 1; i <= Math.min(currentPage + 1, totalPages); i += 1) {
       mid.push(i);
     }
   }
@@ -160,15 +160,15 @@ function getPaginationGroups(totalPages, currentPage) {
       if (!midSetFirstElement) {
         mid.push(currentPage);
         midSetFirstElement = currentPage;
-        diff = diff - 1;
+        diff -= 1;
       }
-      for (let i = 1; i <= diff; i++) {
+      for (let i = 1; i <= diff; i += 1) {
         // add to the start of mid array
         mid.unshift(midSetFirstElement - i);
       }
     } else if (mid.length === 0) {
       const startSetSize = start.length;
-      for (let i = 1; i <= diff; i++) {
+      for (let i = 1; i <= diff; i += 1) {
         start.push(startSetSize + i);
       }
     }
@@ -180,7 +180,7 @@ function getPaginationGroups(totalPages, currentPage) {
 function getYears(index) {
   const years = [];
   index.forEach((e) => {
-    const date = new Date(parseInt(e.publisheddatems));
+    const date = new Date(parseInt(e.publisheddatems, 10));
     const year = date.getFullYear();
     if (!years.includes(year)) {
       years.push(year);
@@ -192,7 +192,7 @@ function getYears(index) {
 function filterByYear(index, year) {
   if (!year) return index;
   return index.filter((e) => {
-    const date = new Date(parseInt(e.publisheddatems));
+    const date = new Date(parseInt(e.publisheddatems, 10));
     return date.getFullYear() === parseInt(year, 10);
   });
 }
@@ -208,29 +208,27 @@ function collapseWhenOutofFocus(event) {
   }
 }
 
-
 function addEventListenerToYearPicker(newsListContainer) {
   const yearPicker = newsListContainer.querySelector('#newslist-filter-year');
-    yearPicker.addEventListener('click', (event) => {
-      const yearDropdown = yearPicker.querySelector('.newslist-filter-year-dropdown');
-      const isExpanded = yearDropdown.getAttribute('aria-expanded');
-      if (isExpanded === 'true') {
-        yearDropdown.setAttribute('aria-expanded', 'false');
-        window.removeEventListener('click', collapseWhenOutofFocus);
-      } else {
-        yearDropdown.setAttribute('aria-expanded', 'true');
-        window.addEventListener('click', collapseWhenOutofFocus);
-      }
+  yearPicker.addEventListener('click', () => {
+    const yearDropdown = yearPicker.querySelector('.newslist-filter-year-dropdown');
+    const isExpanded = yearDropdown.getAttribute('aria-expanded');
+    if (isExpanded === 'true') {
+      yearDropdown.setAttribute('aria-expanded', 'false');
+      window.removeEventListener('click', collapseWhenOutofFocus);
+    } else {
+      yearDropdown.setAttribute('aria-expanded', 'true');
+      window.addEventListener('click', collapseWhenOutofFocus);
+    }
+  });
+  const yearItems = newsListContainer.querySelectorAll('.newslist-filter-year-item');
+  yearItems.forEach((item) => {
+    item.addEventListener('click', () => {
+      const year = item.getAttribute('value');
+      const yearUrl = addParam('year', year);
+      window.location.href = yearUrl;
     });
-    const yearItems = newsListContainer.querySelectorAll('.newslist-filter-year-item');
-    yearItems.forEach((item) => {
-      item.addEventListener('click', (event) => {
-        const yearDropdown = yearPicker.querySelector('.newslist-filter-year-dropdown');
-        const year = item.getAttribute('value');
-        const yearUrl = addParam('year', year);
-        window.location.href = yearUrl;
-      });
-    });
+  });
 }
 
 export default async function decorate(block) {
@@ -245,7 +243,7 @@ export default async function decorate(block) {
   const l = offset + limit;
   const cfg = readBlockConfig(block);
   const key = Object.keys(cfg)[0];
-  let value = Object.values(cfg)[0];
+  const value = Object.values(cfg)[0];
   const isSearch = key === 'query';
   const index = await fetchIndex();
   let shortIndex = index;
@@ -286,20 +284,18 @@ export default async function decorate(block) {
       return false;
     });
     const years = getYears(shortIndex);
-    let options = years.map((y) => {
-      return `<div class="newslist-filter-year-item" value="${y}" >${y}</div>`;
-    }).join('');
+    let options = years.map((y) => (`<div class="newslist-filter-year-item" value="${y}" >${y}</div>`)).join('');
     options = `<div class="newslist-filter-year-item" value="" >YEAR</div> ${options}`;
     // prepend filter form and year picker
     const newsListHeader = document.createElement('div');
     newsListHeader.classList.add('newslist-header-container');
     newsListHeader.innerHTML = `
-      <form action="${location.pathname}" method="get" id="filter-form">
+      <form action="${window.location.pathname}" method="get" id="filter-form">
         <label for="newslist-filter-input">Filter News</label>
         <input type="text" id="newslist-filter-input" title="Date Range" name="date" value="DATERANGE" size="40" maxlength="60" disabled>
         <input type="submit" value="" disabled>
         <div id="newslist-filter-year" name="year">
-          ${year ? year : "YEAR"}
+          ${year || 'YEAR'}
           <div class="newslist-filter-year-dropdown">
             ${options}
           </div>
@@ -308,9 +304,9 @@ export default async function decorate(block) {
     `;
     newsListContainer.append(newsListHeader);
     if (fromDate && toDate) {
-      shortIndex = filterByDate(index, fromDate, toDate);
+      shortIndex = filterByDate(shortIndex, fromDate, toDate);
     } else if (year) {
-      shortIndex = filterByYear(index, year);
+      shortIndex = filterByYear(shortIndex, year);
     }
   } else {
     // prepend search form and date picker
@@ -323,7 +319,7 @@ export default async function decorate(block) {
         <input type="submit" value="Search">
       </form>
       
-      <form action="${location.pathname}" method="get" id="filter-form">
+      <form action="${window.location.pathname}" method="get" id="filter-form">
         <label for="newslist-filter-input">Filter News</label>
         <input type="text" id="newslist-filter-input" title="Date Range" name="date" value="DATERANGE" size="40" maxlength="60" disabled>
         <input type="submit" value="" disabled>
@@ -334,10 +330,6 @@ export default async function decorate(block) {
       shortIndex = filterByDate(index, fromDate, toDate);
     }
   }
-  // simulate more content for testing
-  shortIndex = [...shortIndex, ...shortIndex, ...shortIndex, ...shortIndex, ...shortIndex];
-  shortIndex = [...shortIndex, ...shortIndex, ...shortIndex, ...shortIndex, ...shortIndex];
-  shortIndex = [...shortIndex, ...shortIndex, ...shortIndex, ...shortIndex, ...shortIndex];
 
   const range = document.createRange();
   for (let i = offset; i < l && i < shortIndex.length; i += 1) {
@@ -389,10 +381,9 @@ export default async function decorate(block) {
   if (shortIndex.length > 10) {
     const totalPages = Math.ceil(shortIndex.length / 10);
     const paginationGroups = getPaginationGroups(totalPages, pageOffset);
-    console.log(paginationGroups);
     const paginationContainer = document.createElement('div');
     paginationContainer.classList.add('newslist-pagination-container');
-    for (let i = 0; i < paginationGroups.length; i++) {
+    for (let i = 0; i < paginationGroups.length; i += 1) {
       const pageGroup = paginationGroups[i];
       pageGroup.forEach((pageNumber) => {
         const pageUrl = addParam('page', pageNumber);
@@ -405,7 +396,7 @@ export default async function decorate(block) {
         }
         paginationContainer.append(pageLink);
       });
-      if (i < paginationGroups.length - 1 && paginationGroups[i+1].length > 0) {
+      if (i < paginationGroups.length - 1 && paginationGroups[i + 1].length > 0) {
         const ellipsis = document.createElement('a');
         ellipsis.setAttribute('href', '#');
         ellipsis.classList.add('pagination-ellipsis');
@@ -414,21 +405,21 @@ export default async function decorate(block) {
       }
     }
     const prev = document.createElement('a');
-    if (pageOffset == 1) {
-      prev.setAttribute('aria-disabled', 'true')
+    if (pageOffset === 1) {
+      prev.setAttribute('aria-disabled', 'true');
     } else {
       prev.setAttribute('href', addParam('page', pageOffset - 1));
     }
     prev.classList.add('pagination-prev');
-    prev.innerHTML = `<span class="pagination-prev-arrow"/>`;
+    prev.innerHTML = '<span class="pagination-prev-arrow"/>';
     paginationContainer.prepend(prev);
     const next = document.createElement('a');
-    if (pageOffset == totalPages) {
-      next.setAttribute('aria-disabled', 'true')
+    if (pageOffset === totalPages) {
+      next.setAttribute('aria-disabled', 'true');
     } else {
       next.setAttribute('href', addParam('page', pageOffset + 1));
-    } 
-    next.innerHTML = `<span class="pagination-next-arrow"/>`;
+    }
+    next.innerHTML = '<span class="pagination-next-arrow"/>';
     next.classList.add('pagination-next');
     paginationContainer.append(next);
     block.append(paginationContainer);
