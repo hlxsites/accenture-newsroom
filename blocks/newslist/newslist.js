@@ -274,8 +274,13 @@ export default async function decorate(block) {
     }
     newsListContainer.append(searchHeader);
   } else if (key && value) {
-    shortIndex = index.filter((e) => (e[key.trim()].toLowerCase()
-      === value.trim().toLowerCase()));
+    shortIndex = index.filter((e) => {
+      const values = e[key.trim()].toLowerCase().split(',').map((v) => v.trim());
+      if (values.includes(value.trim().toLowerCase())) {
+        return true;
+      }
+      return false;
+    });
     const years = getYears(shortIndex);
     let options = years.map((y) => {
       return `<div class="newslist-filter-year-item" value="${y}" >${y}</div>`;
@@ -372,7 +377,9 @@ export default async function decorate(block) {
   }
   block.innerHTML = newsListContainer.outerHTML;
 
-  addEventListenerToYearPicker(block);
+  if (key && value) {
+    addEventListenerToYearPicker(block);
+  }
 
   // add pagination information
   if (shortIndex.length > 10) {
