@@ -1,6 +1,6 @@
 /* eslint-disable no-undef */
 
-const isCategoryPage = (url) => (url.includes('/industry/') || url.includes('/subjects/'));
+const isCategoryPage = (url) => (url.includes('/industries/') || url.includes('/subjects/'));
 
 const createMetadataBlock = (main, document, url) => {
   const meta = {};
@@ -82,7 +82,7 @@ const createNewsListBlock = (main, document, url) => {
   if (titleEl) {
     title = titleEl.textContent.trim();
   }
-  if (url.includes('/industry/')) {
+  if (url.includes('/industries/')) {
     cells.push(['Industry', title]);
   } else if (url.includes('/subjects/')) {
     cells.push(['Subjects', title]);
