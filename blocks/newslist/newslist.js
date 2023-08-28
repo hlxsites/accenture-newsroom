@@ -96,7 +96,12 @@ function filterByDate(index, fromDate, toDate) {
  */
 function addParam(name, value) {
   const usp = new URLSearchParams(window.location.search);
-  usp.set(name, value);
+  if (name && value) {
+    usp.set(name, value);
+  }
+  if (!value) {
+    usp.delete(name);
+  }
   return `${window.location.pathname}?${usp.toString()}`;
 }
 
@@ -168,12 +173,69 @@ function getPaginationGroups(totalPages, currentPage) {
   return result;
 }
 
+function getYears(index) {
+  const years = [];
+  index.forEach((e) => {
+    const date = new Date(parseInt(e.publisheddatems));
+    const year = date.getFullYear();
+    if (!years.includes(year)) {
+      years.push(year);
+    }
+  });
+  return years;
+}
+
+function filterByYear(index, year) {
+  if (!year) return index;
+  return index.filter((e) => {
+    const date = new Date(parseInt(e.publisheddatems));
+    return date.getFullYear() === parseInt(year, 10);
+  });
+}
+
+function collapseWhenOutofFocus(event) {
+  if (!event.target.closest('#newslist-filter-year')) {
+    const yearPicker = document.querySelector('#newslist-filter-year');
+    const yearDropdown = yearPicker.querySelector('.newslist-filter-year-dropdown');
+    const isExpanded = yearDropdown.getAttribute('aria-expanded');
+    if (isExpanded) {
+      yearDropdown.setAttribute('aria-expanded', 'false');
+    }
+  }
+}
+
+
+function addEventListenerToYearPicker(newsListContainer) {
+  const yearPicker = newsListContainer.querySelector('#newslist-filter-year');
+    yearPicker.addEventListener('click', (event) => {
+      const yearDropdown = yearPicker.querySelector('.newslist-filter-year-dropdown');
+      const isExpanded = yearDropdown.getAttribute('aria-expanded');
+      if (isExpanded === 'true') {
+        yearDropdown.setAttribute('aria-expanded', 'false');
+        window.removeEventListener('click', collapseWhenOutofFocus);
+      } else {
+        yearDropdown.setAttribute('aria-expanded', 'true');
+        window.addEventListener('click', collapseWhenOutofFocus);
+      }
+    });
+    const yearItems = newsListContainer.querySelectorAll('.newslist-filter-year-item');
+    yearItems.forEach((item) => {
+      item.addEventListener('click', (event) => {
+        const yearDropdown = yearPicker.querySelector('.newslist-filter-year-dropdown');
+        const year = item.getAttribute('value');
+        const yearUrl = addParam('year', year);
+        window.location.href = yearUrl;
+      });
+    });
+}
+
 export default async function decorate(block) {
   const limit = 10;
   // get request parameter page as limit
   const usp = new URLSearchParams(window.location.search);
   const fromDate = usp.get('from_date');
   const toDate = usp.get('to_date');
+  const year = usp.get('year');
   const pageOffset = parseInt(usp.get('page'), 10) || 1;
   const offset = (Math.max(pageOffset, 1) - 1) * 10;
   const l = offset + limit;
@@ -211,6 +273,36 @@ export default async function decorate(block) {
       searchHeader.innerHTML = form;
     }
     newsListContainer.append(searchHeader);
+  } else if (key && value) {
+    shortIndex = index.filter((e) => (e[key.trim()].toLowerCase()
+      === value.trim().toLowerCase()));
+    const years = getYears(shortIndex);
+    let options = years.map((y) => {
+      return `<div class="newslist-filter-year-item" value="${y}" >${y}</div>`;
+    }).join('');
+    options = `<div class="newslist-filter-year-item" value="" >YEAR</div> ${options}`;
+    // prepend filter form and year picker
+    const newsListHeader = document.createElement('div');
+    newsListHeader.classList.add('newslist-header-container');
+    newsListHeader.innerHTML = `
+      <form action="${location.pathname}" method="get" id="filter-form">
+        <label for="newslist-filter-input">Filter News</label>
+        <input type="text" id="newslist-filter-input" title="Date Range" name="date" value="DATERANGE" size="40" maxlength="60" disabled>
+        <input type="submit" value="" disabled>
+        <div id="newslist-filter-year" name="year">
+          ${year ? year : "YEAR"}
+          <div class="newslist-filter-year-dropdown">
+            ${options}
+          </div>
+        </div>
+      </form>
+    `;
+    newsListContainer.append(newsListHeader);
+    if (fromDate && toDate) {
+      shortIndex = filterByDate(index, fromDate, toDate);
+    } else if (year) {
+      shortIndex = filterByYear(index, year);
+    }
   } else {
     // prepend search form and date picker
     const newsListHeader = document.createElement('div');
@@ -279,6 +371,8 @@ export default async function decorate(block) {
     newsListContainer.append(item);
   }
   block.innerHTML = newsListContainer.outerHTML;
+
+  addEventListenerToYearPicker(block);
 
   // add pagination information
   if (shortIndex.length > 10) {

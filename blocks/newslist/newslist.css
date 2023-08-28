@@ -241,6 +241,77 @@
   text-transform: uppercase;
 }
 
+#newslist-filter-year {
+  box-sizing: border-box;
+  padding-top: 5px;
+  padding-left: 15px;
+  padding-right: 10px;
+  text-transform: uppercase;
+  font-family: var(--graphik-semibold);
+  font-size: 18px;
+  font-weight: 600;
+  color: #000;
+  line-height: 40px;
+  height: 50px;
+  border: 1px solid #979797;
+  border-radius: 0px;
+  position: relative;
+}
+
+#newslist-filter-year::after {
+  content: "";
+  vertical-align: middle;
+  border-top: 4px dashed;
+  border-top: 4px solid;
+  border-right: 4px solid transparent;
+  border-left: 4px solid transparent;
+  width: 0;
+  height: 0;
+  font-style: normal;
+  font-weight: 400;
+  font-variant: normal;
+  text-transform: none;
+  line-height: 1;
+  margin: 0;
+  text-decoration: none;
+  float: right;
+  margin-top: 18px;
+}
+
+#newslist-filter-year .newslist-filter-year-dropdown {
+  display: none;
+}
+
+#newslist-filter-year .newslist-filter-year-dropdown[aria-expanded='true'] {
+  position: absolute;
+  width: 100%;
+  max-height: 300px;
+  padding: 10px;
+  display: block;
+  z-index: 10;
+  background-color: #fff;
+  left: 0;
+  top: 50px;
+  margin: 2px 0 0;
+  font-size: 14px;
+  text-align: left;
+  border: 1px solid rgba(0,0,0,.15);
+  border-radius: 4px;
+  box-sizing: border-box;
+}
+
+#newslist-filter-year .newslist-filter-year-dropdown[aria-expanded='true'] .newslist-filter-year-item {
+  cursor: pointer;
+  padding-top: 5px;
+  text-transform: uppercase;
+  font-family: var(--graphik-semibold);
+  font-size: 18px;
+  font-weight: 600;
+  color: #000;
+  height: 52px;
+}
+
+
 @media (min-width: 1000px) {
   .newslist.block {
     width: 100%;
@@ -256,7 +327,6 @@
   .newslist .newslist-container .newslist-header-container {
     grid-column: 1 / span 2;
     display: flex;
-    justify-content: space-between;
   }
 
   .newslist .newslist-container .newslist-header-container form {
@@ -306,8 +376,17 @@
     font-weight: 400;
   }
 
-  #filter-form {
+  #newslist-search-form {
     width: 50%;
+  }
+
+  #newslist-filter-year {
+    width: 370px;
+    margin-left: 258px;
+  }
+
+  #filter-form {
+    width: auto;
   }
 
   #filter-form label {
