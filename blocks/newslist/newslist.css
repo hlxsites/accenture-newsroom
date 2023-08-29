@@ -227,9 +227,7 @@
   height: 18px;
   color: transparent;
   border: none;
-  background-color: transparent;
-  background-position: center center;
-  background: transparent url('/icons/calendar-arrow-icon.svg') -12px -8px no-repeat;
+  background: transparent url('/icons/calendar-arrow-icon.svg') -9px -11px no-repeat;
   margin-left: 10px;
   margin-top: 3px;
   transition: all .5s ease;
@@ -245,7 +243,7 @@
   height: 40px;
   color: transparent;
   border: none;
-  background: url(/icons/calendar-icon.svg) no-repeat center;
+  background: url('/icons/calendar-icon.svg') no-repeat center;
   margin-left: -44px;
   margin-top: 4px;
   display: none;

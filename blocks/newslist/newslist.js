@@ -294,7 +294,7 @@ export default async function decorate(block) {
       ${form}
       <h2>Results for "${query}"</h2>
       <div class="search-sub-header">
-        <h3> ${shortIndex.length > 0 ? 'ALL RESULTS' : '0 RESULTS WERE FOUND' } </h3>
+        <h3> ${shortIndex.length > 0 ? 'ALL RESULTS' : '0 RESULTS WERE FOUND'} </h3>
         <div class="search-sub-header-right">
           ${shortIndex.length > 0 ? `Showing ${offset + 1} - ${Math.min(l, shortIndex.length)} of ${shortIndex.length} results` : ''}
         </div>
