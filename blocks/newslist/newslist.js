@@ -231,6 +231,33 @@ function addEventListenerToYearPicker(newsListContainer) {
   });
 }
 
+function addEventListenerToFilterForm(block) {
+  const filterForm = block.querySelector('#filter-form');
+  const filterFormLabel = filterForm.querySelector('label');
+  const filterArrow = filterForm.querySelector('.newslist-filter-arrow');
+  const filterInput = filterForm.querySelector('#newslist-filter-input');
+  const filterFormSubmit = filterForm.querySelector('input[type="submit"]');
+  const filterYear = filterForm.querySelector('#newslist-filter-year');
+  filterFormLabel.addEventListener('click', () => {
+    const isActive = filterArrow.classList.contains('active');
+    if (isActive) {
+      filterArrow.classList.remove('active');
+      filterInput.style.display = 'none';
+      filterFormSubmit.style.display = 'none';
+      if (filterYear) {
+        filterYear.style.display = 'none';
+      }
+    } else {
+      filterArrow.classList.add('active');
+      filterInput.style.display = 'inline';
+      filterFormSubmit.style.display = 'inline';
+      if (filterYear) {
+        filterYear.style.display = 'inline-block';
+      }
+    }
+  });
+}
+
 export default async function decorate(block) {
   const limit = 10;
   // get request parameter page as limit
@@ -267,9 +294,11 @@ export default async function decorate(block) {
       ${form}
       <h2>Results for "${query}"</h2>
       <div class="search-sub-header">
-        <h3> ALL RESULTS </h3>
+        <h3> ${shortIndex.length > 0 ? 'ALL RESULTS' : '0 RESULTS WERE FOUND' } </h3>
         <div class="search-sub-header-right">
-        Showing ${offset + 1} - ${Math.min(l, shortIndex.length)} of ${shortIndex.length} results
+          ${shortIndex.length > 0 ? `Showing ${offset + 1} - ${Math.min(l, shortIndex.length)} of ${shortIndex.length} results` : ''}
+        </div>
+      </div>
       `;
     } else {
       searchHeader.innerHTML = form;
@@ -292,7 +321,8 @@ export default async function decorate(block) {
     newsListHeader.innerHTML = `
       <form action="${window.location.pathname}" method="get" id="filter-form">
         <label for="newslist-filter-input">Filter News</label>
-        <input type="text" id="newslist-filter-input" title="Date Range" name="date" value="DATERANGE" size="40" maxlength="60" disabled>
+        <span class="newslist-filter-arrow"></span>
+        <input type="text" id="newslist-filter-input" title="Date Range" name="date" value="DATE RANGE" size="40" maxlength="60" disabled>
         <input type="submit" value="" disabled>
         <div id="newslist-filter-year" name="year">
           ${year || 'YEAR'}
@@ -321,7 +351,8 @@ export default async function decorate(block) {
       
       <form action="${window.location.pathname}" method="get" id="filter-form">
         <label for="newslist-filter-input">Filter News</label>
-        <input type="text" id="newslist-filter-input" title="Date Range" name="date" value="DATERANGE" size="40" maxlength="60" disabled>
+        <span class="newslist-filter-arrow"></span>
+        <input type="text" id="newslist-filter-input" title="Date Range" name="date" value="DATE RANGE" size="40" maxlength="60" disabled>
         <input type="submit" value="" disabled>
       </form>
     `;
@@ -375,6 +406,9 @@ export default async function decorate(block) {
 
   if (key && value) {
     addEventListenerToYearPicker(block);
+  }
+  if (!isSearch) {
+    addEventListenerToFilterForm(block);
   }
 
   // add pagination information
