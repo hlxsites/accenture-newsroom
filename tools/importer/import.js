@@ -153,11 +153,19 @@ export default {
     // make proxy srcs for images
     makeProxySrcs(main);
 
-    const meta = createMetadataBlock(main, document, url);
+    // If contact info in right rail, move it to the bottom of the content
+    const authors = main.querySelectorAll('#tek-wrap-rightrail .wrap-feature.author .pad-bottom20');
+    if (authors && authors.length > 0) {
+      authors.forEach((author) => {
+        main.append(author);
+      });
+    }
 
     // remove right nav
     const rightNav = main.querySelector('#tek-wrap-rightrail');
     if (rightNav) rightNav.remove();
+
+    const meta = createMetadataBlock(main, document, url);
 
     if (isCategoryPage(url)) {
       createNewsListBlock(main, document, url);
