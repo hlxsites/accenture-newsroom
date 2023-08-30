@@ -148,10 +148,41 @@ export default {
     if (footer) footer.remove();
 
     // replace weird trailing backslash and ndash
-    main.innerHTML = main.innerHTML.replace(/&ndash;/g, '-').replace('<div style="text-align: center; background-image: none;"># # #</div>', '<br># # #');
+    main.innerHTML = main.innerHTML.replace(/&ndash;/g, '-')
+      .replaceAll('<br style="background-image: none;">', '<br>')
+      .replace('<div style="text-align: center; background-image: none;"># # #</div>', '<br># # #')
+      .replace('</strong> <br>', '</strong>')
+      .replaceAll(/&nbsp;<br>/g, '<br>');
 
     // make proxy srcs for images
     makeProxySrcs(main);
+
+    // convert title to h1 tag
+    const title = main.querySelector('#tek-wrap-centerwell article strong');
+    if (title) {
+      title.outerHTML = `<h1>${title.innerHTML}</h1>`;
+    }
+
+    // add section after abstract
+    // old page style
+    const abstracts = main.querySelectorAll('#tek-wrap-centerwell article #content-details p');
+    if (abstracts && (abstracts.length > 0)) {
+      // eslint-disable-next-line no-plusplus
+      for (let i = 0; i < abstracts.length; i++) {
+        const abstract = abstracts[i];
+        if (abstract.textContent.trim() !== '') {
+          abstract.after('---');
+          break;
+        }
+      }
+    } else {
+      // new page style
+      const newAbstract = main.querySelectorAll('#tek-wrap-centerwell article #content-details br');
+      if (newAbstract) {
+        newAbstract[2].after(document.createElement('br'));
+        newAbstract[2].after('---');
+      }
+    }
 
     // If contact info in right rail, move it to the bottom of the content
     const authors = main.querySelectorAll('#tek-wrap-rightrail .wrap-feature.author .pad-bottom20');
