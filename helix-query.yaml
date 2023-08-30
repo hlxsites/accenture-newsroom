@@ -24,15 +24,9 @@ indices:
       subjects:
         select: head > meta[name="subjects"]
         value: attribute(el, "content")
-      longdescription:
-        select: head > meta[name="longdescription"]
-        value: attribute(el, "content")
       publisheddateinseconds:
         select: head > meta[name="publisheddate"]
         value: parseTimestamp(attribute(el, 'content'), 'ddd, DD MMM YYYY hh:mm:ss.SSS GMT')
-      longdescription1:
-        select: main > div > p:nth-child(3)
-        value: match(innerHTML(el), '(.*?)<br><br>.*')
-      longdescription2:
-        select: main > div > p:nth-child(3)
+      longdescriptionextracted:
+        select: main > div:first-child
         value: innerHTML(el)
