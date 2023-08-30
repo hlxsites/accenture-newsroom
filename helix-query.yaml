@@ -1,0 +1,38 @@
+version: 1
+auto-generated: false
+indices:
+  default:
+    include:
+      - /**
+    target: /query-index.json
+    properties:
+      lastModified:
+        select: none
+        value: parseTimestamp(headers["last-modified"], "ddd, DD MMM YYYY hh:mm:ss GMT")
+      title:
+        select: head > meta[property="og:title"]
+        value: attribute(el, "content")
+      description:
+        select: head > meta[name="description"]
+        value: attribute(el, "content")
+      publisheddate:
+        select: head > meta[name="publisheddate"]
+        value: attribute(el, "content")
+      industries:
+        select: head > meta[name="industries"]
+        value: attribute(el, "content")
+      subjects:
+        select: head > meta[name="subjects"]
+        value: attribute(el, "content")
+      longdescription:
+        select: head > meta[name="longdescription"]
+        value: attribute(el, "content")
+      publisheddateinseconds:
+        select: head > meta[name="publisheddate"]
+        value: parseTimestamp(attribute(el, 'content'), 'ddd, DD MMM YYYY hh:mm:ss.SSS GMT')
+      longdescription1:
+        select: main > div > p:nth-child(3)
+        value: match(innerHTML(el), '(.*?)<br><br>.*')
+      longdescription2:
+        select: main > div > p:nth-child(3)
+        value: innerHTML(el)
