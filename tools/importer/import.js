@@ -110,6 +110,30 @@ const makeProxySrcs = (main, host = 'https://newsroom.accenture.com') => {
   });
 };
 
+const collectTextNodes = (node, list) => {
+  if (node.nodeType === Node.TEXT_NODE) {
+    list.push(node);
+  } else {
+    // eslint-disable-next-line no-restricted-syntax
+    for (const childNode of node.childNodes) {
+      collectTextNodes(childNode, list);
+    }
+  }
+};
+
+const findNextBrOrpNode = (node) => {
+  let currentNode = node.nextSibling;
+
+  // Check siblings first
+  while (currentNode !== null) {
+    if (currentNode.nodeName === 'BR' || currentNode.nodeName === 'P') {
+      return currentNode;
+    }
+    currentNode = currentNode.nextSibling;
+  }
+  return null; // No next <br> node found
+};
+
 export default {
   transform: ({
     // eslint-disable-next-line no-unused-vars
@@ -164,23 +188,21 @@ export default {
     }
 
     // add section after abstract
-    // old page style
-    const abstracts = main.querySelectorAll('#tek-wrap-centerwell article #content-details p');
-    if (abstracts && (abstracts.length > 0)) {
-      // eslint-disable-next-line no-plusplus
-      for (let i = 0; i < abstracts.length; i++) {
-        const abstract = abstracts[i];
-        if (abstract.textContent.trim() !== '') {
-          abstract.after('---');
-          break;
-        }
-      }
-    } else {
-      // new page style
-      const newAbstract = main.querySelectorAll('#tek-wrap-centerwell article #content-details br');
-      if (newAbstract) {
-        newAbstract[2].after(document.createElement('br'));
-        newAbstract[2].after('---');
+    const contentDetails = main.querySelector('#tek-wrap-centerwell article #content-details');
+    const abstractRegex = /(.*?);.*?(\d{4})|(.*?)(\d{4})\s+–\s+\b|(.*?)(\d{4})\s+-\s+\b/;
+    const contentDetailsTextNodes = [];
+    collectTextNodes(contentDetails, contentDetailsTextNodes);
+    const matchingParagraph = contentDetailsTextNodes.find(
+      (p) => abstractRegex.test(p.textContent),
+    );
+    if (matchingParagraph) {
+      const nextBrNode = findNextBrOrpNode(matchingParagraph);
+      if (nextBrNode) {
+        nextBrNode.after('---');
+      } else {
+        const brNode = document.createElement('br');
+        const insertedBrNode = matchingParagraph.parentElement.insertAdjacentElement('afterend', brNode);
+        insertedBrNode.after('---');
       }
     }
 
