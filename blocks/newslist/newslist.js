@@ -65,13 +65,25 @@ function getHumanReadableDate(dateString) {
   });
 }
 
-function getDescription(e) {
-  const { longdescriptionextracted } = e;
+/**
+ * In the longdescrptionextracted field, iterate over all the child nodes and
+ * check if the content matches with the regex, then return it as description.
+ * Oterwise return the description field.
+ * @param {*} queryIndexEntry
+ * @returns
+ */
+function getDescription(queryIndexEntry) {
+  const descriptionRegex = /(.*?);.*?(\d{4})/;
+  const { longdescriptionextracted } = queryIndexEntry;
   const div = document.createElement('div');
   div.innerHTML = longdescriptionextracted;
-  const longdescriptionEl = div.querySelector('h1+p');
-  const longdescription = longdescriptionEl ? longdescriptionEl.innerHTML : '';
-  return longdescription || e.description;
+  const longdescriptionElements = Array.from(div.querySelectorAll('p'));
+  const matchingParagraph = longdescriptionElements.find((p) => descriptionRegex.test(p.innerText));
+  const longdescription = matchingParagraph ? matchingParagraph.innerText : '';
+  if (queryIndexEntry.description.length > longdescription.length) {
+    return queryIndexEntry.description;
+  }
+  return longdescription;
 }
 
 function filterByQuery(index, query) {
