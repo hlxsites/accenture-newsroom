@@ -111,9 +111,9 @@ const makeProxySrcs = (main, host = 'https://newsroom.accenture.com') => {
 };
 
 const collectTextNodes = (node, list) => {
-  if (node.nodeType === Node.TEXT_NODE) {
+  if (node && node.nodeType && node.nodeType === Node.TEXT_NODE) {
     list.push(node);
-  } else {
+  } else if (node && node.childNodes) {
     // eslint-disable-next-line no-restricted-syntax
     for (const childNode of node.childNodes) {
       collectTextNodes(childNode, list);
@@ -204,6 +204,8 @@ export default {
         const insertedBrNode = matchingParagraph.parentElement.insertAdjacentElement('afterend', brNode);
         insertedBrNode.after('---');
       }
+    } else {
+      throw new Error('abstract not found');
     }
 
     // If contact info in right rail, move it to the bottom of the content
