@@ -233,6 +233,8 @@ async function loadEager(doc) {
   const main = doc.querySelector('main');
   if (main) {
     decorateMain(main);
+    // article processing
+    annotateArticleSections();
     document.body.classList.add('appear');
     await waitForLCP(LCP_BLOCKS);
   }
@@ -265,7 +267,6 @@ async function loadLazy(doc) {
   loadCSS(`${window.hlx.codeBasePath}/styles/lazy-styles.css`);
   loadFonts();
   // article processing
-  annotateArticleSections();
   addPrevNextLinksToArticles();
 
   sampleRUM('lazy');
