@@ -1,5 +1,5 @@
 /* header and nav layout */
-header {
+header .header.block {
   background-color: var(--background-color);
   width: 100%;
   z-index: 2;
@@ -397,7 +397,7 @@ header nav[aria-expanded="true"] .nav-tools {
     padding: 1.53em 10% 4.755em;
     position: absolute;
     left: 0;
-    margin: 12px 0 0 11px;
+    top: var(--nav-height);
     background-color: var(--background-color);
 
     /* stylelint-disable-next-line property-no-vendor-prefix */

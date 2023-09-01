@@ -1,57 +1,5 @@
 import { readBlockConfig } from '../../scripts/lib-franklin.js';
-
-/**
- * Traverse the whole json structure in data and replace '0' with empty string
- * @param {*} data
- * @returns updated data
- */
-function replaceEmptyValues(data) {
-  Object.keys(data).forEach((key) => {
-    if (typeof data[key] === 'object') {
-      replaceEmptyValues(data[key]);
-    } else if (data[key] === '0') {
-      data[key] = '';
-    }
-  });
-  return data;
-}
-
-function skipInternalPaths(jsonData) {
-  const internalPaths = ['/search', '/'];
-  const regexp = [/drafts\/.*/];
-  const templates = ['category'];
-  return jsonData.filter((row) => {
-    if (internalPaths.includes(row.path)) {
-      return false;
-    }
-    if (regexp.some((r) => r.test(row.path))) {
-      return false;
-    }
-    if (templates.includes(row.template)) {
-      return false;
-    }
-    return true;
-  });
-}
-
-async function fetchIndex(indexURL = '/query-index.json') {
-  if (window.queryIndex && window.queryIndex[indexURL]) {
-    return window.queryIndex[indexURL];
-  }
-  try {
-    const resp = await fetch(indexURL);
-    const json = await resp.json();
-    replaceEmptyValues(json.data);
-    const queryIndex = skipInternalPaths(json.data);
-    window.queryIndex = window.queryIndex || {};
-    window.queryIndex[indexURL] = queryIndex;
-    return queryIndex;
-  } catch (e) {
-    // eslint-disable-next-line no-console
-    console.log(`error while fetching ${indexURL}`, e);
-    return [];
-  }
-}
+import { fetchIndex } from '../../scripts/scripts.js';
 
 function getHumanReadableDate(dateString) {
   if (!dateString) return dateString;

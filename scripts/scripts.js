@@ -16,6 +16,59 @@ import {
 
 const LCP_BLOCKS = []; // add your LCP blocks to the list
 
+/**
+ * Traverse the whole json structure in data and replace '0' with empty string
+ * @param {*} data
+ * @returns updated data
+ */
+function replaceEmptyValues(data) {
+  Object.keys(data).forEach((key) => {
+    if (typeof data[key] === 'object') {
+      replaceEmptyValues(data[key]);
+    } else if (data[key] === '0') {
+      data[key] = '';
+    }
+  });
+  return data;
+}
+
+function skipInternalPaths(jsonData) {
+  const internalPaths = ['/search', '/'];
+  const regexp = [/drafts\/.*/];
+  const templates = ['category'];
+  return jsonData.filter((row) => {
+    if (internalPaths.includes(row.path)) {
+      return false;
+    }
+    if (regexp.some((r) => r.test(row.path))) {
+      return false;
+    }
+    if (templates.includes(row.template)) {
+      return false;
+    }
+    return true;
+  });
+}
+
+export async function fetchIndex(indexURL = '/query-index.json', limit = 1000) {
+  if (window.queryIndex && window.queryIndex[indexURL]) {
+    return window.queryIndex[indexURL];
+  }
+  try {
+    const resp = await fetch(`${indexURL}?limit=${limit}}`);
+    const json = await resp.json();
+    replaceEmptyValues(json.data);
+    const queryIndex = skipInternalPaths(json.data);
+    window.queryIndex = window.queryIndex || {};
+    window.queryIndex[indexURL] = queryIndex;
+    return queryIndex;
+  } catch (e) {
+    // eslint-disable-next-line no-console
+    console.log(`error while fetching ${indexURL}`, e);
+    return [];
+  }
+}
+
 // DOM helper
 export function createEl(name, attributes = {}, content = '', parentEl = null) {
   const el = document.createElement(name);
@@ -44,6 +97,40 @@ export function createEl(name, attributes = {}, content = '', parentEl = null) {
   return el;
 }
 
+async function addPrevNextLinksToArticles() {
+  const template = getMetadata('template');
+  const heroBlock = document.querySelector('.hero.block');
+  if (template !== 'Article' || !heroBlock) {
+    return;
+  }
+  const indexURL = '/query-index.json';
+  const limit = 10000;
+  const queryIndex = await fetchIndex(indexURL, limit);
+  // iterate queryIndex to find current article and add prev/next links
+  const currentArticlePath = window.location.pathname;
+  const currentArticleIndex = queryIndex.findIndex((row) => row.path === currentArticlePath);
+  if (currentArticleIndex === -1) {
+    return;
+  }
+  const prevArticle = queryIndex[currentArticleIndex + 1];
+  const nextArticle = queryIndex[currentArticleIndex - 1];
+  const heroLinkContainer = heroBlock.querySelector('.hero-link-container');
+  let prevLink = '';
+  let nextLink = '';
+  if (prevArticle) {
+    prevLink = createEl('a', { href: prevArticle.path, class: 'prev' }, 'Previous');
+  } else {
+    prevLink = createEl('a', { href: '#', class: 'prev disabled' }, 'Previous');
+  }
+  if (nextArticle) {
+    nextLink = createEl('a', { href: nextArticle.path, class: 'next' }, 'Next');
+  } else {
+    nextLink = createEl('a', { href: '#', class: 'next disabled' }, 'Next');
+  }
+  heroLinkContainer.append(prevLink);
+  heroLinkContainer.append(nextLink);
+}
+
 /**
  * Builds aside block and attaches it to main in a new section.
  * @param {Element} main The container element
@@ -55,6 +142,20 @@ function buildAsideBlock(main) {
     section.append(buildBlock('aside', { elems: [] }));
     main.append(section);
   }
+}
+
+/**
+ * Builds hero block and prepends to main in a new section.
+ * @param {Element} main The container element
+ */
+function buildHeroBlock(main) {
+  const template = getMetadata('template');
+  if (template === 'home' || window.location.pathname === '/') {
+    return;
+  }
+  const section = document.createElement('div');
+  section.append(buildBlock('hero', { elems: [] }));
+  main.prepend(section);
 }
 
 /**
@@ -76,6 +177,7 @@ async function loadFonts() {
 function buildAutoBlocks(main) {
   try {
     buildAsideBlock(main);
+    buildHeroBlock(main);
   } catch (error) {
     // eslint-disable-next-line no-console
     console.error('Auto Blocking failed', error);
@@ -137,6 +239,7 @@ async function loadLazy(doc) {
 
   loadCSS(`${window.hlx.codeBasePath}/styles/lazy-styles.css`);
   loadFonts();
+  addPrevNextLinksToArticles();
 
   sampleRUM('lazy');
   sampleRUM.observe(main.querySelectorAll('div[data-block-name]'));
