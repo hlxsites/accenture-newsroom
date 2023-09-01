@@ -114,9 +114,11 @@
   width: 92%;
   padding: 15px;
   border: 1px solid transparent;
-  border-radius: 0px;
-  -webkit-box-shadow: 0 1px 1px rgba(0, 0, 0, 0.05);
-  box-shadow: 0 1px 1px rgba(0, 0, 0, 0.05);
+  border-radius: 0;
+
+  /* stylelint-disable-next-line property-no-vendor-prefix */
+  -webkit-box-shadow: 0 1px 1px rgb(0 0 0 / 5%);
+  box-shadow: 0 1px 1px rgb(0 0 0 / 5%);
 }
 
 #search-input {
