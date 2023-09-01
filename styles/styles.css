@@ -260,6 +260,35 @@ main .section {
   padding: 64px 16px;
 }
 
+body.article main .section.abstract {
+  padding-bottom: 0;
+  padding-top: 0;
+}
+
+body.article main .section.abstract + .section {
+  padding-top: 0;
+}
+
+body.article main .section.abstract p.date {
+  font-family: var(--graphik-semibold);
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.33;
+  color: #000;
+  padding-bottom: 9px;
+  text-transform: uppercase;
+  margin: 0;
+}
+
+body.article main .section.abstract h1 {
+  text-align: center;
+  font-family: var(--header-font-family-regular);
+  font-weight: 700;
+  font-size: 1rem;
+  line-height: 1.6em;
+  margin: 0;
+}
+
 @media (min-width: 600px) {
   main .section {
     padding: 64px 32px;

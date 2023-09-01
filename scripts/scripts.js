@@ -16,6 +16,9 @@ import {
 
 const LCP_BLOCKS = []; // add your LCP blocks to the list
 
+// regex to find abstract paragraph
+export const ABSTRACT_REGEX = /(.*?);.*?(\d{4})|(.*?)(\d{4})\s+–\s+\b|(.*?)(\d{4})\s+-\s+\b/;
+
 /**
  * Traverse the whole json structure in data and replace '0' with empty string
  * @param {*} data
@@ -131,6 +134,28 @@ async function addPrevNextLinksToArticles() {
   heroLinkContainer.append(nextLink);
 }
 
+function annotateArticleSections() {
+  const template = getMetadata('template');
+  if (template !== 'Article') {
+    return;
+  }
+  const articleSections = document.querySelectorAll('main > .section');
+  articleSections.forEach((section) => {
+    const sectionText = section.innerText;
+    const isAbstract = ABSTRACT_REGEX.test(sectionText);
+    if (isAbstract) {
+      section.classList.add('abstract');
+      const h1 = section.querySelector('h1');
+      if (h1) {
+        const date = h1.previousSibling;
+        if (date) {
+          date.classList.add('date');
+        }
+      }
+    }
+  });
+}
+
 /**
  * Builds aside block and attaches it to main in a new section.
  * @param {Element} main The container element
@@ -239,6 +264,8 @@ async function loadLazy(doc) {
 
   loadCSS(`${window.hlx.codeBasePath}/styles/lazy-styles.css`);
   loadFonts();
+  // article processing
+  annotateArticleSections();
   addPrevNextLinksToArticles();
 
   sampleRUM('lazy');

@@ -1,5 +1,5 @@
 import { readBlockConfig } from '../../scripts/lib-franklin.js';
-import { fetchIndex } from '../../scripts/scripts.js';
+import { fetchIndex, ABSTRACT_REGEX } from '../../scripts/scripts.js';
 
 function getHumanReadableDate(dateString) {
   if (!dateString) return dateString;
@@ -21,12 +21,11 @@ function getHumanReadableDate(dateString) {
  * @returns
  */
 function getDescription(queryIndexEntry) {
-  const descriptionRegex = /(.*?);.*?(\d{4})/;
   const { longdescriptionextracted } = queryIndexEntry;
   const div = document.createElement('div');
   div.innerHTML = longdescriptionextracted;
   const longdescriptionElements = Array.from(div.querySelectorAll('p'));
-  const matchingParagraph = longdescriptionElements.find((p) => descriptionRegex.test(p.innerText));
+  const matchingParagraph = longdescriptionElements.find((p) => ABSTRACT_REGEX.test(p.innerText));
   const longdescription = matchingParagraph ? matchingParagraph.innerText : '';
   if (queryIndexEntry.description.length > longdescription.length) {
     return queryIndexEntry.description;
