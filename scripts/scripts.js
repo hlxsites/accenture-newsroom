@@ -37,7 +37,7 @@ function replaceEmptyValues(data) {
 
 function skipInternalPaths(jsonData) {
   const internalPaths = ['/search', '/'];
-  const regexp = [/drafts\/.*/];
+  const regexp = [/drafts\/.*/, /\/industries\/.*/, /\/subjects\/.*/];
   const templates = ['category'];
   return jsonData.filter((row) => {
     if (internalPaths.includes(row.path)) {
