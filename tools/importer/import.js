@@ -134,6 +134,17 @@ const findNextBrOrpNode = (node) => {
   return null; // No next <br> node found
 };
 
+const replaceSupSubElements = (main) => {
+  const sups = main.querySelectorAll('sup');
+  sups.forEach((sup) => {
+    sup.outerHTML = sup.textContent;
+  });
+  const subs = main.querySelectorAll('sub');
+  subs.forEach((sub) => {
+    sub.outerHTML = sub.textContent;
+  });
+};
+
 export default {
   transform: ({
     // eslint-disable-next-line no-unused-vars
@@ -216,11 +227,11 @@ export default {
       });
     }
 
+    const meta = createMetadataBlock(main, document, url);
+
     // remove right nav
     const rightNav = main.querySelector('#tek-wrap-rightrail');
     if (rightNav) rightNav.remove();
-
-    const meta = createMetadataBlock(main, document, url);
 
     if (isCategoryPage(url)) {
       createNewsListBlock(main, document, url);
@@ -229,6 +240,7 @@ export default {
         url = url.slice(0, -1);
       }
     }
+    replaceSupSubElements(main);
 
     if (meta.PublishedDate && url.includes('/news/')) {
       const publishedYear = new Date(meta.PublishedDate).getFullYear().toString().trim();
