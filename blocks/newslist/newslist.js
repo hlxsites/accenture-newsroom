@@ -4,9 +4,9 @@ import { fetchIndex, ABSTRACT_REGEX } from '../../scripts/scripts.js';
 function getHumanReadableDate(dateString) {
   if (!dateString) return dateString;
   const date = new Date(parseInt(dateString, 10));
-  // display the date with two digits.
-
+  // display the date in GMT timezone
   return date.toLocaleDateString('en-US', {
+    timeZone: 'GMT',
     year: 'numeric',
     month: 'long',
     day: '2-digit',
@@ -86,7 +86,7 @@ function getPaginationGroups(totalPages, currentPage) {
     for (let i = 1; i <= totalPages; i += 1) {
       r.push(i);
     }
-    return r;
+    return [r, [], []];
   }
 
   const start = [];
@@ -189,7 +189,7 @@ function addEventListenerToYearPicker(newsListContainer) {
   yearItems.forEach((item) => {
     item.addEventListener('click', () => {
       const year = item.getAttribute('value');
-      const yearUrl = addParam('year', year);
+      const yearUrl = `${window.location.pathname}?year=${year}`;
       window.location.href = yearUrl;
     });
   });

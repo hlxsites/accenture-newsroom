@@ -315,7 +315,7 @@ body.article main .section.abstract h1 {
     position: absolute;
     top: 160px;
     right: 5%;
-    padding-top: calc(var(--nav-height) + 50px);
+    padding-top: 0;
     max-width: 25%;
   }
 }
@@ -330,7 +330,7 @@ body.article main .section.abstract h1 {
     position: absolute;
     top: 160px;
     right: 0;
-    padding-top: calc(var(--nav-height) + 50px);
+    padding-top: 0;
     max-width: 350px;
   }
 }

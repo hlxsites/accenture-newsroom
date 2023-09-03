@@ -140,7 +140,9 @@ function annotateArticleSections() {
     return;
   }
   const articleSections = document.querySelectorAll('main > .section');
-  articleSections.forEach((section) => {
+
+  // eslint-disable-next-line no-restricted-syntax
+  for (const section of articleSections) {
     const sectionText = section.innerText;
     const isAbstract = ABSTRACT_REGEX.test(sectionText);
     if (isAbstract) {
@@ -152,8 +154,9 @@ function annotateArticleSections() {
           date.classList.add('date');
         }
       }
+      break;
     }
-  });
+  }
 }
 
 /**
