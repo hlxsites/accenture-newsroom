@@ -2,7 +2,7 @@ export default async function decorate(block) {
   const title = block.querySelector('h1');
   const overlayContainer = document.createElement('div');
   overlayContainer.classList.add('overlay-container');
-  block.querySelectorAll('em').forEach(element => {
+  block.querySelectorAll('em').forEach((element) => {
     const parent = element.parentNode;
     parent.innerHTML = element.innerHTML;
     overlayContainer.append(parent);

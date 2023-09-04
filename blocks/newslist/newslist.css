@@ -58,7 +58,7 @@
   height: 20px;
   width: 40px;
   line-height: 20px;
-  background: transparent url('/icons/arrow-icon.svg') no-repeat 0px -8px;
+  background: transparent url('/icons/arrow-icon.svg') no-repeat 0 -8px;
 }
 
 .newslist .newslist-container .newslist-item .newslist-item-footer .newslist-item-publisheddate {

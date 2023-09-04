@@ -8,8 +8,8 @@
 }
 
 .home-hero.block .home-hero-content-container {
-  height: 530px;
-  padding: 0px;
+  height: 246px;
+  padding: 0;
   z-index: 1;
   max-width: 75rem;
   margin: auto;
@@ -18,17 +18,20 @@
 .home-hero.block > div:first-child {
   background-size: cover;
   position: relative;
+  border-bottom: 0.063em solid #e3e3e3;
 }
+
 .home-hero.block h1 {
   font-family: var(--heading-font-family);
   color: #000;
-  font-size: 65px;
+  font-size: 36px;
   font-weight: 900;
   width: 200px;
-  margin-top: 0;
-  padding-top: 55px;
+  margin-top: 11px;
   margin-bottom: 10px;
   line-height: 1.1;
+  left: 4.25%;
+  position: relative;
 }
 
 .home-hero.block .home-hero-stripe {
@@ -43,25 +46,29 @@
 }
 
 .home-hero.block .overlay-container {
-  width: 46%;
-  max-width: 550px;
-  min-width: 450px;
-  height: auto;
-  border: 1px solid #cccccc;
-  border-top: 4px solid #6c2cb9;
-  position: relative;
   background-color: #fff;
+  padding: 0;
+  border: 1px solid #ccc;
+  border-top: 4px solid #6c2cb9;
+  width: 53.7%;
+  top: 25px;
+  height: auto;
+  min-height: 115px;
+  padding-left: 20px;
+  margin-left: -3px;
+  position: relative;
   z-index: 3;
-  top: 55px;
-  left: 4px;
-  padding: 0 20px;
+  min-width: 360px;
+  left: 5.25%;
+  max-width: 550px;
+  box-sizing: border-box;
 }
 
 .home-hero.block .overlay-container h2 {
   font-family: var(--graphik-semibold);
   color: #000;
-  font-size: 30px;
-  line-height: 30px;
+  font-size: 14px;
+  line-height: 1.83;
   margin-top: 20px;
   margin-bottom: 10px;
 }
@@ -74,17 +81,48 @@
   display: none;
 }
 
-.home-hero.block .home-hero-links-container ul li a::after,
-.home-hero.block .overlay-container a::after {
+.home-hero.block .overlay-container a::after,
+.home-hero.block .home-hero-links-container ul li a::after {
   content: '';
   display: inline-block;
   height: 20px;
   width: 40px;
   line-height: 20px;
-  background: transparent url('/icons/arrow-icon.svg') no-repeat 0px -8px;
+  background: transparent url('/icons/arrow-icon.svg') no-repeat 0 -8px;
 }
 
 @media (min-width: 1000px) {
+  .home-hero.block h1 {
+    font-size: 65px;
+    margin-top: 0;
+    padding-top: 55px;
+    line-height: 1.1;
+  }
+
+  .home-hero.block .home-hero-content-container {
+    height: 530px;
+  }
+
+  .home-hero.block .overlay-container {
+    width: 46%;
+    max-width: 550px;
+    min-width: 450px;
+    height: auto;
+    border: 1px solid #ccc;
+    border-top: 4px solid #6c2cb9;
+    position: relative;
+    background-color: #fff;
+    z-index: 3;
+    top: 55px;
+    left: 4px;
+    padding: 0 20px;
+  }
+
+  .home-hero.block .overlay-container h2 {
+    font-size: 30px;
+    line-height: 30px;
+  }
+
   .home-hero.block .home-hero-links-container {
     display: block;
     border-top: 4px solid #004dff;
