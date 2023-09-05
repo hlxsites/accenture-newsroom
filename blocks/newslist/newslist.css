@@ -1,5 +1,5 @@
 .section.newslist-container {
-  padding: 64px 15px;
+  padding: 0 15px 64px;
 }
 
 .newslist.block {
@@ -58,7 +58,7 @@
   height: 20px;
   width: 40px;
   line-height: 20px;
-  background: 'transparent url(/icons/arrow-icon.svg) no-repeat 0px -8px';
+  background: transparent url('/icons/arrow-icon.svg') no-repeat 0 -8px;
 }
 
 .newslist .newslist-container .newslist-item .newslist-item-footer .newslist-item-publisheddate {
@@ -112,6 +112,13 @@
 #search-form {
   display: flex;
   width: 92%;
+  padding: 15px;
+  border: 1px solid transparent;
+  border-radius: 0;
+
+  /* stylelint-disable-next-line property-no-vendor-prefix */
+  -webkit-box-shadow: 0 1px 1px rgb(0 0 0 / 5%);
+  box-shadow: 0 1px 1px rgb(0 0 0 / 5%);
 }
 
 #search-input {
@@ -151,13 +158,13 @@
   font-size: 30px;
   font-weight: bold;
   line-height: 1.1;
-  margin-top: 20px;
+  margin-top: 40px;
   margin-bottom: 50px;  
 }
 
 .search-header-container .search-sub-header {
   display: flex;
-  width: 66.66%;
+  width: 100%;
   justify-content: space-between;
   padding-bottom: 20px;
 }
@@ -177,7 +184,7 @@
 }
 
 .newslist .search-results-container .search-results-item {
-  width: 66.66%;
+  width: 100%;
   padding-top: 20px;
   padding-bottom: 10px;
   border-top: 2px solid #ccc;
@@ -211,8 +218,26 @@
   line-height: 1.6;
 }
 
-#filter-form {
-  width: 190px;
+#newslist-search-form {
+  display: none;
+}
+
+#filter-form .newslist-filter-arrow {
+  display: inline-block;
+  cursor: pointer;
+  transform: rotate(90deg);
+  width: 18px;
+  height: 18px;
+  color: transparent;
+  border: none;
+  background: transparent url('/icons/calendar-arrow-icon.svg') -9px -11px no-repeat;
+  margin-left: 10px;
+  margin-top: 3px;
+  transition: all .5s ease;
+}
+
+#filter-form .newslist-filter-arrow.active {
+  transform: rotate(-90deg);
 }
 
 #filter-form input[type='submit'] {
@@ -222,17 +247,20 @@
   color: transparent;
   border: none;
   background: url('/icons/calendar-icon.svg') no-repeat center;
-  margin-left: -50px;
-  margin-top: 5px;
+  margin-left: -44px;
+  margin-top: 4px;
+  display: none;
+  position: absolute;
 }
 
 #newslist-filter-input {
+  display: none;
   font-family: var(--graphik-semibold);
   font-style: normal;
   font-size: 18px;
   font-weight: 600;
   line-height: 37px;
-  width: 265px;
+  width: 190px;
   padding-left: 10px;
   padding-right: 50px;
   border: 1px solid #979797;
@@ -243,6 +271,8 @@
 }
 
 #newslist-filter-year {
+  display: none;
+  width: 110px;
   box-sizing: border-box;
   padding-top: 5px;
   padding-left: 15px;
@@ -257,6 +287,7 @@
   border: 1px solid #979797;
   border-radius: 0;
   position: relative;
+  margin-left: 5px;
 }
 
 #newslist-filter-year::after {
@@ -312,6 +343,17 @@
   height: 52px;
 }
 
+.newslist .newslist-container .newslist-header-container label {
+  font-family: var(--graphik-semibold);
+  padding-left: 15px;
+  margin-bottom: 5px;
+  font-size: 18px;
+  font-weight: 700;
+  line-height: 50px;
+  text-transform: uppercase;
+  color: #000;
+}
+
 
 @media (min-width: 1000px) {
   .newslist.block {
@@ -328,21 +370,15 @@
   .newslist .newslist-container .newslist-header-container {
     grid-column: 1 / span 2;
     display: flex;
+    border: 0.5px solid #ccc;
+    margin-bottom: 10px;
+    padding-top: 10px;
+    padding-bottom: 10px;
   }
 
   .newslist .newslist-container .newslist-header-container form {
     display: flex;
-  }
-
-  .newslist .newslist-container .newslist-header-container label {
-    font-family: var(--graphik-semibold);
-    padding-left: 15px;
-    margin-bottom: 5px;
-    font-size: 18px;
-    font-weight: 700;
-    line-height: 50px;
-    text-transform: uppercase;
-    color: #000;
+    align-items: center;
   }
 
   #newslist-search-form input[type='submit'] {
@@ -351,15 +387,15 @@
     height: 40px;
     color: transparent;
     border: none;
-    background: url('/icons/search-color-icon.svg') no-repeat center;
+    background: url('/icons/search-color-icon.svg') no-repeat -2px 8px;
     margin-left: -50px;
-    margin-top: 5px;
   }
 
   #newslist-search-input {
     width: 410px;
     height: 50px;
     margin-left: 10px;
+    margin-bottom: 0;
     border: 1px solid #979797;
     font-style: normal;
     padding-left: 10px;
@@ -378,10 +414,20 @@
   }
 
   #newslist-search-form {
+    display: flex;
     width: 50%;
   }
 
+  .newslist .search-results-container .search-results-item {
+    width: 66.66%;
+  }
+
+  .search-header-container .search-sub-header {
+    width: 66.66%;
+  }
+
   #newslist-filter-year {
+    display: block;
     width: 370px;
     margin-left: 258px;
   }
@@ -392,6 +438,21 @@
 
   #filter-form label {
     width: 120px;
+  }
+
+  #filter-form input[type='submit'] {
+    display: inline;
+    position: relative;
+  }
+
+  #newslist-filter-input {
+    display: inline;
+    width: 265px;
+    margin-bottom: 0;
+  }
+
+  #filter-form .newslist-filter-arrow {
+    display: none;
   }
 
   .newslist .newslist-container .newslist-item {

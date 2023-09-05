@@ -1,39 +1,119 @@
 /* block specific CSS goes here */
 
-main .hero-container > div {
-  max-width: unset;
-}
-  
-main .hero-container {
-  padding: 0;
-}
-  
-main .hero {
-  position: relative;
-  padding: 32px;
-  min-height: 300px;
-}
-
-main .hero h1 {
-  max-width: 1200px;
-  margin-left: auto;
-  margin-right: auto;
-  color: white;
-}
-
-main .hero picture {
-  position: absolute;
-  z-index: -1;
-  top: 0;
-  left: 0;
-  bottom: 0;
-  right: 0;
-  object-fit: cover;
-  box-sizing: border-box;
-}
-
-main .hero img {
-  object-fit: cover;
+.section.hero-container {
   width: 100%;
-  height: 100%;
+  background-color:#d8d8d8;
+  padding: 0 20px 10px;
+  box-sizing: border-box;
+  margin-bottom: 20px;
+}
+
+.hero.block h1 {
+  font-family: var(--heading-font-family);
+  font-size: 36px;
+  font-weight: 900;
+  line-height: 1;
+  color: #000;
+  margin: 8px 0 10px;
+  padding: 25px 0 10px;
+}
+
+.hero.block h2 {
+  width: 50%;
+  font-family: var(--graphik-semibold);
+  font-size: 22px;
+  font-weight: bold;
+  color: #004dff;
+  line-height: 15px;
+  margin: 0;
+  padding-top: 15px;
+}
+
+.hero.block .hero-link-container {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  height: 62px;
+}
+
+.hero.block .hero-link-container a {
+  font-family: var(--subheading-font-family);
+  font-size: 16px;
+  font-weight: bold;
+  padding-left: 11px;
+  line-height: 52px;
+  margin: 10px 0 0 15px;
+}
+
+.hero.block .hero-link-container a.next::after,
+.hero.block .hero-link-container a.prev::before {
+  content: '\e900';
+  width: 40px;
+  height: 40px;
+  display: inline-block;
+  vertical-align: middle;
+  font-family: var(--icomoon);
+  font-size: 40px;
+  line-height: 1;
+  font-style: normal;
+  font-weight: normal;
+  font-variant: normal;
+
+  /* stylelint-disable-next-line property-no-vendor-prefix */
+  -webkit-font-smoothing: antialiased;
+}
+
+.hero.block .hero-link-container a.disabled,
+.hero.block .hero-link-container a.disabled::before,
+.hero.block .hero-link-container a.disabled::after {
+  color: #96aee3;
+}
+
+.hero.block .hero-link-container a.prev::before {
+
+  /* stylelint-disable-next-line property-no-vendor-prefix */
+  -webkit-transform: rotateY(180deg);
+
+  /* stylelint-disable-next-line property-no-vendor-prefix */
+  -ms-transform: rotateY(180deg);
+  transform: rotateY(180deg);
+}
+
+@media (min-width: 768px) {
+  .section.hero-container {
+    padding: 47px 65px 50px 67px;
+  }
+
+  body.article .hero.block {
+    display: flex;
+    justify-content: space-between;
+    padding-bottom: 30px;
+    height: 62px;
+  }
+
+  body.article main .section.hero-container {
+    position: relative;
+    width: 100vw;
+    max-width: 100vw;
+    padding: 47px 65px 0 67px;
+  }
+
+  .hero.block h1 {
+    font-size: 58px;
+  }
+
+  .hero.block h2 {
+    line-height: 28px;
+    margin: 0 0 10px;
+  }
+
+  .hero.block .hero-link-container {
+    gap: 6em;
+  }
+}
+
+@media (min-width: 1200px) {
+  body.article main .section.hero-container {
+    margin-left: calc((1200px - 100vw) / 2);
+  }
 }

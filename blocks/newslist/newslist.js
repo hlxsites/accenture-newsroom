@@ -1,68 +1,36 @@
 import { readBlockConfig } from '../../scripts/lib-franklin.js';
-
-/**
- * Traverse the whole json structure in data and replace '0' with empty string
- * @param {*} data
- * @returns updated data
- */
-function replaceEmptyValues(data) {
-  Object.keys(data).forEach((key) => {
-    if (typeof data[key] === 'object') {
-      replaceEmptyValues(data[key]);
-    } else if (data[key] === '0') {
-      data[key] = '';
-    }
-  });
-  return data;
-}
-
-function skipInternalPaths(jsonData) {
-  const internalPaths = ['/search', '/'];
-  const regexp = [/drafts\/.*/];
-  const templates = ['category'];
-  return jsonData.filter((row) => {
-    if (internalPaths.includes(row.path)) {
-      return false;
-    }
-    if (regexp.some((r) => r.test(row.path))) {
-      return false;
-    }
-    if (templates.includes(row.template)) {
-      return false;
-    }
-    return true;
-  });
-}
-
-async function fetchIndex(indexURL = '/query-index.json') {
-  if (window.queryIndex && window.queryIndex[indexURL]) {
-    return window.queryIndex[indexURL];
-  }
-  try {
-    const resp = await fetch(indexURL);
-    const json = await resp.json();
-    replaceEmptyValues(json.data);
-    const queryIndex = skipInternalPaths(json.data);
-    window.queryIndex = window.queryIndex || {};
-    window.queryIndex[indexURL] = queryIndex;
-    return queryIndex;
-  } catch (e) {
-    // eslint-disable-next-line no-console
-    console.log(`error while fetching ${indexURL}`, e);
-    return [];
-  }
-}
+import { fetchIndex, ABSTRACT_REGEX } from '../../scripts/scripts.js';
 
 function getHumanReadableDate(dateString) {
   if (!dateString) return dateString;
   const date = new Date(parseInt(dateString, 10));
-  // display the date with two digits.
-
+  // display the date in GMT timezone
   return date.toLocaleDateString('en-US', {
+    timeZone: 'GMT',
     year: 'numeric',
     month: 'long',
     day: '2-digit',
   });
+}
+
+/**
+ * In the longdescrptionextracted field, iterate over all the child nodes and
+ * check if the content matches with the regex, then return it as description.
+ * Oterwise return the description field.
+ * @param {*} queryIndexEntry
+ * @returns
+ */
+function getDescription(queryIndexEntry) {
+  const { longdescriptionextracted } = queryIndexEntry;
+  const div = document.createElement('div');
+  div.innerHTML = longdescriptionextracted;
+  const longdescriptionElements = Array.from(div.querySelectorAll('p'));
+  const matchingParagraph = longdescriptionElements.find((p) => ABSTRACT_REGEX.test(p.innerText));
+  const longdescription = matchingParagraph ? matchingParagraph.innerText : '';
+  if (queryIndexEntry.description.length > longdescription.length) {
+    return queryIndexEntry.description;
+  }
+  return longdescription;
 }
 
 function filterByQuery(index, query) {
@@ -70,13 +38,9 @@ function filterByQuery(index, query) {
   const queryTokens = query.split(' ');
   return index.filter((e) => {
     const title = e.title.toLowerCase();
-    const description = e.description.toLowerCase();
+    const longdescription = getDescription(e).toLowerCase();
     return queryTokens.every((token) => {
-      if (description.includes(token)) {
-        return true;
-      }
-      if (title.includes(token)) {
-        e.matchedToken = `... ${title} ...`;
+      if (title.includes(token) || longdescription.includes(token)) {
         return true;
       }
       return false;
@@ -90,7 +54,7 @@ function filterByDate(index, fromDate, toDate) {
   const to = new Date(toDate);
   if (from > to) return [];
   return index.filter((e) => {
-    const date = new Date(parseInt(e.publisheddatems, 10));
+    const date = new Date(parseInt(e.publisheddateinseconds * 1000, 10));
     return date >= from && date <= to;
   });
 }
@@ -122,7 +86,7 @@ function getPaginationGroups(totalPages, currentPage) {
     for (let i = 1; i <= totalPages; i += 1) {
       r.push(i);
     }
-    return r;
+    return [r, [], []];
   }
 
   const start = [];
@@ -180,7 +144,7 @@ function getPaginationGroups(totalPages, currentPage) {
 function getYears(index) {
   const years = [];
   index.forEach((e) => {
-    const date = new Date(parseInt(e.publisheddatems, 10));
+    const date = new Date(parseInt(e.publisheddateinseconds * 1000, 10));
     const year = date.getFullYear();
     if (!years.includes(year)) {
       years.push(year);
@@ -192,7 +156,7 @@ function getYears(index) {
 function filterByYear(index, year) {
   if (!year) return index;
   return index.filter((e) => {
-    const date = new Date(parseInt(e.publisheddatems, 10));
+    const date = new Date(parseInt(e.publisheddateinseconds * 1000, 10));
     return date.getFullYear() === parseInt(year, 10);
   });
 }
@@ -225,9 +189,36 @@ function addEventListenerToYearPicker(newsListContainer) {
   yearItems.forEach((item) => {
     item.addEventListener('click', () => {
       const year = item.getAttribute('value');
-      const yearUrl = addParam('year', year);
+      const yearUrl = `${window.location.pathname}?year=${year}`;
       window.location.href = yearUrl;
     });
+  });
+}
+
+function addEventListenerToFilterForm(block) {
+  const filterForm = block.querySelector('#filter-form');
+  const filterFormLabel = filterForm.querySelector('label');
+  const filterArrow = filterForm.querySelector('.newslist-filter-arrow');
+  const filterInput = filterForm.querySelector('#newslist-filter-input');
+  const filterFormSubmit = filterForm.querySelector('input[type="submit"]');
+  const filterYear = filterForm.querySelector('#newslist-filter-year');
+  filterFormLabel.addEventListener('click', () => {
+    const isActive = filterArrow.classList.contains('active');
+    if (isActive) {
+      filterArrow.classList.remove('active');
+      filterInput.style.display = 'none';
+      filterFormSubmit.style.display = 'none';
+      if (filterYear) {
+        filterYear.style.display = 'none';
+      }
+    } else {
+      filterArrow.classList.add('active');
+      filterInput.style.display = 'inline';
+      filterFormSubmit.style.display = 'inline';
+      if (filterYear) {
+        filterYear.style.display = 'inline-block';
+      }
+    }
   });
 }
 
@@ -267,9 +258,11 @@ export default async function decorate(block) {
       ${form}
       <h2>Results for "${query}"</h2>
       <div class="search-sub-header">
-        <h3> ALL RESULTS </h3>
+        <h3> ${shortIndex.length > 0 ? 'ALL RESULTS' : '0 RESULTS WERE FOUND'} </h3>
         <div class="search-sub-header-right">
-        Showing ${offset + 1} - ${Math.min(l, shortIndex.length)} of ${shortIndex.length} results
+          ${shortIndex.length > 0 ? `Showing ${offset + 1} - ${Math.min(l, shortIndex.length)} of ${shortIndex.length} results` : ''}
+        </div>
+      </div>
       `;
     } else {
       searchHeader.innerHTML = form;
@@ -292,7 +285,8 @@ export default async function decorate(block) {
     newsListHeader.innerHTML = `
       <form action="${window.location.pathname}" method="get" id="filter-form">
         <label for="newslist-filter-input">Filter News</label>
-        <input type="text" id="newslist-filter-input" title="Date Range" name="date" value="DATERANGE" size="40" maxlength="60" disabled>
+        <span class="newslist-filter-arrow"></span>
+        <input type="text" id="newslist-filter-input" title="Date Range" name="date" value="DATE RANGE" size="40" maxlength="60" disabled>
         <input type="submit" value="" disabled>
         <div id="newslist-filter-year" name="year">
           ${year || 'YEAR'}
@@ -321,7 +315,8 @@ export default async function decorate(block) {
       
       <form action="${window.location.pathname}" method="get" id="filter-form">
         <label for="newslist-filter-input">Filter News</label>
-        <input type="text" id="newslist-filter-input" title="Date Range" name="date" value="DATERANGE" size="40" maxlength="60" disabled>
+        <span class="newslist-filter-arrow"></span>
+        <input type="text" id="newslist-filter-input" title="Date Range" name="date" value="DATE RANGE" size="40" maxlength="60" disabled>
         <input type="submit" value="" disabled>
       </form>
     `;
@@ -339,12 +334,12 @@ export default async function decorate(block) {
       itemHtml = `
       <div class="search-results-item">
         <div class="search-results-item-published-date">
-          ${getHumanReadableDate(e.publisheddatems)}
+          ${getHumanReadableDate(e.publisheddateinseconds * 1000)}
         </div>
         <div class="search-results-item-title">
           <a href="${e.path}">${e.title}</a>
         </div>
-        <div class="search-results-item-content">${e.description}</div>
+        <div class="search-results-item-content">${getDescription(e)}</div>
       </div>
 
       `;
@@ -357,12 +352,12 @@ export default async function decorate(block) {
             </h4>
           </div>
           <div class="newslist-item-description">
-            <p>${e.description}</p>
+            <p>${getDescription(e)}</p>
           </div>
           <div class="newslist-item-footer">
             <a href="${e.path}">Read More <span class="read-more-arrow"></span></a>
             <div class="newslist-item-publisheddate">
-              ${getHumanReadableDate(e.publisheddatems)}
+              ${getHumanReadableDate(e.publisheddateinseconds * 1000)}
             </div>
           </div>
         </div>
@@ -375,6 +370,9 @@ export default async function decorate(block) {
 
   if (key && value) {
     addEventListenerToYearPicker(block);
+  }
+  if (!isSearch) {
+    addEventListenerToFilterForm(block);
   }
 
   // add pagination information
