@@ -1,1 +1,28 @@
 /* add global styles that can be loaded post LCP here */
+#optanon-minimize-wrapper #optanon-minimize-button {
+  font-family: Arial, 'Open Sans', sans-serif;
+
+  /* stylelint-disable-next-line property-no-vendor-prefix */
+  -webkit-text-size-adjust: none;
+  font-size: .63em;
+  color: #000;
+  margin: auto;
+  text-decoration: none;
+  background-color: #d7d7d7; 
+  background-repeat: no-repeat;
+  border: solid;
+  border-color: #333;
+  cursor: pointer;
+  overflow: hidden;
+  border-width: 1px;
+  padding: 10px;
+  border-radius: 8px;
+  position: fixed; 
+  right: 0;
+  bottom: 0;
+  z-index: 1;
+  text-transform: none;
+  box-sizing: border-box;
+  font-weight: 400;
+  line-height: inherit;
+}
