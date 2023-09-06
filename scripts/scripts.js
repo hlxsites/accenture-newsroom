@@ -272,13 +272,16 @@ async function loadEager(doc) {
 }
 
 async function loadJQueryDateRangePicker() {
+  const filterInput = document.querySelector('#newslist-filter-input');
+  if (!filterInput) {
+    return;
+  }
   // await import('./moment.min.js');
   await loadScript('/scripts/moment.min.js');
   await loadScript('/scripts/jquery-3.5.1.min.js');
   await loadScript('/scripts/jquery.daterangepicker-20190409.js');
   await loadCSS('/styles/daterangepicker.css');
 
-  const filterInput = document.querySelector('#newslist-filter-input');
   const filterSubmit = filterInput.closest('form').querySelector('input[type="submit"]');
   const url = new URL(window.location);
   const usp = new URLSearchParams(url.search);
