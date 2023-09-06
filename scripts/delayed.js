@@ -3,6 +3,13 @@ import { sampleRUM, loadScript } from './lib-franklin.js';
 
 const ONETRUST_SDK = 'https://cdn.cookielaw.org/scripttemplates/otSDKStub.js';
 
+function getCookie(name) {
+  const value = `; ${window.document.cookie}`;
+  const parts = value.split(`; ${name}=`);
+  if (parts.length === 2) return parts.pop().split(';').shift();
+  return '';
+}
+
 function addOneTrustCookieButton(text) {
   const OPTANON_BUTTON_ID = 'optanon-minimize-button';
   if (!document.getElementById(OPTANON_BUTTON_ID)) {
@@ -26,7 +33,7 @@ function addOneTrustCookieButton(text) {
 }
 
 function attachOneTrustCookieListeners() {
-  // const minimizeBanner = getCookie('OptanonAlertBoxClosed');
+  const minimizeBanner = getCookie('OptanonAlertBoxClosed');
   let localStorageName = ONETRUST_SDK;
   const substringStart = localStorageName.lastIndexOf('/') + 1;
   const substringEnd = localStorageName.lastIndexOf('.');
@@ -34,7 +41,7 @@ function attachOneTrustCookieListeners() {
   localStorageName = localStorageName.replace(/-/g, '');
   const minimizeButtonKey = localStorageName;
   // if not closed yet delegate event to the buttons
-  if (!localStorage.getItem(minimizeButtonKey)) {
+  if (!minimizeBanner) {
     document.addEventListener('click', (event) => {
       if (event.target.matches('button[class*="save-preference"], button[id*="accept"]')) {
         const minimizeButtonText = document.querySelector('button#onetrust-pc-btn-handler').textContent;
