@@ -1,5 +1,7 @@
 // eslint-disable-next-line import/no-cycle
-import { sampleRUM, loadScript } from './lib-franklin.js';
+import { sampleRUM, loadScript, getMetadata } from './lib-franklin.js';
+// eslint-disable-next-line import/no-cycle
+import { getLocale, getCountryLanguage } from './scripts.js';
 
 const ONETRUST_SDK = 'https://cdn.cookielaw.org/scripttemplates/otSDKStub.js';
 
@@ -78,6 +80,120 @@ function addMartechStack() {
   loadScript('https://assets.adobedtm.com/launch-EN664f8f34ad5946f8a0f7914005f717cf.min.js?v=20190409', { async: '' });
 }
 
+function getPageInstanceId(template, path, countryLanguage = '') {
+  const pageIdPrefix = `nws:${countryLanguage || 'newsroom'}:page:`;
+  let pageId = '';
+  if (template === 'Article') {
+    const pageName = path.split('/').pop();
+    pageId = `${pageIdPrefix}news-${pageName}`;
+  } else if (template === 'Category') {
+    const pageName = path.replace(/^\/+|\/+$/g, '').replace(/[^a-z0-9]/gi, '-');
+    pageId = `${pageIdPrefix}${pageName}`;
+  } else if (path === '/') {
+    pageId = `${pageIdPrefix}index`;
+  } else {
+    pageId = `${pageIdPrefix}${path.split('/').pop()}`;
+  }
+  return pageId;
+}
+
+function getPageName(path) {
+  if (path === '/') {
+    return 'accenture-newsroom-dashboard';
+  }
+  return path.split('/').pop();
+}
+
+function getUniquePageName(template, path) {
+  if (path === '/') {
+    return 'index';
+  }
+  if (template === 'Category') {
+    return path.replace(/^\/+|\/+$/g, '').replace(/[^a-z0-9]/gi, '-');
+  }
+  return path.split('/').pop();
+}
+
+function addDataLayer() {
+  const template = getMetadata('template');
+  const path = window.location.pathname;
+  const pageInstanceId = getPageInstanceId(template, path);
+  const pageName = getPageName(path);
+  const uniquePageName = getUniquePageName(template, path);
+  const countryLanguage = getCountryLanguage(getLocale(path));
+  const pageId = getPageInstanceId(template, path, countryLanguage);
+  const language = countryLanguage.split('-').length === 2 ? countryLanguage.split('-')[1] : 'en';
+  window.digitalData = {
+    pageInstanceId,
+    version: '1.0',
+    page: {
+      category: {
+        primaryCategory: 'nws',
+      },
+      pageInfo: {
+        pageId,
+        pageName,
+        destinationUrl: '',
+        referringUrl: '',
+        author: '',
+        issueDate: null,
+        effectiveDate: null,
+        expiryDate: null,
+        language,
+        geoRegion: '',
+        countryLanguage,
+        subfolder: 'page',
+        uniquePageName,
+        template: '',
+        reportingSuiteIDs: 'accnextacnprod,accnextglobprod',
+      },
+      attributes: {
+        metadata: [
+          {
+            category: {
+              primaryCategory: '',
+            },
+            metadataInfo: {
+              metadataID: '',
+              metadataName: '',
+            },
+          },
+          {
+            category: {
+              primaryCategory: '',
+            },
+            metadataInfo: {
+              metadataID: '',
+              metadataName: '',
+            },
+          },
+        ],
+      },
+    },
+    product: null,
+    events: null,
+    component: [
+      {
+        componentInfo: {
+          componentID: '',
+          componentName: '',
+        },
+      },
+      {
+        componentInfo: {
+          componentID: '',
+          componentName: '',
+        },
+      },
+    ],
+    user: null,
+    privacy: {
+      accessCategories: [],
+    },
+  };
+}
+
+addDataLayer();
 addMartechStack();
 
 // add more delayed functionality here

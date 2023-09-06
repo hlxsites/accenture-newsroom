@@ -19,6 +19,24 @@ const LCP_BLOCKS = []; // add your LCP blocks to the list
 // regex to find abstract paragraph
 export const ABSTRACT_REGEX = /(.*?);.*?(\d{4})|(.*?)(\d{4})\s+–\s+\b|(.*?)(\d{4})\s+-\s+\b/;
 
+export function getLocale(path) {
+  const locale = path.split('/')[1];
+  if (/^[a-z]{2}$/.test(locale)) {
+    return locale;
+  }
+  return 'us';
+}
+
+export function getCountryLanguage(locale) {
+  const langs = {
+    us: 'us-en',
+  };
+  let language = langs[locale];
+  if (!language) language = 'us-en';
+
+  return language;
+}
+
 /**
  * Traverse the whole json structure in data and replace '0' with empty string
  * @param {*} data
