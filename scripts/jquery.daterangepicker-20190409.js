@@ -1,3 +1,4 @@
+/* eslint-disable */
 // jquery.daterangepicker.js
 // author : Chunlong Liu
 // license : MIT
