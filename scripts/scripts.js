@@ -259,14 +259,16 @@ async function loadJQueryDateRangePicker() {
   await loadScript('/scripts/jquery-3.5.1.min.js');
   await loadScript('/scripts/jquery.daterangepicker-20190409.js');
   await loadCSS('/styles/daterangepicker.css');
-  
+
   const filterInput = document.querySelector('#newslist-filter-input');
   const filterSubmit = filterInput.closest('form').querySelector('input[type="submit"]');
+  const url = new URL(window.location);
+  const usp = new URLSearchParams(url.search);
   if (filterInput) {
     filterInput.removeAttribute('disabled');
     filterSubmit.removeAttribute('disabled');
+    // eslint-disable-next-line no-undef
     const $filter = $('#newslist-filter-input');
-    console.log($filter);
     $filter.dateRangePicker(
       {
         singleMonth: true,
@@ -276,50 +278,67 @@ async function loadJQueryDateRangePicker() {
         separator: ' - ',
         monthSelect: true,
         yearSelect: true,
-        extraClass: 'landing-picker'
-      }).bind('datepicker-change', function (evt, obj) {
-        let fullDtFrm = (obj.date1.getMonth() + 1) + '/' + obj.date1.getDate() + '/' + obj.date1.getFullYear();
-        let fullDtTo = (obj.date2.getMonth() + 1) + '/' + obj.date2.getDate() + '/' + obj.date2.getFullYear();
-
-        // $("#from_dt").val(fullDtFrm);
-        // $("#to_dt").val(fullDtTo);
-        // $('.display_year').val('');
-
-        // $("#filterFormSF").submit();
-
-      }).bind('datepicker-open', function () {
+        extraClass: 'landing-picker',
+      // eslint-disable-next-line prefer-arrow-callback
+      },
+    )
+      .bind('datepicker-change', (evt, obj) => {
+        const fullDtFrm = `${(obj.date1.getMonth() + 1)}/${obj.date1.getDate()}/${obj.date1.getFullYear()}`;
+        const fullDtTo = `${(obj.date2.getMonth() + 1)}/${obj.date2.getDate()}/${obj.date2.getFullYear()}`;
+        usp.set('from_date', fullDtFrm);
+        usp.set('to_date', fullDtTo);
+        window.location.search = decodeURIComponent(usp);
+      })
+      .bind('datepicker-open', () => {
+        // eslint-disable-next-line no-undef
         if (!$('#clear-date-range').length) {
-          $(".date-picker-wrapper .month-wrapper").append(
-            '<button id="clear-date-range" class="clearDateRange" name="clearDateRange" data-analytics-content-type="search intent" data-analytics-link-type="search intent" data-analytics-template-zone="body" data-analytics-module-name="nws-search-date-filter" data-analytics-link-name="clear" >Clear</button>'
+          // eslint-disable-next-line no-undef
+          $('.date-picker-wrapper .month-wrapper').append(
+            '<button id="clear-date-range" class="clearDateRange" name="clearDateRange" data-analytics-content-type="search intent" data-analytics-link-type="search intent" data-analytics-template-zone="body" data-analytics-module-name="nws-search-date-filter" data-analytics-link-name="clear" >Clear</button>',
           );
-
-          $(".clearDateRange").on("click", function () {
-            $("#from_dt").val('');
-            $("#to_dt").val('');
-            $('#newsFilter').data('dateRangePicker').clear();
-            $("#filterFormSF").submit();
+          // eslint-disable-next-line no-undef
+          $('.clearDateRange').on('click', () => {
+            // eslint-disable-next-line no-undef
+            $('#newslist-filter-input').data('dateRangePicker').clear();
+            // eslint-disable-next-line no-undef
+            $('#filter-form').submit();
           });
-
-        };
-
-        const testL = $("#newslist-filter-input").offset().left;
-        $(".date-picker-wrapper").css("left", testL);
+        }
+        // eslint-disable-next-line no-undef
+        const testL = $('#newslist-filter-input').offset().left;
+        // eslint-disable-next-line no-undef
+        $('.date-picker-wrapper').css('left', testL);
       });
+  }
+  const datePicker = document.querySelector('.date-picker-wrapper');
+  datePicker.classList.add('date-picker-wrapper-custom');
+  const paramDateFrom = usp.get('from_date');
+  const paramDateTo = usp.get('to_date');
+  if (paramDateFrom && paramDateTo) {
+    // eslint-disable-next-line no-undef
+    $('#newslist-filter-input').data('dateRangePicker')
+      // eslint-disable-next-line no-undef
+      .setStart(moment(paramDateFrom.toString()).format('MM/DD/YY'))
+      // eslint-disable-next-line no-undef
+      .setEnd(moment(paramDateTo.toString()).format('MM/DD/YY'));
+  }
 
-    $('#newsFilter-open').click(function (evt) {
-      // let stateOC = $('.date-picker-wrapper').css("display") === 'block';
-      // //console.log(stateOC);
-      // evt.stopPropagation();
-      // evt.preventDefault();
+  function displayDatePicker(e) {
+    e.stopPropagation();
+    e.preventDefault();
+    const stateOC = document.querySelector('.date-picker-wrapper').style.display === 'none';
+    if (stateOC) {
+      // eslint-disable-next-line no-undef
+      $('#newslist-filter-input').data('dateRangePicker').open();
+    } else {
+      // eslint-disable-next-line no-undef
+      $('#newslist-filter-input').data('dateRangePicker').close();
+    }
+  }
 
-
-      // if (stateOC) {
-      //   $('#newsFilter').data('dateRangePicker').close();
-      // } else {
-      //   $('#newsFilter').data('dateRangePicker').open();
-      // }
-
-    });
+  const filterButton = document.querySelector('#filter-form > input[type=submit]');
+  if (filterButton) {
+    filterButton.addEventListener('click', displayDatePicker);
   }
 }
 
@@ -340,7 +359,7 @@ async function loadLazy(doc) {
 
   loadCSS(`${window.hlx.codeBasePath}/styles/lazy-styles.css`);
   loadFonts();
-  
+
   // article processing
   addPrevNextLinksToArticles();
 

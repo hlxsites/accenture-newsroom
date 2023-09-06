@@ -1294,18 +1294,10 @@
                         left: offset.left - containerOffset.left - leftIndent
                     });
                 } else {
-                    if (offset.left < 460) //left to right
-                    {
-                        box.css({
-                            top: offset.top + $(self).outerHeight() + parseInt($('body').css('border-top') || 0, 10),
-                            left: offset.left
-                        });
-                    } else {
-                        box.css({
-                            top: offset.top + $(self).outerHeight() + parseInt($('body').css('border-top') || 0, 10),
-                            left: offset.left + $(self).width() - box.width() - 16
-                        });
-                    }
+                    box.css({
+                        top: offset.top + $(self).outerHeight() + parseInt($('body').css('border-top') || 0, 10),
+                        left: offset.left
+                    });
                 }
             }
         }
