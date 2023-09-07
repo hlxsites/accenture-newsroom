@@ -1,64 +1,12 @@
 import { readBlockConfig } from '../../scripts/lib-franklin.js';
-
-/**
- * Traverse the whole json structure in data and replace '0' with empty string
- * @param {*} data
- * @returns updated data
- */
-function replaceEmptyValues(data) {
-  Object.keys(data).forEach((key) => {
-    if (typeof data[key] === 'object') {
-      replaceEmptyValues(data[key]);
-    } else if (data[key] === '0') {
-      data[key] = '';
-    }
-  });
-  return data;
-}
-
-function skipInternalPaths(jsonData) {
-  const internalPaths = ['/search', '/'];
-  const regexp = [/drafts\/.*/];
-  const templates = ['category'];
-  return jsonData.filter((row) => {
-    if (internalPaths.includes(row.path)) {
-      return false;
-    }
-    if (regexp.some((r) => r.test(row.path))) {
-      return false;
-    }
-    if (templates.includes(row.template)) {
-      return false;
-    }
-    return true;
-  });
-}
-
-async function fetchIndex(indexURL = '/query-index.json') {
-  if (window.queryIndex && window.queryIndex[indexURL]) {
-    return window.queryIndex[indexURL];
-  }
-  try {
-    const resp = await fetch(indexURL);
-    const json = await resp.json();
-    replaceEmptyValues(json.data);
-    const queryIndex = skipInternalPaths(json.data);
-    window.queryIndex = window.queryIndex || {};
-    window.queryIndex[indexURL] = queryIndex;
-    return queryIndex;
-  } catch (e) {
-    // eslint-disable-next-line no-console
-    console.log(`error while fetching ${indexURL}`, e);
-    return [];
-  }
-}
+import { fetchIndex, ABSTRACT_REGEX } from '../../scripts/scripts.js';
 
 function getHumanReadableDate(dateString) {
   if (!dateString) return dateString;
   const date = new Date(parseInt(dateString, 10));
-  // display the date with two digits.
-
+  // display the date in GMT timezone
   return date.toLocaleDateString('en-US', {
+    timeZone: 'GMT',
     year: 'numeric',
     month: 'long',
     day: '2-digit',
@@ -73,12 +21,11 @@ function getHumanReadableDate(dateString) {
  * @returns
  */
 function getDescription(queryIndexEntry) {
-  const descriptionRegex = /(.*?);.*?(\d{4})/;
   const { longdescriptionextracted } = queryIndexEntry;
   const div = document.createElement('div');
   div.innerHTML = longdescriptionextracted;
   const longdescriptionElements = Array.from(div.querySelectorAll('p'));
-  const matchingParagraph = longdescriptionElements.find((p) => descriptionRegex.test(p.innerText));
+  const matchingParagraph = longdescriptionElements.find((p) => ABSTRACT_REGEX.test(p.innerText));
   const longdescription = matchingParagraph ? matchingParagraph.innerText : '';
   if (queryIndexEntry.description.length > longdescription.length) {
     return queryIndexEntry.description;
@@ -139,7 +86,7 @@ function getPaginationGroups(totalPages, currentPage) {
     for (let i = 1; i <= totalPages; i += 1) {
       r.push(i);
     }
-    return r;
+    return [r, [], []];
   }
 
   const start = [];
@@ -242,7 +189,7 @@ function addEventListenerToYearPicker(newsListContainer) {
   yearItems.forEach((item) => {
     item.addEventListener('click', () => {
       const year = item.getAttribute('value');
-      const yearUrl = addParam('year', year);
+      const yearUrl = `${window.location.pathname}?year=${year}`;
       window.location.href = yearUrl;
     });
   });
