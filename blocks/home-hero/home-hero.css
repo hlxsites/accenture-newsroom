@@ -167,3 +167,23 @@
     content: none;
   }
 }
+
+/* dark theme styles goes here */
+.theme-dark .section.home-hero-container,
+.theme-dark .home-hero.block .home-hero-links-container {
+  background-color:#000;
+  color: #fff;
+}
+
+.theme-dark .home-hero.block .home-hero-content-container h1,
+.theme-dark .home-hero.block .overlay-container a,
+.theme-dark .home-hero.block .home-hero-links-container a {
+  color: #fff;
+}
+
+.theme-dark .home-hero.block .overlay-container,
+.theme-dark .home-hero.block .overlay-container h1,
+.theme-dark .home-hero.block .overlay-container h2 {
+  background-color:#000;
+  color: #fff;
+}

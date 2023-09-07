@@ -489,3 +489,16 @@
     color: #004dff;
   }
 }
+
+/* dark theme goes here */
+.theme-dark .section.newslist-container {
+  background-color: #000;
+  color: #fff;
+}
+
+.theme-dark .newslist .newslist-container .newslist-header-container label,
+.theme-dark .section.newslist-container .newslist-item h4 a,
+.theme-dark .newslist .newslist-container .newslist-item .newslist-item-description p,
+.theme-dark .newslist .newslist-container .newslist-item .newslist-item-footer a {
+  color: #fff;
+}

@@ -117,3 +117,13 @@
     margin-left: calc((1200px - 100vw) / 2);
   }
 }
+
+/* block specific CSS goes here */
+
+.theme-dark .section.hero-container,
+.theme-dark .hero.block,
+.theme-dark .hero.block h1 a,
+.theme-dark .hero.block h2 a {
+  background-color:#202020;
+  color: #fff;
+}

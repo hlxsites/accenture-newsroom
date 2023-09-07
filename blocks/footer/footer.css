@@ -165,3 +165,14 @@ footer .footer-black .columns.copyright ul li a {
     background: transparent url('../../icons/acn-brand-icon.svg') no-repeat;
   }
 }
+
+/* dark theme codes goes here */
+.theme-dark footer {
+  background-color: #000;
+  color: #fff;
+}
+
+/* stylelint-disable-next-line no-descending-specificity */
+.theme-dark footer .section.pre-footer a {
+  color: #fff;
+}

@@ -535,3 +535,43 @@ header nav[aria-expanded="true"] .nav-tools {
     display: none;
   }
 }
+
+/* Area for dark theme */
+.theme-dark header nav {
+  background-color: #000;
+  color: #fff;
+}
+
+header nav .nav-sections .nav-drop:hover {
+  border-bottom: 4px solid #fff;
+}
+
+.theme-dark header .nav-drop .level-two,
+.theme-dark header .nav-drop .level-three {
+  background-color: #202020;
+  color: #fff;
+}
+
+/* stylelint-disable-next-line no-descending-specificity */
+.theme-dark header nav .nav-sections > ul > li[aria-expanded="true"] > ul.sub-menu-container > li.sub-menu > ul {
+  background-color:  #202020;
+}
+
+
+.theme-dark header nav .nav-sections > ul > li.nav-drop[aria-expanded="true"] > ul.sub-menu-container li.sub-menu {
+ background-color: #202020;
+ color: #fff;
+}
+
+.theme-dark header nav .nav-sections > ul > li.nav-drop[aria-expanded="true"] > ul li.level-two a {
+  color: #fff;
+}
+
+.theme-dark header nav .nav-sections {
+  background-color: #000;
+  color: #fff;
+}
+
+.theme-dark header nav .nav-brand img {
+  background-color: #fff;
+}
