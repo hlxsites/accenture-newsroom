@@ -321,8 +321,8 @@ async function loadJQueryDateRangePicker() {
           $('.clearDateRange').on('click', () => {
             // eslint-disable-next-line no-undef
             $('#newslist-filter-input').data('dateRangePicker').clear();
-            // eslint-disable-next-line no-undef
-            $('#filter-form').submit();
+            const urlNoParamStr = window.location.toString().replace(window.location.search, '');
+            window.location = urlNoParamStr;
           });
         }
         // eslint-disable-next-line no-undef

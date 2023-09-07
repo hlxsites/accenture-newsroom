@@ -284,8 +284,9 @@ export default async function decorate(block) {
     newsListHeader.classList.add('newslist-header-container');
     newsListHeader.innerHTML = `
       <form action="${window.location.pathname}" method="get" id="filter-form">
-        <label for="newslist-filter-input">Filter News</label>
-        <span class="newslist-filter-arrow"></span>
+        <label for="newslist-filter-input">Filter News
+          <span class="newslist-filter-arrow"></span>
+        </label>
         <input type="text" id="newslist-filter-input" title="Date Range" name="date" value="DATE RANGE" size="40" maxlength="60" disabled>
         <input type="submit" value="" disabled>
         <div id="newslist-filter-year" name="year">
@@ -314,8 +315,9 @@ export default async function decorate(block) {
       </form>
       
       <form action="${window.location.pathname}" method="get" id="filter-form">
-        <label for="newslist-filter-input">Filter News</label>
-        <span class="newslist-filter-arrow"></span>
+        <label for="newslist-filter-input">Filter News
+          <span class="newslist-filter-arrow"></span>
+        </label>
         <input type="text" id="newslist-filter-input" title="Date Range" name="date" value="DATE RANGE" size="40" maxlength="60" disabled>
         <input type="submit" value="" disabled>
       </form>

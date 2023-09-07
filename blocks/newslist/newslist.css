@@ -48,7 +48,7 @@
 .newslist .newslist-container .newslist-item .newslist-item-footer a {
   font-family: var(--graphik-semibold);
   text-transform: uppercase;
-  font-size: var(--body-font-size-xxs);
+  font-size: var(--body-font-size-xs);
   font-weight: 600;
   color: var(--link-color);
 }
@@ -58,7 +58,7 @@
   height: 20px;
   width: 40px;
   line-height: 20px;
-  background: 'transparent url(/icons/arrow-icon.svg) no-repeat 0px -8px';
+  background: transparent url('/icons/arrow-icon.svg') no-repeat 0 -8px;
 }
 
 .newslist .newslist-container .newslist-item .newslist-item-footer .newslist-item-publisheddate {
@@ -213,7 +213,7 @@
   padding-bottom: 20px;
   margin-bottom: 20px;
   font-family: var(--header-font-family);
-  font-size: var(--body-font-size-xxs);
+  font-size: var(--body-font-size-xs);
   color: #000;
   line-height: 1.6;
 }
@@ -445,6 +445,7 @@
   #filter-form input[type='submit'] {
     display: inline;
     position: relative;
+    top: 5px;
   }
 
   #newslist-filter-input {
@@ -492,7 +493,6 @@
   }
 }
 
-/* stylelint-disable selector-class-pattern */
 .date-picker-wrapper-custom.date-picker-wrapper .month-wrapper {
   height: auto;
   padding-bottom: 50px;
@@ -536,11 +536,8 @@
   color: #6b6b6b;
   font-size: 12px;
 }
-
-.date-picker-wrapper-custom.date-picker-wrapper .month-wrapper table .day.toMonth.valid,
-.date-picker-wrapper-custom.date-picker-wrapper .month-wrapper table .day.valid,
-.date-picker-wrapper-custom.date-picker-wrapper .month-wrapper table div.day.lastMonth,
-.date-picker-wrapper-custom.date-picker-wrapper .month-wrapper table div.day.nextMonth {
+/* stylelint-disable-next-line selector-class-pattern */
+.date-picker-wrapper-custom.date-picker-wrapper .month-wrapper table .day.toMonth.valid,.date-picker-wrapper-custom.date-picker-wrapper .month-wrapper table .day.valid,.date-picker-wrapper-custom.date-picker-wrapper .month-wrapper table div.day.lastMonth,.date-picker-wrapper-custom.date-picker-wrapper .month-wrapper table div.day.nextMonth {
   color: #333;
   cursor: pointer;
   height: 17px;
@@ -558,6 +555,7 @@
   background-color: #F7F7F7 !important;
 }
 
+/* stylelint-disable-next-line selector-class-pattern */
 .date-picker-wrapper .month-wrapper table .day.toMonth.hovering {
   background-color: #F7F7F7 !important;
 }
@@ -571,11 +569,12 @@
   background-color: var(--link-color) !important;
 }
 
-.date-picker-wrapper-custom.date-picker-wrapper .month-wrapper table .day.nextMonth,
-.date-picker-wrapper-custom.date-picker-wrapper .month-wrapper table .day.lastMonth {
+/* stylelint-disable-next-line selector-class-pattern */
+.date-picker-wrapper-custom.date-picker-wrapper .month-wrapper table .day.nextMonth,.date-picker-wrapper-custom.date-picker-wrapper .month-wrapper table .day.lastMonth {
   display: block;
 }
 
+/* stylelint-disable-next-line selector-class-pattern */
 .date-picker-wrapper-custom.date-picker-wrapper .month-wrapper table .day.toMonth.valid {
   background-color: transparent;
 }
@@ -665,6 +664,7 @@ body .dd-arrow {
   right: -1px;
 }
 
+/* stylelint-disable-next-line selector-class-pattern */
 .date-picker-wrapper-custom.date-picker-wrapper .caption th.prevNext div {
   text-align: right;
   width: 94%;
@@ -676,9 +676,8 @@ body .dd-arrow {
   width: auto;
 }
 
-.date-picker-wrapper .month-wrapper table td.wkend .day.toMonth.valid,
-.date-picker-wrapper .month-wrapper table td.wkend div.day.nextMonth,
-.date-picker-wrapper .month-wrapper table td.wkend div.day.lastMonth {
+/* stylelint-disable-next-line selector-class-pattern */
+.date-picker-wrapper .month-wrapper table td.wkend .day.toMonth.valid, .date-picker-wrapper .month-wrapper table td.wkend div.day.nextMonth,.date-picker-wrapper .month-wrapper table td.wkend div.day.lastMonth {
   color: #999 !important;
 }
 
