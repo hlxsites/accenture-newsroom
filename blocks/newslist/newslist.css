@@ -330,6 +330,7 @@
   border: 1px solid rgb(0 0 0 / 15%);
   border-radius: 4px;
   box-sizing: border-box;
+  overflow-x: scroll;
 }
 
 #newslist-filter-year .newslist-filter-year-dropdown[aria-expanded='true'] .newslist-filter-year-item {
