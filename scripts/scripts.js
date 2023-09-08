@@ -1,3 +1,4 @@
+import { ANALYTICS_LINK_TYPE_NAV_PAGINATE, ANALYTICS_TEMPLATE_ZONE_BODY, ANALYTICS_MODULE_SEARCH_PAGINATION } from './constants.js';
 import {
   sampleRUM,
   buildBlock,
@@ -178,15 +179,19 @@ async function addPrevNextLinksToArticles() {
   let prevLink = '';
   let nextLink = '';
   if (prevArticle) {
-    prevLink = createEl('a', { href: prevArticle.path, class: 'prev' }, 'Previous');
+    prevLink = createEl('a', { href: prevArticle.path, class: 'prev', title: 'Prev' }, 'Previous');
   } else {
-    prevLink = createEl('a', { href: '#', class: 'prev disabled' }, 'Previous');
+    prevLink = createEl('a', { href: '#', class: 'prev disabled', title: 'Prev' }, 'Previous');
   }
   if (nextArticle) {
-    nextLink = createEl('a', { href: nextArticle.path, class: 'next' }, 'Next');
+    nextLink = createEl('a', { href: nextArticle.path, class: 'next', title: 'Next' }, 'Next');
   } else {
-    nextLink = createEl('a', { href: '#', class: 'next disabled' }, 'Next');
+    nextLink = createEl('a', { href: '#', class: 'next disabled', title: 'Next' }, 'Next');
   }
+  annotateLinkEl(prevLink, 'Prev',
+    ANALYTICS_MODULE_SEARCH_PAGINATION, ANALYTICS_TEMPLATE_ZONE_BODY, ANALYTICS_LINK_TYPE_NAV_PAGINATE);
+  annotateLinkEl(nextLink, 'Next',
+    ANALYTICS_MODULE_SEARCH_PAGINATION, ANALYTICS_TEMPLATE_ZONE_BODY, ANALYTICS_LINK_TYPE_NAV_PAGINATE);
   heroLinkContainer.append(prevLink);
   heroLinkContainer.append(nextLink);
 }

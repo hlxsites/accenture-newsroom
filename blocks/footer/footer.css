@@ -147,6 +147,14 @@ footer .footer-black .columns.copyright ul li a {
     padding-bottom: 95px;
   }
 
+  footer .pre-footer .columns > div {
+    display: flex;
+  }
+
+  footer .pre-footer .columns > div > div {
+    width: 41%;
+  }
+
   footer .footer-black .columns > div {
     display: flex;
     column-gap: 20px;

@@ -1,3 +1,13 @@
+import {
+  ANALYTICS_LINK_TYPE_ENGAGEMENT,
+  ANALYTICS_LINK_TYPE_NAV_PAGINATE,
+  ANALYTICS_MODULE_MARQUEE,
+  ANALYTICS_MODULE_MULTIPAGE_NAV,
+  ANALYTICS_TEMPLATE_ZONE_HERO,
+  ANALYTICS_TEMPLATE_ZONE_BODY,
+} from '../../scripts/constants.js';
+import { annotateLinkEl } from '../../scripts/scripts.js';
+
 export default async function decorate(block) {
   const title = block.querySelector('h1');
   const overlayContainer = document.createElement('div');
@@ -6,6 +16,15 @@ export default async function decorate(block) {
     const parent = element.parentNode;
     parent.innerHTML = element.innerHTML;
     overlayContainer.append(parent);
+  });
+  overlayContainer.querySelectorAll('a').forEach((link) => {
+    annotateLinkEl(
+      link,
+      link.textContent,
+      ANALYTICS_MODULE_MARQUEE,
+      ANALYTICS_TEMPLATE_ZONE_HERO,
+      ANALYTICS_LINK_TYPE_ENGAGEMENT,
+    );
   });
   title.insertAdjacentElement('afterend', overlayContainer);
   const stripe = document.createElement('div');
@@ -21,6 +40,15 @@ export default async function decorate(block) {
     const linksContainer = document.createElement('div');
     linksContainer.classList.add('home-hero-links-container');
     linksContainer.append(links);
+    links.querySelectorAll('a').forEach((link) => {
+      annotateLinkEl(
+        link,
+        link.textContent,
+        ANALYTICS_MODULE_MULTIPAGE_NAV,
+        ANALYTICS_TEMPLATE_ZONE_BODY,
+        ANALYTICS_LINK_TYPE_NAV_PAGINATE,
+      );
+    });
     block.append(linksContainer);
   }
   content.parentNode.style.backgroundImage = `url('${imgSrc}')`;

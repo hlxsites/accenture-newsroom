@@ -1,4 +1,4 @@
-import { ANALYTICS_LINK_TYPE_LOGO, ANALYTICS_LINK_TYPE_NAVIGATION, ANALYTICS_LINK_TYPE_SEARCH, ANALYTICS_MODULE_PRIMARY_NAV, ANALYTICS_MODULE_SECONDARY_NAV, ANALYTICS_MODULE_TOP_NAV, ANALYTICS_TEMPLATE_ZONE_GLOBAL_HEADER } from '../../scripts/constants.js';
+import { ANALYTICS_LINK_TYPE_LOGO, ANALYTICS_LINK_TYPE_NAVIGATION, ANALYTICS_LINK_TYPE_SEARCH_ACTIVITY, ANALYTICS_MODULE_PRIMARY_NAV, ANALYTICS_MODULE_SECONDARY_NAV, ANALYTICS_MODULE_TOP_NAV, ANALYTICS_TEMPLATE_ZONE_GLOBAL_HEADER } from '../../scripts/constants.js';
 import {
   readBlockConfig,
   decorateButtons,
@@ -81,7 +81,7 @@ export default async function decorate(block) {
       decorateButtons(section, { decorateClasses: false });
     } else if (sectionName === 'tools') {
       const searchLink = createAnnotatedLinkEl('/search', 'Search',
-        ANALYTICS_MODULE_TOP_NAV, ANALYTICS_TEMPLATE_ZONE_GLOBAL_HEADER, ANALYTICS_LINK_TYPE_SEARCH);
+        ANALYTICS_MODULE_TOP_NAV, ANALYTICS_TEMPLATE_ZONE_GLOBAL_HEADER, ANALYTICS_LINK_TYPE_SEARCH_ACTIVITY);
       searchLink.innerHTML = '<div class="search-icon"></div>';
       section.innerHTML = searchLink.outerHTML;
     }
@@ -89,7 +89,7 @@ export default async function decorate(block) {
 
   // link the home page to brand logo
   const navBrand = nav.querySelector('.nav-brand');
-  const navBrandLink = createAnnotatedLinkEl('https://www.accenture.com/us-en', 'Home',
+  const navBrandLink = createAnnotatedLinkEl('https://www.accenture.com/us-en', 'accenture',
     ANALYTICS_MODULE_TOP_NAV, ANALYTICS_TEMPLATE_ZONE_GLOBAL_HEADER, ANALYTICS_LINK_TYPE_LOGO);
   navBrandLink.setAttribute('aria-label', 'Home');
   navBrandLink.innerHTML = navBrand.innerHTML;

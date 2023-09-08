@@ -51,28 +51,25 @@ export default async function decorate(block) {
 
   // Facebook
   const facebookUrl = `https://www.facebook.com/sharer/sharer.php?u=${pageUrl}&display=popup&ref=plugin&src=share_button`;
-  const facebookShare = `
-    <a href="${facebookUrl}"
-        onclick="return !window.open(this.href, 'Facebook', 'width=640,height=580')">
-        <span class="icon icon-social-facebook" />
-    </a>`;
+  const facebookShare = createAnnotatedLinkEl(twitterUrl, 'facebook',
+  ANALYTICS_MODULE_SHARE, ANALYTICS_TEMPLATE_ZONE_RIGHT_RAIL, ANALYTICS_LINK_TYPE_SHARE_INTENT);
+  facebookShare.innerHTML = '<span class="icon icon-social-facebook" />';
+  facebookShare.setAttribute('onclick', "return !window.open(this.href, 'Facebook', 'width=640,height=580')");
   createEl('div', { class: 'facebook-share' }, facebookShare, social);
 
   // Email
   const emailUrl = `mailto:?subject=${pageTitle}&body=Read this from Accenture Newsroom: ${pageUrl}`;
-  const emailShare = `
-    <a href="${emailUrl}"
-        target="_blank">
-        <span class="icon icon-social-email" />
-    </a>`;
+  const emailShare = createAnnotatedLinkEl(emailUrl, 'email',
+  ANALYTICS_MODULE_SHARE, ANALYTICS_TEMPLATE_ZONE_RIGHT_RAIL, ANALYTICS_LINK_TYPE_SHARE_INTENT);
+  emailShare.innerHTML = '<span class="icon icon-social-email" />';
+  emailShare.target = '_blank';
   createEl('div', { class: 'email-share' }, emailShare, social);
 
   // Print
-  const printShare = `
-    <a href="javascript:void(0)"
-      onclick="window.print()">
-      <span class="icon icon-social-print" />
-    </a>`;
+  const printShare = createAnnotatedLinkEl('javascript:void(0)', 'print',
+  ANALYTICS_MODULE_SHARE, ANALYTICS_TEMPLATE_ZONE_RIGHT_RAIL, ANALYTICS_LINK_TYPE_SHARE_INTENT);
+  printShare.innerHTML = '<span class="icon icon-social-print" />';
+  printShare.setAttribute('onclick', 'window.print()');
   createEl('div', { class: 'print-share' }, printShare, social);
 
   await decorateIcons(social);

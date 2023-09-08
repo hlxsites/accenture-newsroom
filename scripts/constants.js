@@ -42,7 +42,7 @@ export const ANALYTICS_TEMPLATE_ZONE_FOOTER = 'footer';
 export const ANALYTICS_TEMPLATE_ZONE_CONSENT_MANAGER = 'consent-manager';
 
 // ANALYTICS LINK TYPES
-export const ANALYTICS_LINK_TYPE_NAV = 'nav';
+export const ANALYTICS_LINK_TYPE_NAV_PAGINATE = 'nav/paginate';
 export const ANALYTICS_LINK_TYPE_NAVIGATION = 'navigation';
 export const ANALYTICS_LINK_TYPE_SEARCH = 'search';
 export const ANALYTICS_LINK_TYPE_LOGO = 'logo';
@@ -55,7 +55,7 @@ export const ANALYTICS_LINK_TYPE_VIDEO = 'video';
 export const ANALYTICS_LINK_TYPE_SEARCH_ACTIVITY = 'search activity';
 export const ANALYTICS_LINK_TYPE_INLINE_LINK = 'inline-link';
 export const ANALYTICS_LINK_TYPE_SEARCH_INTENT = 'search-intent';
-export const ANALYTICS_LINK_TYPE_CALL_TO_ACTION = 'call-to-action';
+export const ANALYTICS_LINK_TYPE_CALL_TO_ACTION = 'call to action';
 export const ANALYTICS_LINK_TYPE_FILTER = 'filter';
 export const ANALYTICS_LINK_TYPE_SHARE_INTENT = 'share intent';
 export const ANALYTICS_LINK_TYPE_DOWNLOADABLE = 'downloadable';
