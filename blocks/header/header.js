@@ -1,8 +1,10 @@
+import { ANALYTICS_LINK_TYPE_LOGO, ANALYTICS_LINK_TYPE_NAVIGATION, ANALYTICS_LINK_TYPE_SEARCH, ANALYTICS_MODULE_PRIMARY_NAV, ANALYTICS_MODULE_SECONDARY_NAV, ANALYTICS_MODULE_TOP_NAV, ANALYTICS_TEMPLATE_ZONE_GLOBAL_HEADER } from '../../scripts/constants.js';
 import {
   readBlockConfig,
   decorateButtons,
   decorateIcons,
 } from '../../scripts/lib-franklin.js';
+import { annotateLinkEl, createAnnotatedLinkEl } from '../../scripts/scripts.js';
 
 const KEY_ENTER = 'Enter';
 
@@ -78,16 +80,17 @@ export default async function decorate(block) {
     if (sectionName === 'brand') {
       decorateButtons(section, { decorateClasses: false });
     } else if (sectionName === 'tools') {
-      section.innerHTML = `
-        <a href="/search" title="Search"> <div class="search-icon"></div> </a>
-      `;
+      const searchLink = createAnnotatedLinkEl('/search', 'Search',
+        ANALYTICS_MODULE_TOP_NAV, ANALYTICS_TEMPLATE_ZONE_GLOBAL_HEADER, ANALYTICS_LINK_TYPE_SEARCH);
+      searchLink.innerHTML = '<div class="search-icon"></div>';
+      section.innerHTML = searchLink.outerHTML;
     }
   });
 
   // link the home page to brand logo
   const navBrand = nav.querySelector('.nav-brand');
-  const navBrandLink = document.createElement('a');
-  navBrandLink.setAttribute('href', 'https://www.accenture.com/us-en');
+  const navBrandLink = createAnnotatedLinkEl('https://www.accenture.com/us-en', 'Home',
+    ANALYTICS_MODULE_TOP_NAV, ANALYTICS_TEMPLATE_ZONE_GLOBAL_HEADER, ANALYTICS_LINK_TYPE_LOGO);
   navBrandLink.setAttribute('aria-label', 'Home');
   navBrandLink.innerHTML = navBrand.innerHTML;
   navBrand.innerHTML = '';
@@ -125,6 +128,12 @@ export default async function decorate(block) {
       // Setup level 2 links
       navSection.querySelectorAll(':scope > ul > li').forEach((levelTwo) => {
         levelTwo.classList.add('level-two');
+        // annotate levelTwo links
+        const levelTwoLink = levelTwo.querySelector(':scope > a');
+        if (levelTwoLink) {
+          annotateLinkEl(levelTwoLink, levelTwoLink.textContent,
+            ANALYTICS_MODULE_PRIMARY_NAV, ANALYTICS_TEMPLATE_ZONE_GLOBAL_HEADER, ANALYTICS_LINK_TYPE_NAVIGATION);
+        }
         levelTwo.parentElement.classList.add('level-two');
         // add back button to level 2
         levelTwo.querySelectorAll(':scope > ul').forEach((levelThree) => {
@@ -153,6 +162,12 @@ export default async function decorate(block) {
         // Setup level 3 links
         levelTwo.querySelectorAll(':scope > ul > li').forEach((levelThree) => {
           levelThree.classList.add('level-three');
+          // annotate levelTwo links
+          const levelThreeLink = levelThree.querySelector(':scope > a');
+          if (levelThreeLink) {
+            annotateLinkEl(levelThreeLink, levelThreeLink.textContent,
+              ANALYTICS_MODULE_SECONDARY_NAV, ANALYTICS_TEMPLATE_ZONE_GLOBAL_HEADER, ANALYTICS_LINK_TYPE_NAVIGATION);
+          }
         });
       });
     });

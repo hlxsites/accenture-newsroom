@@ -39,6 +39,44 @@ export function getCountryLanguage(locale) {
 }
 
 /**
+ * Annotates given link element with click tracking attributes
+ *
+ * @param {*} link
+ * @param {*} linkName
+ * @param {*} moduleName
+ * @param {*} templateZone
+ * @param {*} linkType
+ * @returns
+ */
+
+export function annotateLinkEl(link, linkName, moduleName, templateZone, linkType) {
+  if (!link) return;
+  link.setAttribute('data-analytics-link-name', linkName);
+  link.setAttribute('data-analytics-module-name', moduleName);
+  link.setAttribute('data-analytics-template-zone', templateZone);
+  link.setAttribute('data-analytics-link-type', linkType);
+}
+
+/**
+ * Creates link element with click tracking attributes
+ * @param {*} href
+ * @param {*} text
+ * @param {*} moduleName
+ * @param {*} templateZone
+ * @param {*} linkType
+ * @returns annotate anchor tag
+ */
+
+export function createAnnotatedLinkEl(href, text, moduleName, templateZone, linkType) {
+  const link = document.createElement('a');
+  link.href = href;
+  link.innerText = text;
+  link.title = text;
+  annotateLinkEl(link, text, moduleName, templateZone, linkType);
+  return link;
+}
+
+/**
  * Traverse the whole json structure in data and replace '0' with empty string
  * @param {*} data
  * @returns updated data

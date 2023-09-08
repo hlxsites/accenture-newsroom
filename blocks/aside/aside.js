@@ -1,5 +1,6 @@
-import { createEl } from '../../scripts/scripts.js';
+import { annotateLinkEl, createAnnotatedLinkEl, createEl } from '../../scripts/scripts.js';
 import { decorateIcons, getMetadata, loadScript } from '../../scripts/lib-franklin.js';
+import { ANALYTICS_LINK_TYPE_DOWNLOADABLE, ANALYTICS_LINK_TYPE_ENGAGEMENT, ANALYTICS_LINK_TYPE_SHARE_INTENT, ANALYTICS_MODULE_DOWNLOAD_ARTICLE, ANALYTICS_MODULE_INDUSTRY_TAGS, ANALYTICS_MODULE_SHARE, ANALYTICS_MODULE_SUBJECT_TAGS, ANALYTICS_TEMPLATE_ZONE_RIGHT_RAIL } from '../../scripts/constants.js';
 
 async function generatePDF(pageTitle) {
   // Source HTMLElement or a string containing HTML.
@@ -34,20 +35,18 @@ export default async function decorate(block) {
 
   // Linkedin
   const linkedinShareUrl = `https://www.linkedin.com/shareArticle?mini=true&url=${pageUrl}&title=${pageTitle}`;
-  const linkedinShare = `
-    <a href="${linkedinShareUrl}"
-        onclick="return !window.open(this.href, 'Linkedin', 'width=640,height=580')">
-        <span class="icon icon-social-linkedin" />
-    </a>`;
+  const linkedinShare = createAnnotatedLinkEl(linkedinShareUrl, 'linkedin',
+    ANALYTICS_MODULE_SHARE, ANALYTICS_TEMPLATE_ZONE_RIGHT_RAIL, ANALYTICS_LINK_TYPE_SHARE_INTENT);
+  linkedinShare.innerHTML = '<span class="icon icon-social-linkedin" />';
+  linkedinShare.setAttribute('onclick', "return !window.open(this.href, 'Linkedin', 'width=640,height=580')");
   createEl('div', { class: 'linkedin-share' }, linkedinShare, social);
 
   // Twitter
   const twitterUrl = `https://twitter.com/share?text=${pageTitle}&url=${pageUrl}`;
-  const twitterShare = `
-    <a href="${twitterUrl}"
-        onclick="return !window.open(this.href, 'Twitter', 'width=640,height=580')">
-        <span class="icon icon-social-twitter" />
-    </a>`;
+  const twitterShare = createAnnotatedLinkEl(twitterUrl, 'twitter',
+  ANALYTICS_MODULE_SHARE, ANALYTICS_TEMPLATE_ZONE_RIGHT_RAIL, ANALYTICS_LINK_TYPE_SHARE_INTENT);
+  twitterShare.innerHTML = '<span class="icon icon-social-twitter" />';
+  twitterShare.setAttribute('onclick', "return !window.open(this.href, 'Twitter', 'width=640,height=580')");
   createEl('div', { class: 'twitter-share' }, twitterShare, social);
 
   // Facebook
@@ -86,6 +85,8 @@ export default async function decorate(block) {
   const addPDF = getMetadata('pdf');
   if (addPDF && (addPDF === 'true')) {
     const pdfButton = createEl('a', { class: 'pdf-button button' }, 'DOWNLOAD PRESS RELEASE', share);
+    annotateLinkEl(pdfButton, pdfButton.textContent,
+      ANALYTICS_MODULE_DOWNLOAD_ARTICLE, ANALYTICS_TEMPLATE_ZONE_RIGHT_RAIL, ANALYTICS_LINK_TYPE_DOWNLOADABLE);
     pdfButton.addEventListener('click', async () => {
       // Add the js2pdf script
       await loadScript('https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js');
@@ -106,6 +107,8 @@ export default async function decorate(block) {
   industryTagValues.split(',').forEach((industryTag) => {
     const cleanedUpValue = industryTag.trim().toLowerCase().replace(/[\W_]+/g, '-');
     const link = createEl('a', { href: `/industries/${cleanedUpValue}` }, industryTag);
+    annotateLinkEl(link, link.textContent,
+      ANALYTICS_MODULE_INDUSTRY_TAGS, ANALYTICS_TEMPLATE_ZONE_RIGHT_RAIL, ANALYTICS_LINK_TYPE_ENGAGEMENT);
     createEl('li', { class: 'industry-tag' }, link, industryUl);
   });
 
@@ -113,6 +116,8 @@ export default async function decorate(block) {
   subjectTagValues.split(',').forEach((subjectTag) => {
     const cleanedUpValue = subjectTag.trim().toLowerCase().replace(/[\W_]+/g, '-');
     const link = createEl('a', { href: `/subjects/${cleanedUpValue}` }, subjectTag);
+    annotateLinkEl(link, link.textContent,
+      ANALYTICS_MODULE_SUBJECT_TAGS, ANALYTICS_TEMPLATE_ZONE_RIGHT_RAIL, ANALYTICS_LINK_TYPE_ENGAGEMENT);
     createEl('li', { class: 'subject-tag' }, link, subjectUl);
   });
 
