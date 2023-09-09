@@ -1,4 +1,4 @@
-import { annotateLinkEl, createAnnotatedLinkEl, createEl } from '../../scripts/scripts.js';
+import { annotateElWithAnalyticsTracking, createAnnotatedLinkEl, createEl } from '../../scripts/scripts.js';
 import { decorateIcons, getMetadata, loadScript } from '../../scripts/lib-franklin.js';
 import { ANALYTICS_LINK_TYPE_DOWNLOADABLE, ANALYTICS_LINK_TYPE_ENGAGEMENT, ANALYTICS_LINK_TYPE_SHARE_INTENT, ANALYTICS_MODULE_DOWNLOAD_ARTICLE, ANALYTICS_MODULE_INDUSTRY_TAGS, ANALYTICS_MODULE_SHARE, ANALYTICS_MODULE_SUBJECT_TAGS, ANALYTICS_TEMPLATE_ZONE_RIGHT_RAIL } from '../../scripts/constants.js';
 
@@ -82,7 +82,7 @@ export default async function decorate(block) {
   const addPDF = getMetadata('pdf');
   if (addPDF && (addPDF === 'true')) {
     const pdfButton = createEl('a', { class: 'pdf-button button' }, 'DOWNLOAD PRESS RELEASE', share);
-    annotateLinkEl(pdfButton, pdfButton.textContent,
+    annotateElWithAnalyticsTracking(pdfButton, pdfButton.textContent,
       ANALYTICS_MODULE_DOWNLOAD_ARTICLE, ANALYTICS_TEMPLATE_ZONE_RIGHT_RAIL, ANALYTICS_LINK_TYPE_DOWNLOADABLE);
     pdfButton.addEventListener('click', async () => {
       // Add the js2pdf script
@@ -104,7 +104,7 @@ export default async function decorate(block) {
   industryTagValues.split(',').forEach((industryTag) => {
     const cleanedUpValue = industryTag.trim().toLowerCase().replace(/[\W_]+/g, '-');
     const link = createEl('a', { href: `/industries/${cleanedUpValue}` }, industryTag);
-    annotateLinkEl(link, link.textContent,
+    annotateElWithAnalyticsTracking(link, link.textContent,
       ANALYTICS_MODULE_INDUSTRY_TAGS, ANALYTICS_TEMPLATE_ZONE_RIGHT_RAIL, ANALYTICS_LINK_TYPE_ENGAGEMENT);
     createEl('li', { class: 'industry-tag' }, link, industryUl);
   });
@@ -113,7 +113,7 @@ export default async function decorate(block) {
   subjectTagValues.split(',').forEach((subjectTag) => {
     const cleanedUpValue = subjectTag.trim().toLowerCase().replace(/[\W_]+/g, '-');
     const link = createEl('a', { href: `/subjects/${cleanedUpValue}` }, subjectTag);
-    annotateLinkEl(link, link.textContent,
+    annotateElWithAnalyticsTracking(link, link.textContent,
       ANALYTICS_MODULE_SUBJECT_TAGS, ANALYTICS_TEMPLATE_ZONE_RIGHT_RAIL, ANALYTICS_LINK_TYPE_ENGAGEMENT);
     createEl('li', { class: 'subject-tag' }, link, subjectUl);
   });

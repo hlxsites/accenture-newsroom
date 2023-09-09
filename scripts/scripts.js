@@ -42,20 +42,20 @@ export function getCountryLanguage(locale) {
 /**
  * Annotates given link element with click tracking attributes
  *
- * @param {*} link
- * @param {*} linkName
+ * @param {*} el
+ * @param {*} elName
  * @param {*} moduleName
  * @param {*} templateZone
  * @param {*} linkType
  * @returns
  */
 
-export function annotateLinkEl(link, linkName, moduleName, templateZone, linkType) {
-  if (!link) return;
-  link.setAttribute('data-analytics-link-name', linkName);
-  link.setAttribute('data-analytics-module-name', moduleName);
-  link.setAttribute('data-analytics-template-zone', templateZone);
-  link.setAttribute('data-analytics-link-type', linkType);
+export function annotateElWithAnalyticsTracking(el, elName, moduleName, templateZone, linkType) {
+  if (!el) return;
+  el.setAttribute('data-analytics-link-name', elName);
+  el.setAttribute('data-analytics-module-name', moduleName);
+  el.setAttribute('data-analytics-template-zone', templateZone);
+  el.setAttribute('data-analytics-link-type', linkType);
 }
 
 /**
@@ -73,7 +73,7 @@ export function createAnnotatedLinkEl(href, text, moduleName, templateZone, link
   link.href = href;
   link.innerText = text;
   link.title = text;
-  annotateLinkEl(link, text, moduleName, templateZone, linkType);
+  annotateElWithAnalyticsTracking(link, text, moduleName, templateZone, linkType);
   return link;
 }
 
@@ -116,7 +116,7 @@ export async function fetchIndex(indexURL = '/query-index.json', limit = 1000) {
     return window.queryIndex[indexURL];
   }
   try {
-    const resp = await fetch(`${indexURL}?limit=${limit}}`);
+    const resp = await fetch(`${indexURL}?limit=${limit}`);
     const json = await resp.json();
     replaceEmptyValues(json.data);
     const queryIndex = skipInternalPaths(json.data);
@@ -188,9 +188,9 @@ async function addPrevNextLinksToArticles() {
   } else {
     nextLink = createEl('a', { href: '#', class: 'next disabled', title: 'Next' }, 'Next');
   }
-  annotateLinkEl(prevLink, 'Prev',
+  annotateElWithAnalyticsTracking(prevLink, 'Prev',
     ANALYTICS_MODULE_SEARCH_PAGINATION, ANALYTICS_TEMPLATE_ZONE_BODY, ANALYTICS_LINK_TYPE_NAV_PAGINATE);
-  annotateLinkEl(nextLink, 'Next',
+  annotateElWithAnalyticsTracking(nextLink, 'Next',
     ANALYTICS_MODULE_SEARCH_PAGINATION, ANALYTICS_TEMPLATE_ZONE_BODY, ANALYTICS_LINK_TYPE_NAV_PAGINATE);
   heroLinkContainer.append(prevLink);
   heroLinkContainer.append(nextLink);

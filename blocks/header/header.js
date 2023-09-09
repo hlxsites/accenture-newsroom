@@ -4,7 +4,7 @@ import {
   decorateButtons,
   decorateIcons,
 } from '../../scripts/lib-franklin.js';
-import { annotateLinkEl, createAnnotatedLinkEl } from '../../scripts/scripts.js';
+import { annotateElWithAnalyticsTracking, createAnnotatedLinkEl } from '../../scripts/scripts.js';
 
 const KEY_ENTER = 'Enter';
 
@@ -131,7 +131,7 @@ export default async function decorate(block) {
         // annotate levelTwo links
         const levelTwoLink = levelTwo.querySelector(':scope > a');
         if (levelTwoLink) {
-          annotateLinkEl(levelTwoLink, levelTwoLink.textContent,
+          annotateElWithAnalyticsTracking(levelTwoLink, levelTwoLink.textContent,
             ANALYTICS_MODULE_PRIMARY_NAV, ANALYTICS_TEMPLATE_ZONE_GLOBAL_HEADER, ANALYTICS_LINK_TYPE_NAVIGATION);
         }
         levelTwo.parentElement.classList.add('level-two');
@@ -165,7 +165,7 @@ export default async function decorate(block) {
           // annotate levelTwo links
           const levelThreeLink = levelThree.querySelector(':scope > a');
           if (levelThreeLink) {
-            annotateLinkEl(levelThreeLink, levelThreeLink.textContent,
+            annotateElWithAnalyticsTracking(levelThreeLink, levelThreeLink.textContent,
               ANALYTICS_MODULE_SECONDARY_NAV, ANALYTICS_TEMPLATE_ZONE_GLOBAL_HEADER, ANALYTICS_LINK_TYPE_NAVIGATION);
           }
         });

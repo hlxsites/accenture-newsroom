@@ -1,5 +1,18 @@
 import { readBlockConfig } from '../../scripts/lib-franklin.js';
-import { fetchIndex, ABSTRACT_REGEX } from '../../scripts/scripts.js';
+import { fetchIndex, ABSTRACT_REGEX, annotateElWithAnalyticsTracking } from '../../scripts/scripts.js';
+import {
+  ANALYTICS_MODULE_SEARCH,
+  ANALYTICS_TEMPLATE_ZONE_BODY,
+  ANALYTICS_LINK_TYPE_SEARCH_ACTIVITY,
+  ANALYTICS_MODULE_TOP_NAV,
+  ANALYTICS_LINK_TYPE_SEARCH_INTENT,
+  ANALYTICS_MODULE_YEAR_FILTER,
+  ANALYTICS_LINK_TYPE_FILTER,
+  ANALYTICS_MODULE_CONTENT_CARDS,
+  ANALYTICS_LINK_TYPE_ENGAGEMENT,
+  ANALYTICS_MODULE_SEARCH_PAGINATION,
+  ANALYTICS_LINK_TYPE_NAV_PAGINATE,
+} from '../../scripts/constants.js';
 
 function getHumanReadableDate(dateString) {
   if (!dateString) return dateString;
@@ -35,7 +48,7 @@ function getDescription(queryIndexEntry) {
 
 function filterByQuery(index, query) {
   if (!query) return [];
-  const queryTokens = query.split(' ');
+  const queryTokens = query.split(' ').map((t) => t.toLowerCase());
   return index.filter((e) => {
     const title = e.title.toLowerCase();
     const longdescription = getDescription(e).toLowerCase();
@@ -267,6 +280,12 @@ export default async function decorate(block) {
     } else {
       searchHeader.innerHTML = form;
     }
+    const submitAction = searchHeader.querySelector('input[type="submit"]');
+    annotateElWithAnalyticsTracking(submitAction, '',
+      ANALYTICS_MODULE_SEARCH, ANALYTICS_TEMPLATE_ZONE_BODY, ANALYTICS_LINK_TYPE_SEARCH_ACTIVITY);
+    const searchInput = searchHeader.querySelector('#search-input');
+    annotateElWithAnalyticsTracking(searchInput, '',
+      ANALYTICS_MODULE_TOP_NAV, ANALYTICS_TEMPLATE_ZONE_BODY, ANALYTICS_LINK_TYPE_SEARCH_ACTIVITY);
     newsListContainer.append(searchHeader);
   } else if (key && value) {
     shortIndex = index.filter((e) => {
@@ -297,6 +316,11 @@ export default async function decorate(block) {
         </div>
       </form>
     `;
+    newsListHeader.querySelectorAll('.newslist-filter-year-item').forEach((item) => {
+      const year = item.textContent;
+      annotateElWithAnalyticsTracking(item, year,
+        ANALYTICS_MODULE_YEAR_FILTER, '', ANALYTICS_LINK_TYPE_FILTER);
+    });
     newsListContainer.append(newsListHeader);
     if (fromDate && toDate) {
       shortIndex = filterByDate(shortIndex, fromDate, toDate);
@@ -322,6 +346,9 @@ export default async function decorate(block) {
         <input type="submit" value="" disabled>
       </form>
     `;
+    const searchSubmitAction = newsListHeader.querySelector('#newslist-search-form input[type="submit"]');
+    annotateElWithAnalyticsTracking(searchSubmitAction, 'initiated search - click/tap',
+      ANALYTICS_MODULE_SEARCH, ANALYTICS_TEMPLATE_ZONE_BODY, ANALYTICS_LINK_TYPE_SEARCH_INTENT);
     newsListContainer.append(newsListHeader);
     if (fromDate && toDate) {
       shortIndex = filterByDate(index, fromDate, toDate);
@@ -339,7 +366,7 @@ export default async function decorate(block) {
           ${getHumanReadableDate(e.publisheddateinseconds * 1000)}
         </div>
         <div class="search-results-item-title">
-          <a href="${e.path}">${e.title}</a>
+          <a href="${e.path}" title="${e.title}">${e.title}</a>
         </div>
         <div class="search-results-item-content">${getDescription(e)}</div>
       </div>
@@ -350,14 +377,14 @@ export default async function decorate(block) {
         <div class="newslist-item">
           <div class="newslist-item-title">
             <h4> 
-              <a href="${e.path}">${e.title}</a>
+              <a href="${e.path}" title="${e.title}">${e.title}</a>
             </h4>
           </div>
           <div class="newslist-item-description">
             <p>${getDescription(e)}</p>
           </div>
           <div class="newslist-item-footer">
-            <a href="${e.path}">Read More <span class="read-more-arrow"></span></a>
+            <a href="${e.path}" title="Read More">Read More <span class="read-more-arrow"></span></a>
             <div class="newslist-item-publisheddate">
               ${getHumanReadableDate(e.publisheddateinseconds * 1000)}
             </div>
@@ -366,6 +393,10 @@ export default async function decorate(block) {
       `;
     }
     const item = range.createContextualFragment(itemHtml);
+    item.querySelectorAll('a').forEach((link) => {
+      annotateElWithAnalyticsTracking(link, link.textContent,
+        ANALYTICS_MODULE_CONTENT_CARDS, ANALYTICS_TEMPLATE_ZONE_BODY, ANALYTICS_LINK_TYPE_ENGAGEMENT);
+    });
     newsListContainer.append(item);
   }
   block.innerHTML = newsListContainer.outerHTML;
@@ -422,6 +453,18 @@ export default async function decorate(block) {
     next.innerHTML = '<span class="pagination-next-arrow"/>';
     next.classList.add('pagination-next');
     paginationContainer.append(next);
+    paginationContainer.querySelectorAll('a').forEach((link) => {
+      if (link.textContent === '...') {
+        return;
+      }
+      annotateElWithAnalyticsTracking(
+        link,
+        link.textContent,
+        ANALYTICS_MODULE_SEARCH_PAGINATION,
+        ANALYTICS_TEMPLATE_ZONE_BODY,
+        ANALYTICS_LINK_TYPE_NAV_PAGINATE
+      );
+    });
     block.append(paginationContainer);
   }
 }

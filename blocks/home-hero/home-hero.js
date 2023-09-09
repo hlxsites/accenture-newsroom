@@ -6,7 +6,7 @@ import {
   ANALYTICS_TEMPLATE_ZONE_HERO,
   ANALYTICS_TEMPLATE_ZONE_BODY,
 } from '../../scripts/constants.js';
-import { annotateLinkEl } from '../../scripts/scripts.js';
+import { annotateElWithAnalyticsTracking } from '../../scripts/scripts.js';
 
 export default async function decorate(block) {
   const title = block.querySelector('h1');
@@ -18,7 +18,7 @@ export default async function decorate(block) {
     overlayContainer.append(parent);
   });
   overlayContainer.querySelectorAll('a').forEach((link) => {
-    annotateLinkEl(
+    annotateElWithAnalyticsTracking(
       link,
       link.textContent,
       ANALYTICS_MODULE_MARQUEE,
@@ -41,7 +41,7 @@ export default async function decorate(block) {
     linksContainer.classList.add('home-hero-links-container');
     linksContainer.append(links);
     links.querySelectorAll('a').forEach((link) => {
-      annotateLinkEl(
+      annotateElWithAnalyticsTracking(
         link,
         link.textContent,
         ANALYTICS_MODULE_MULTIPAGE_NAV,

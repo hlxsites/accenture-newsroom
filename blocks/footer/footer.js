@@ -2,7 +2,7 @@ import { ANALYTICS_LINK_TYPE_CALL_TO_ACTION, ANALYTICS_LINK_TYPE_FOOTER, ANALYTI
 import {
   readBlockConfig, decorateIcons, decorateSections, loadBlocks,
 } from '../../scripts/lib-franklin.js';
-import { annotateLinkEl } from '../../scripts/scripts.js';
+import { annotateElWithAnalyticsTracking } from '../../scripts/scripts.js';
 
 /**
  * loads and decorates the footer
@@ -43,7 +43,7 @@ export default async function decorate(block) {
     const preFooter = footer.querySelector('.section.pre-footer');
     preFooter.querySelectorAll('a').forEach((link) => {
       const moduleName = link.innerText === 'Contact Us' ? ANALYTICS_MODULE_CONTACT_US : ANALYTICS_MODULE_CORPORATE_INFORMATION_LINKS;
-      annotateLinkEl(link, link.innerText,
+      annotateElWithAnalyticsTracking(link, link.innerText,
         moduleName, ANALYTICS_TEMPLATE_ZONE_BODY, ANALYTICS_LINK_TYPE_CALL_TO_ACTION);
     });
 
@@ -57,7 +57,7 @@ export default async function decorate(block) {
         // remove the icon class from the iconClass
         text = socialTitlesMapping[iconClass.replace('icon-', '')] || '';
       }
-      annotateLinkEl(link, text,
+      annotateElWithAnalyticsTracking(link, text,
         ANALYTICS_MODULE_FOOTER, ANALYTICS_TEMPLATE_ZONE_FOOTER, ANALYTICS_LINK_TYPE_FOOTER); 
     });
 
