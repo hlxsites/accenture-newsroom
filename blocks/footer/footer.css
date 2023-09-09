@@ -151,14 +151,14 @@ footer .footer-black .columns.copyright ul li a {
     display: flex;
   }
 
-  footer .pre-footer .columns > div > div {
-    width: 41%;
-  }
-
   footer .footer-black .columns > div {
     display: flex;
     column-gap: 20px;
     align-items: center;
+  }
+
+  footer .pre-footer .columns > div > div {
+    width: 41%;
   }
 
   footer .footer-black .columns > div > div:last-child {

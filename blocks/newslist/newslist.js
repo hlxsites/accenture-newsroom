@@ -281,11 +281,21 @@ export default async function decorate(block) {
       searchHeader.innerHTML = form;
     }
     const submitAction = searchHeader.querySelector('input[type="submit"]');
-    annotateElWithAnalyticsTracking(submitAction, '',
-      ANALYTICS_MODULE_SEARCH, ANALYTICS_TEMPLATE_ZONE_BODY, ANALYTICS_LINK_TYPE_SEARCH_ACTIVITY);
+    annotateElWithAnalyticsTracking(
+      submitAction,
+      '',
+      ANALYTICS_MODULE_SEARCH,
+      ANALYTICS_TEMPLATE_ZONE_BODY,
+      ANALYTICS_LINK_TYPE_SEARCH_ACTIVITY,
+    );
     const searchInput = searchHeader.querySelector('#search-input');
-    annotateElWithAnalyticsTracking(searchInput, '',
-      ANALYTICS_MODULE_TOP_NAV, ANALYTICS_TEMPLATE_ZONE_BODY, ANALYTICS_LINK_TYPE_SEARCH_ACTIVITY);
+    annotateElWithAnalyticsTracking(
+      searchInput,
+      '',
+      ANALYTICS_MODULE_TOP_NAV,
+      ANALYTICS_TEMPLATE_ZONE_BODY,
+      ANALYTICS_LINK_TYPE_SEARCH_ACTIVITY,
+    );
     newsListContainer.append(searchHeader);
   } else if (key && value) {
     shortIndex = index.filter((e) => {
@@ -317,9 +327,13 @@ export default async function decorate(block) {
       </form>
     `;
     newsListHeader.querySelectorAll('.newslist-filter-year-item').forEach((item) => {
-      const year = item.textContent;
-      annotateElWithAnalyticsTracking(item, year,
-        ANALYTICS_MODULE_YEAR_FILTER, '', ANALYTICS_LINK_TYPE_FILTER);
+      annotateElWithAnalyticsTracking(
+        item,
+        item.textContent,
+        ANALYTICS_MODULE_YEAR_FILTER,
+        '',
+        ANALYTICS_LINK_TYPE_FILTER,
+      );
     });
     newsListContainer.append(newsListHeader);
     if (fromDate && toDate) {
@@ -347,8 +361,13 @@ export default async function decorate(block) {
       </form>
     `;
     const searchSubmitAction = newsListHeader.querySelector('#newslist-search-form input[type="submit"]');
-    annotateElWithAnalyticsTracking(searchSubmitAction, 'initiated search - click/tap',
-      ANALYTICS_MODULE_SEARCH, ANALYTICS_TEMPLATE_ZONE_BODY, ANALYTICS_LINK_TYPE_SEARCH_INTENT);
+    annotateElWithAnalyticsTracking(
+      searchSubmitAction,
+      'initiated search - click/tap',
+      ANALYTICS_MODULE_SEARCH,
+      ANALYTICS_TEMPLATE_ZONE_BODY,
+      ANALYTICS_LINK_TYPE_SEARCH_INTENT,
+    );
     newsListContainer.append(newsListHeader);
     if (fromDate && toDate) {
       shortIndex = filterByDate(index, fromDate, toDate);
@@ -394,8 +413,13 @@ export default async function decorate(block) {
     }
     const item = range.createContextualFragment(itemHtml);
     item.querySelectorAll('a').forEach((link) => {
-      annotateElWithAnalyticsTracking(link, link.textContent,
-        ANALYTICS_MODULE_CONTENT_CARDS, ANALYTICS_TEMPLATE_ZONE_BODY, ANALYTICS_LINK_TYPE_ENGAGEMENT);
+      annotateElWithAnalyticsTracking(
+        link,
+        link.textContent,
+        ANALYTICS_MODULE_CONTENT_CARDS,
+        ANALYTICS_TEMPLATE_ZONE_BODY,
+        ANALYTICS_LINK_TYPE_ENGAGEMENT,
+      );
     });
     newsListContainer.append(item);
   }
@@ -462,7 +486,7 @@ export default async function decorate(block) {
         link.textContent,
         ANALYTICS_MODULE_SEARCH_PAGINATION,
         ANALYTICS_TEMPLATE_ZONE_BODY,
-        ANALYTICS_LINK_TYPE_NAV_PAGINATE
+        ANALYTICS_LINK_TYPE_NAV_PAGINATE,
       );
     });
     block.append(paginationContainer);
