@@ -4,7 +4,6 @@ import {
 import { createAnnotatedLinkEl } from '../../scripts/scripts.js';
 import { ANALYTICS_LINK_TYPE_BREADCRUMB, ANALYTICS_MODULE_MARQUEE, ANALYTICS_TEMPLATE_ZONE_HERO } from '../../scripts/constants.js';
 
-
 function isSearchPage() {
   return window.location.pathname === '/search';
 }
@@ -13,8 +12,13 @@ export default async function decorate(block) {
   block.innerHTML = '';
   template = template ? template.toLowerCase() : '';
   const newsRoomLink = document.createElement('h2');
-  const annotatedLink = createAnnotatedLinkEl('/', 'Newsroom',
-    ANALYTICS_MODULE_MARQUEE, ANALYTICS_TEMPLATE_ZONE_HERO, ANALYTICS_LINK_TYPE_BREADCRUMB);
+  const annotatedLink = createAnnotatedLinkEl(
+    '/',
+    'Newsroom',
+    ANALYTICS_MODULE_MARQUEE,
+    ANALYTICS_TEMPLATE_ZONE_HERO,
+    ANALYTICS_LINK_TYPE_BREADCRUMB,
+  );
   newsRoomLink.innerHTML = annotatedLink.outerHTML;
   block.append(newsRoomLink);
 

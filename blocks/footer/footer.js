@@ -1,4 +1,12 @@
-import { ANALYTICS_LINK_TYPE_CALL_TO_ACTION, ANALYTICS_LINK_TYPE_FOOTER, ANALYTICS_MODULE_CONTACT_US, ANALYTICS_MODULE_CORPORATE_INFORMATION_LINKS, ANALYTICS_MODULE_FOOTER, ANALYTICS_TEMPLATE_ZONE_BODY, ANALYTICS_TEMPLATE_ZONE_FOOTER } from '../../scripts/constants.js';
+import {
+  ANALYTICS_LINK_TYPE_CALL_TO_ACTION,
+  ANALYTICS_LINK_TYPE_FOOTER,
+  ANALYTICS_MODULE_CONTACT_US,
+  ANALYTICS_MODULE_CORPORATE_INFORMATION_LINKS,
+  ANALYTICS_MODULE_FOOTER,
+  ANALYTICS_TEMPLATE_ZONE_BODY,
+  ANALYTICS_TEMPLATE_ZONE_FOOTER,
+} from '../../scripts/constants.js';
 import {
   readBlockConfig, decorateIcons, decorateSections, loadBlocks,
 } from '../../scripts/lib-franklin.js';
@@ -10,11 +18,11 @@ import { annotateElWithAnalyticsTracking } from '../../scripts/scripts.js';
  */
 export default async function decorate(block) {
   const socialTitlesMapping = {
-    'linkedin': 'Follow us on Linkedin',
-    'twitter': 'Follow us on Twitter',
-    'facebook': 'Follow us on Facebook',
-    'youtube': 'Follow us on Youtube',
-  }
+    linkedin: 'Follow us on Linkedin',
+    twitter: 'Follow us on Twitter',
+    facebook: 'Follow us on Facebook',
+    youtube: 'Follow us on Youtube',
+  };
   const cfg = readBlockConfig(block);
   block.textContent = '';
 
@@ -43,8 +51,13 @@ export default async function decorate(block) {
     const preFooter = footer.querySelector('.section.pre-footer');
     preFooter.querySelectorAll('a').forEach((link) => {
       const moduleName = link.innerText === 'Contact Us' ? ANALYTICS_MODULE_CONTACT_US : ANALYTICS_MODULE_CORPORATE_INFORMATION_LINKS;
-      annotateElWithAnalyticsTracking(link, link.innerText,
-        moduleName, ANALYTICS_TEMPLATE_ZONE_BODY, ANALYTICS_LINK_TYPE_CALL_TO_ACTION);
+      annotateElWithAnalyticsTracking(
+        link,
+        link.innerText,
+        moduleName,
+        ANALYTICS_TEMPLATE_ZONE_BODY,
+        ANALYTICS_LINK_TYPE_CALL_TO_ACTION,
+      );
     });
 
     const footerBlack = footer.querySelector('.section.footer-black');
@@ -57,8 +70,13 @@ export default async function decorate(block) {
         // remove the icon class from the iconClass
         text = socialTitlesMapping[iconClass.replace('icon-', '')] || '';
       }
-      annotateElWithAnalyticsTracking(link, text,
-        ANALYTICS_MODULE_FOOTER, ANALYTICS_TEMPLATE_ZONE_FOOTER, ANALYTICS_LINK_TYPE_FOOTER); 
+      annotateElWithAnalyticsTracking(
+        link,
+        text,
+        ANALYTICS_MODULE_FOOTER,
+        ANALYTICS_TEMPLATE_ZONE_FOOTER,
+        ANALYTICS_LINK_TYPE_FOOTER,
+      );
     });
 
     block.append(footer);

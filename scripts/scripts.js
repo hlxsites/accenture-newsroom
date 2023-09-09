@@ -188,10 +188,20 @@ async function addPrevNextLinksToArticles() {
   } else {
     nextLink = createEl('a', { href: '#', class: 'next disabled', title: 'Next' }, 'Next');
   }
-  annotateElWithAnalyticsTracking(prevLink, 'Prev',
-    ANALYTICS_MODULE_SEARCH_PAGINATION, ANALYTICS_TEMPLATE_ZONE_BODY, ANALYTICS_LINK_TYPE_NAV_PAGINATE);
-  annotateElWithAnalyticsTracking(nextLink, 'Next',
-    ANALYTICS_MODULE_SEARCH_PAGINATION, ANALYTICS_TEMPLATE_ZONE_BODY, ANALYTICS_LINK_TYPE_NAV_PAGINATE);
+  annotateElWithAnalyticsTracking(
+    prevLink,
+    'Prev',
+    ANALYTICS_MODULE_SEARCH_PAGINATION,
+    ANALYTICS_TEMPLATE_ZONE_BODY,
+    ANALYTICS_LINK_TYPE_NAV_PAGINATE,
+  );
+  annotateElWithAnalyticsTracking(
+    nextLink,
+    'Next',
+    ANALYTICS_MODULE_SEARCH_PAGINATION,
+    ANALYTICS_TEMPLATE_ZONE_BODY,
+    ANALYTICS_LINK_TYPE_NAV_PAGINATE,
+  );
   heroLinkContainer.append(prevLink);
   heroLinkContainer.append(nextLink);
 }

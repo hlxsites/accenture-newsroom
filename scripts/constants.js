@@ -30,8 +30,6 @@ export const ANALYTICS_MODULE_INDUSTRY_TAGS = 'nws-industry-tags';
 export const ANALYTICS_MODULE_DOWNLOAD_ARTICLE = 'nws-download-article';
 export const ANALYTICS_MODULE_FOOTER = 'nws-footer';
 
-
-
 // ANALYTICS TEMPLATE ZONES
 
 export const ANALYTICS_TEMPLATE_ZONE_HERO = 'hero';
@@ -61,4 +59,3 @@ export const ANALYTICS_LINK_TYPE_SHARE_INTENT = 'share intent';
 export const ANALYTICS_LINK_TYPE_DOWNLOADABLE = 'downloadable';
 export const ANALYTICS_LINK_TYPE_CTA = 'cta';
 export const ANALYTICS_LINK_TYPE_FOOTER = 'footer';
-
