@@ -1,4 +1,10 @@
-import { ANALYTICS_LINK_TYPE_NAV_PAGINATE, ANALYTICS_TEMPLATE_ZONE_BODY, ANALYTICS_MODULE_SEARCH_PAGINATION } from './constants.js';
+import {
+  ANALYTICS_LINK_TYPE_NAV_PAGINATE,
+  ANALYTICS_TEMPLATE_ZONE_BODY,
+  ANALYTICS_MODULE_SEARCH_PAGINATION,
+  ANALYTICS_MODULE_CONTENT,
+  ANALYTICS_LINK_TYPE_CONTENT_MODULE,
+} from './constants.js';
 import {
   sampleRUM,
   buildBlock,
@@ -229,6 +235,23 @@ function annotateArticleSections() {
       break;
     }
   }
+  // annotate links
+  const excludeSections = ['hero-container', 'aside-container'];
+  articleSections.forEach((section) => {
+    const sectionClassList = Array.from(section.classList);
+    if (sectionClassList.some((c) => excludeSections.includes(c))) {
+      return;
+    }
+    section.querySelectorAll('a').forEach((link) => {
+      annotateElWithAnalyticsTracking(
+        link,
+        link.innerText,
+        ANALYTICS_MODULE_CONTENT,
+        ANALYTICS_TEMPLATE_ZONE_BODY,
+        ANALYTICS_LINK_TYPE_CONTENT_MODULE,
+      );
+    });
+  });
 }
 
 /**
