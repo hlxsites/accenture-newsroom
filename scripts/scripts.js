@@ -458,7 +458,7 @@ async function loadLazy(doc) {
   loadFonts();
 
   // article processing
-  addPrevNextLinksToArticles();
+  // addPrevNextLinksToArticles();
 
   loadJQueryDateRangePicker();
 
