@@ -468,9 +468,6 @@ async function loadLazy(doc) {
   loadCSS(`${window.hlx.codeBasePath}/styles/lazy-styles.css`);
   loadFonts();
 
-  // article processing
-  addPrevNextLinksToArticles();
-
   loadJQueryDateRangePicker();
 
   sampleRUM('lazy');
@@ -483,6 +480,8 @@ async function loadLazy(doc) {
  * without impacting the user experience.
  */
 function loadDelayed() {
+  // article processing
+  window.setTimeout(() => addPrevNextLinksToArticles(), 2000);
   // eslint-disable-next-line import/no-cycle
   window.setTimeout(() => import('./delayed.js'), 3000);
   // load anything that can be postponed to the latest here
