@@ -8,6 +8,18 @@ import {
 } from '../../scripts/constants.js';
 import { annotateElWithAnalyticsTracking } from '../../scripts/scripts.js';
 
+function getBackgroundImage(picture) {
+  const sources = picture.querySelectorAll('source[type="image/webp"');
+  // eslint-disable-next-line no-restricted-syntax
+  for (let i = 0; i < sources.length; i += 1) {
+    const mediaQuery = sources[i].getAttribute('media');
+    if (mediaQuery && window.matchMedia(mediaQuery).matches) {
+      return sources[i].srcset;
+    }
+  }
+  return picture.querySelector('img').src;
+}
+
 export default async function decorate(block) {
   const title = block.querySelector('h1');
   const overlayContainer = document.createElement('div');
@@ -31,7 +43,7 @@ export default async function decorate(block) {
   stripe.classList.add('home-hero-stripe');
   title.insertAdjacentElement('afterend', stripe);
   const picture = block.querySelector('picture');
-  const imgSrc = picture.querySelector('img').src;
+  const imgSrc = getBackgroundImage(picture);
   picture.remove();
   const content = block.querySelector('h1').parentNode;
   content.classList.add('home-hero-content-container');
