@@ -164,6 +164,17 @@ export function createEl(name, attributes = {}, content = '', parentEl = null) {
   return el;
 }
 
+function findArticleIndex(queryIndex, path) {
+  let articleIndex = -1;
+  for (let i = 0; i < queryIndex.length; i += 1) {
+    if (queryIndex[i].path === path) {
+      articleIndex = i;
+      break;
+    }
+  }
+  return articleIndex;
+}
+
 async function addPrevNextLinksToArticles() {
   const template = getMetadata('template');
   const heroBlock = document.querySelector('.hero.block');
@@ -175,7 +186,7 @@ async function addPrevNextLinksToArticles() {
   const queryIndex = await fetchIndex(indexURL, limit);
   // iterate queryIndex to find current article and add prev/next links
   const currentArticlePath = window.location.pathname;
-  const currentArticleIndex = queryIndex.findIndex((row) => row.path === currentArticlePath);
+  const currentArticleIndex = findArticleIndex(queryIndex, currentArticlePath);
   if (currentArticleIndex === -1) {
     return;
   }
@@ -458,7 +469,7 @@ async function loadLazy(doc) {
   loadFonts();
 
   // article processing
-  // addPrevNextLinksToArticles();
+  addPrevNextLinksToArticles();
 
   loadJQueryDateRangePicker();
 
