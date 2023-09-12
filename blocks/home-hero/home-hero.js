@@ -17,7 +17,7 @@ function getBackgroundImage(picture) {
       return sources[i].srcset;
     }
   }
-  return picture.querySelector('img').src;
+  return picture.querySelector('source[type="image/webp"]:not([media]').srcset || picture.querySelector('img').src;
 }
 
 export default async function decorate(block) {
