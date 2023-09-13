@@ -104,7 +104,7 @@ const makeProxySrcs = (main, url) => {
     try {
       const u = new URL(img.src);
       u.searchParams.append('host', u.origin);
-      img.src = `http://localhost:3001${u.pathname}${u.search}`;
+      img.src = `http://localhost:3001${u.pathname.replace(/\/\//g, '/')}${u.search}`;
     } catch (error) {
       // eslint-disable-next-line no-console
       console.warn(`Unable to make proxy src for ${img.src}: ${error.message}`);
@@ -125,6 +125,7 @@ const collectTextNodes = (node, list) => {
 
 const findNextBrOrpNode = (node) => {
   let currentNode = node.parentElement.nextSibling;
+  if (node.parentElement.nodeName === 'H1') currentNode = node.parentElement.parentElement;
 
   // Check siblings first
   while (currentNode !== null) {
@@ -211,7 +212,11 @@ export default {
     if (matchingParagraph) {
       const nextBrNode = findNextBrOrpNode(matchingParagraph);
       if (nextBrNode) {
+        const br1 = document.createElement('br');
+        const br2 = document.createElement('br');
+        nextBrNode.after(br1);
         nextBrNode.after('---');
+        nextBrNode.after(br2);
       } else {
         const brNode = document.createElement('br');
         const insertedBrNode = matchingParagraph.parentElement.insertAdjacentElement('afterend', brNode);
