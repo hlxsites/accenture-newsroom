@@ -117,17 +117,20 @@ function skipInternalPaths(jsonData) {
   });
 }
 
-export async function fetchIndex(indexURL = '/query-index.json', limit = 1000) {
+export async function fetchIndex(indexURL = '/query-index.json', limit = 1000, offset = 0) {
   if (window.queryIndex && window.queryIndex[indexURL]) {
     return window.queryIndex[indexURL];
   }
   try {
-    const resp = await fetch(`${indexURL}?limit=${limit}`);
+    const resp = await fetch(`${indexURL}?limit=${limit}&offset=${offset}`);
     const json = await resp.json();
     replaceEmptyValues(json.data);
     const queryIndex = skipInternalPaths(json.data);
     window.queryIndex = window.queryIndex || {};
     window.queryIndex[indexURL] = queryIndex;
+    window.queryIndex[indexURL].total = json.total;
+    window.queryIndex[indexURL].limit = json.limit;
+    window.queryIndex[indexURL].offset = json.offset;
     return queryIndex;
   } catch (e) {
     // eslint-disable-next-line no-console
@@ -183,7 +186,7 @@ async function addPrevNextLinksToArticles() {
   }
   const indexURL = '/query-index.json';
   const limit = 10000;
-  const queryIndex = await fetchIndex(indexURL, limit);
+  const queryIndex = await fetchIndex(indexURL, limit, 0);
   // iterate queryIndex to find current article and add prev/next links
   const currentArticlePath = window.location.pathname;
   const currentArticleIndex = findArticleIndex(queryIndex, currentArticlePath);
