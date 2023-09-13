@@ -93,10 +93,12 @@ const createNewsListBlock = (main, document, url) => {
 };
 
 const makeProxySrcs = (main, url) => {
+  const newUrl = new URL(url);
+  const host = newUrl.searchParams.get('host');
   main.querySelectorAll('img').forEach((img) => {
     if (img.src.startsWith('/')) {
       // make absolute
-      const cu = new URL(url);
+      const cu = new URL(host);
       img.src = `${cu.origin}${img.src}`.replace(/\/\//g, '/');
     }
     try {
