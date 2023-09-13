@@ -92,11 +92,11 @@ const createNewsListBlock = (main, document, url) => {
   if (secHero) secHero.remove();
 };
 
-const makeProxySrcs = (main, host = 'https://newsroom.accenture.com') => {
+const makeProxySrcs = (main, url) => {
   main.querySelectorAll('img').forEach((img) => {
     if (img.src.startsWith('/')) {
       // make absolute
-      const cu = new URL(host);
+      const cu = new URL(url);
       img.src = `${cu.origin}${img.src}`.replace(/\/\//g, '/');
     }
     try {
@@ -122,7 +122,7 @@ const collectTextNodes = (node, list) => {
 };
 
 const findNextBrOrpNode = (node) => {
-  let currentNode = node.nextSibling;
+  let currentNode = node.parentElement.nextSibling;
 
   // Check siblings first
   while (currentNode !== null) {
@@ -190,7 +190,7 @@ export default {
       .replaceAll(/&nbsp;<br>/g, '<br>');
 
     // make proxy srcs for images
-    makeProxySrcs(main);
+    makeProxySrcs(main, url);
 
     // convert title to h1 tag
     const title = main.querySelector('#tek-wrap-centerwell article strong');
@@ -200,7 +200,7 @@ export default {
 
     // add section after abstract
     const contentDetails = main.querySelector('#tek-wrap-centerwell article #content-details');
-    const abstractRegex = /(.*?);.*?(\d{4})|(.*?)(\d{4})\s+–\s+\b|(.*?)(\d{4})\s+-\s+\b/;
+    const abstractRegex = /(.*?);(.*?)(\d{4})|(.*?)(\d{4})\s+–\s+\b|(.*?)(\d{4})\s+-\s+\b/;
     const contentDetailsTextNodes = [];
     collectTextNodes(contentDetails, contentDetailsTextNodes);
     const matchingParagraph = contentDetailsTextNodes.find(
