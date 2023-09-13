@@ -202,7 +202,7 @@ export default {
 
     // add section after abstract
     const contentDetails = main.querySelector('#tek-wrap-centerwell article #content-details');
-    const abstractRegex = /(.*?);(.*?)(\d{4})|(.*?)(\d{4})\s+–\s+\b|(.*?)(\d{4})\s+-\s+\b/;
+    const abstractRegex = /(.*?);(.*?)(\d{4})|(.*?)(\d{4})\s+–\s+\b|(.*?)(\d{4})\s+-\s+\b|\b(\d+)\b(.*?)(\d{4})\b/;
     const contentDetailsTextNodes = [];
     collectTextNodes(contentDetails, contentDetailsTextNodes);
     const matchingParagraph = contentDetailsTextNodes.find(
