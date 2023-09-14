@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 /* eslint-disable no-undef */
 const isCategoryPage = (url) => (url.includes('/industries/') || url.includes('/subjects/'));
 
@@ -203,29 +204,31 @@ export default {
       title.outerHTML = `<h1>${title.innerHTML}</h1>`;
     }
 
-    // add section after abstract
-    const contentDetails = main.querySelector('#tek-wrap-centerwell article #content-details');
-    const abstractRegex = /(.*?);(.*?)(\d{4})|(.*?)(\d{4})\s+–\s+\b|(.*?)(\d{4})\s+-\s+\b|\b(\d+)\b(.*?)(\d{4})\b|(.*?),(.*?)(\d{4})\b/;
-    const contentDetailsTextNodes = [];
-    collectTextNodes(contentDetails, contentDetailsTextNodes);
-    const matchingParagraph = contentDetailsTextNodes.find(
-      (p) => abstractRegex.test(p.textContent),
-    );
-    if (matchingParagraph) {
-      const nextBrNode = findNextBrOrpNode(matchingParagraph);
-      if (nextBrNode) {
-        const br1 = document.createElement('br');
-        const br2 = document.createElement('br');
-        nextBrNode.after(br1);
-        nextBrNode.after('---');
-        nextBrNode.after(br2);
+    // add section after abstract for news articles only
+    if (url.includes('/news/')) {
+      const contentDetails = main.querySelector('#tek-wrap-centerwell article #content-details');
+      const abstractRegex = /(.*?);(.*?)(\d{4})|(.*?)(\d{4})\s+–\s+\b|(.*?)(\d{4})\s+-\s+\b|\b(\d+)\b(.*?)(\d{4})\b|(.*?),(.*?)(\d{4})\b/;
+      const contentDetailsTextNodes = [];
+      collectTextNodes(contentDetails, contentDetailsTextNodes);
+      const matchingParagraph = contentDetailsTextNodes.find(
+        (p) => abstractRegex.test(p.textContent),
+      );
+      if (matchingParagraph) {
+        const nextBrNode = findNextBrOrpNode(matchingParagraph);
+        if (nextBrNode) {
+          const br1 = document.createElement('br');
+          const br2 = document.createElement('br');
+          nextBrNode.after(br1);
+          nextBrNode.after('---');
+          nextBrNode.after(br2);
+        } else {
+          const brNode = document.createElement('br');
+          const insertedBrNode = matchingParagraph.parentElement.insertAdjacentElement('afterend', brNode);
+          insertedBrNode.after('---');
+        }
       } else {
-        const brNode = document.createElement('br');
-        const insertedBrNode = matchingParagraph.parentElement.insertAdjacentElement('afterend', brNode);
-        insertedBrNode.after('---');
+        throw new Error('abstract not found');
       }
-    } else {
-      throw new Error('abstract not found');
     }
 
     // If contact info in right rail, move it to the bottom of the content
@@ -264,6 +267,39 @@ export default {
     results.push({
       element: main,
       path: new URL(url).pathname.replace('.htm', ''),
+    });
+
+    // find pdf links
+    main.querySelectorAll('a').forEach((a) => {
+      const href = a.getAttribute('href');
+      if (href && href.endsWith('.pdf')) {
+        const newUrl = new URL(url);
+        const host = newUrl.searchParams.get('host');
+        if (href.startsWith('/')) {
+          // make absolute
+          const cu = new URL(host);
+          a.setAttribute('href', `${cu.origin}${a.href}`.replace(/\/\//g, '/'));
+        }
+        try {
+          const u = new URL(a.getAttribute('href'));
+          u.searchParams.append('host', u.origin);
+          // no "element", the "from" property is provided instead
+          // importer will download the "from" resource as "path"
+          const newPath = WebImporter.FileUtils.sanitizePath(u.pathname.replace(/\/\//g, '/'));
+          results.push({
+            path: newPath,
+            from: `http://localhost:3001${u.pathname.replace(/\/\//g, '/')}${u.search}`,
+          });
+
+          // update the link to new path on the target host
+          // this is required to be able to follow the links in Word
+          // you will need to replace "main--repo--owner" by your project setup
+          const newHref = new URL(newPath, 'https://main--accenture-newsroom--hlxsites.hlx.page').toString();
+          a.setAttribute('href', newHref);
+        } catch (error) {
+          console.warn(`Unable to create PDF link for ${href}: ${error.message}`);
+        }
+      }
     });
     return results;
   },
