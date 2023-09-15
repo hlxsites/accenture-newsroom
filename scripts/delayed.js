@@ -4,6 +4,10 @@ import { sampleRUM, loadScript, getMetadata } from './lib-franklin.js';
 import { getLocale, getCountryLanguage } from './scripts.js';
 
 const ONETRUST_SDK = 'https://cdn.cookielaw.org/scripttemplates/otSDKStub.js';
+// eslint-disable-next-line no-unused-vars
+const ADOBE_LAUNCH_STAGING_SCRIPT = 'https://assets.adobedtm.com/55621ea95d50/e22056dd1d90/launch-EN379c80f941604b408953a2df1776d1c6-staging.min.js';
+// eslint-disable-next-line no-unused-vars
+const ADOBE_LAUNCH_PRODUCTION_SCRIPT = 'https://assets.adobedtm.com/55621ea95d50/d9fb86f013c5/launch-82a409031058.min.js';
 
 function getCookie(name) {
   const value = `; ${window.document.cookie}`;
@@ -77,7 +81,7 @@ function addMartechStack() {
   // load jquery
   loadScript('/scripts/jquery-3.5.1.min.js', { async: '' });
   // Add Adobe Analytics
-  loadScript('https://assets.adobedtm.com/55621ea95d50/d9fb86f013c5/launch-0e5563018763-staging.min.js', { async: '' });
+  loadScript(ADOBE_LAUNCH_STAGING_SCRIPT, { async: '' });
 }
 
 function getPageInstanceId(template, path, countryLanguage = '') {
