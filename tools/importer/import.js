@@ -188,6 +188,9 @@ export default {
     const footer = main.querySelector('#block-footer');
     if (footer) footer.remove();
 
+    // Get right nav
+    const rightNav = main.querySelector('#tek-wrap-rightrail');
+
     // replace weird trailing backslash and ndash
     main.innerHTML = main.innerHTML.replace(/&ndash;/g, '-')
       .replaceAll('<br style="background-image: none;">', '<br>')
@@ -205,7 +208,7 @@ export default {
     }
 
     // add section after abstract for news articles only
-    if (url.includes('/news/')) {
+    if (url.includes('/news/') && rightNav) {
       const contentDetails = main.querySelector('#tek-wrap-centerwell article #content-details');
       const abstractRegex = /(.*?);(.*?)(\d{4})|(.*?)(\d{4})\s+–\s+\b|(.*?)(\d{4})\s+-\s+\b|\b(\d+)\b(.*?)(\d{4})\b|(.*?),(.*?)(\d{4})\b/;
       const contentDetailsTextNodes = [];
@@ -242,7 +245,6 @@ export default {
     const meta = createMetadataBlock(main, document, url);
 
     // remove right nav
-    const rightNav = main.querySelector('#tek-wrap-rightrail');
     if (rightNav) rightNav.remove();
 
     if (isCategoryPage(url)) {
