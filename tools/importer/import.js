@@ -5,6 +5,7 @@ const isCategoryPage = (url) => (
   || url.includes('/subjects/')
   || url.includes('/secteurs-dactivit/')
   || url.includes('/sujet/')
+  || url.includes('/argomento/')
 );
 
 const createMetadataBlock = (main, document, url) => {
@@ -89,7 +90,7 @@ const createNewsListBlock = (main, document, url) => {
   }
   if (url.includes('/industries/') || url.includes('/secteurs-dactivit/')) {
     cells.push(['Industries', title]);
-  } else if (url.includes('/subjects/') || url.includes('/sujet/')) {
+  } else if (url.includes('/subjects/') || url.includes('/sujet/') || url.includes('/argomento/')) {
     cells.push(['Subjects', title]);
   }
   const table = WebImporter.DOMUtils.createTable(cells, document);
