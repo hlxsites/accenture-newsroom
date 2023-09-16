@@ -1,6 +1,11 @@
 /* eslint-disable no-console */
 /* eslint-disable no-undef */
-const isCategoryPage = (url) => (url.includes('/industries/') || url.includes('/subjects/'));
+const isCategoryPage = (url) => (
+  url.includes('/industries/')
+  || url.includes('/subjects/')
+  || url.includes('/secteurs-dactivit/')
+  || url.includes('/sujet/')
+);
 
 const createMetadataBlock = (main, document, url) => {
   const meta = {};
@@ -82,9 +87,9 @@ const createNewsListBlock = (main, document, url) => {
   if (titleEl) {
     title = titleEl.textContent.trim();
   }
-  if (url.includes('/industries/')) {
+  if (url.includes('/industries/') || url.includes('/secteurs-dactivit/')) {
     cells.push(['Industries', title]);
-  } else if (url.includes('/subjects/')) {
+  } else if (url.includes('/subjects/') || url.includes('/sujet/')) {
     cells.push(['Subjects', title]);
   }
   const table = WebImporter.DOMUtils.createTable(cells, document);
