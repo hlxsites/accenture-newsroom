@@ -166,6 +166,7 @@ export default {
     // Remove unnecessary parts of the content
     const main = document.body;
     const results = [];
+    let abstractFound = false;
 
     // Remove other stuff that shows up in the page
     const nav = main.querySelector('#block-header');
@@ -235,8 +236,10 @@ export default {
           const insertedBrNode = matchingParagraph.parentElement.insertAdjacentElement('afterend', brNode);
           insertedBrNode.after('---');
         }
+        abstractFound = true;
       } else {
-        throw new Error('abstract not found');
+        abstractFound = false;
+        // throw new Error('abstract not found');
       }
     }
 
@@ -269,13 +272,13 @@ export default {
         element: main,
         path: newPath,
       });
-      return results;
+    } else {
+      // main page import - "element" is provided, i.e. a docx will be created
+      results.push({
+        element: main,
+        path: new URL(url).pathname.replace('.htm', ''),
+      });
     }
-    // main page import - "element" is provided, i.e. a docx will be created
-    results.push({
-      element: main,
-      path: new URL(url).pathname.replace('.htm', ''),
-    });
 
     // find pdf links
     main.querySelectorAll('a').forEach((a) => {
@@ -309,6 +312,8 @@ export default {
         }
       }
     });
+
+    if (!abstractFound) console.error(`${new URL(url).pathname} - abstract not found`);
     return results;
   },
 };
