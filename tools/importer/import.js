@@ -166,7 +166,6 @@ export default {
     // Remove unnecessary parts of the content
     const main = document.body;
     const results = [];
-    let abstractFound = false;
 
     // Remove other stuff that shows up in the page
     const nav = main.querySelector('#block-header');
@@ -236,10 +235,8 @@ export default {
           const insertedBrNode = matchingParagraph.parentElement.insertAdjacentElement('afterend', brNode);
           insertedBrNode.after('---');
         }
-        abstractFound = true;
       } else {
-        abstractFound = false;
-        // throw new Error('abstract not found');
+        console.error(`${new URL(url).pathname} - abstract not found`);
       }
     }
 
@@ -313,7 +310,6 @@ export default {
       }
     });
 
-    if (!abstractFound) console.error(`${new URL(url).pathname} - abstract not found`);
     return results;
   },
 };
