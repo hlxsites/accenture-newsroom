@@ -5,6 +5,7 @@ import {
   ANALYTICS_MODULE_CONTENT,
   ANALYTICS_LINK_TYPE_CONTENT_MODULE,
 } from './constants.js';
+import ffetch from './ffetch.js';
 import {
   sampleRUM,
   buildBlock,
@@ -117,26 +118,32 @@ function skipInternalPaths(jsonData) {
   });
 }
 
-export async function fetchIndex(indexURL = '/query-index.json', limit = 1000, offset = 0) {
-  if (window.queryIndex && window.queryIndex[indexURL]) {
-    return window.queryIndex[indexURL];
-  }
+export async function fetchIndex(indexURL = '/query-index.json', sheet = 'articles', limit = 1000, offset = 0) {
   try {
-    const resp = await fetch(`${indexURL}?limit=${limit}&offset=${offset}`);
+    const resp = await fetch(`${indexURL}?sheet=${sheet}&limit=${limit}&offset=${offset}`);
     const json = await resp.json();
     replaceEmptyValues(json.data);
-    const queryIndex = skipInternalPaths(json.data);
+    skipInternalPaths(json.data);
     window.queryIndex = window.queryIndex || {};
-    window.queryIndex[indexURL] = queryIndex;
-    window.queryIndex[indexURL].total = json.total;
-    window.queryIndex[indexURL].limit = json.limit;
-    window.queryIndex[indexURL].offset = json.offset;
-    return queryIndex;
+    window.queryIndex[indexURL] = json;
+    return json;
   } catch (e) {
     // eslint-disable-next-line no-console
     console.log(`error while fetching ${indexURL}`, e);
     return [];
   }
+}
+
+export async function fetchAllArticles(indexURL = '/query-index.json', sheet = 'articles') {
+  if (window.queryIndex && window.queryIndex[indexURL]) {
+    return window.queryIndex[indexURL];
+  }
+  const allArticles = await ffetch(indexURL)
+    .sheet(sheet)
+    .all();
+  window.queryIndex = window.queryIndex || {};
+  window.queryIndex[indexURL] = allArticles;
+  return allArticles;
 }
 
 // DOM helper

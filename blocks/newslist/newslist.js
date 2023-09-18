@@ -1,5 +1,10 @@
 import { readBlockConfig } from '../../scripts/lib-franklin.js';
-import { fetchIndex, ABSTRACT_REGEX, annotateElWithAnalyticsTracking } from '../../scripts/scripts.js';
+import {
+  fetchIndex,
+  fetchAllArticles,
+  ABSTRACT_REGEX,
+  annotateElWithAnalyticsTracking,
+} from '../../scripts/scripts.js';
 import {
   ANALYTICS_MODULE_SEARCH,
   ANALYTICS_TEMPLATE_ZONE_BODY,
@@ -13,6 +18,7 @@ import {
   ANALYTICS_MODULE_SEARCH_PAGINATION,
   ANALYTICS_LINK_TYPE_NAV_PAGINATE,
 } from '../../scripts/constants.js';
+import ffetch from '../../scripts/ffetch.js';
 
 function getHumanReadableDate(dateString) {
   if (!dateString) return dateString;
@@ -235,6 +241,14 @@ function addEventListenerToFilterForm(block) {
   });
 }
 
+function ifArticleBelongsToCategories(article, key, value) {
+  const values = article[key.trim()].toLowerCase().split(',').map((v) => v.trim());
+  if (values.includes(value.trim().toLowerCase())) {
+    return true;
+  }
+  return false;
+}
+
 export default async function decorate(block) {
   const limit = 10;
   // get request parameter page as limit
@@ -244,20 +258,28 @@ export default async function decorate(block) {
   const year = usp.get('year');
   const pageOffset = parseInt(usp.get('page'), 10) || 1;
   const offset = (Math.max(pageOffset, 1) - 1) * 10;
-  const l = offset + limit;
+  let start = offset;
+  let end = offset + limit;
+  let totalResults;
   const cfg = readBlockConfig(block);
   const key = Object.keys(cfg)[0];
   const value = Object.values(cfg)[0];
   const isSearch = key === 'query';
-  const index = await fetchIndex();
-  let shortIndex = index;
+  let index;
+  let shortIndex;
   const newsListContainer = document.createElement('div');
   newsListContainer.classList.add('newslist-container');
 
   if (isSearch) {
     newsListContainer.classList.add('search-results-container');
     const query = usp.get('q') || '';
-    shortIndex = filterByQuery(index, query);
+    if (query) {
+      index = await fetchAllArticles();
+      shortIndex = filterByQuery(index, query);
+    } else {
+      index = [];
+      shortIndex = [];
+    }
     const searchHeader = document.createElement('div');
     searchHeader.classList.add('search-header-container');
     const form = `
@@ -273,7 +295,7 @@ export default async function decorate(block) {
       <div class="search-sub-header">
         <h3> ${shortIndex.length > 0 ? 'ALL RESULTS' : '0 RESULTS WERE FOUND'} </h3>
         <div class="search-sub-header-right">
-          ${shortIndex.length > 0 ? `Showing ${offset + 1} - ${Math.min(l, shortIndex.length)} of ${shortIndex.length} results` : ''}
+          ${shortIndex.length > 0 ? `Showing ${offset + 1} - ${Math.min(end, shortIndex.length)} of ${shortIndex.length} results` : ''}
         </div>
       </div>
       `;
@@ -297,14 +319,11 @@ export default async function decorate(block) {
       ANALYTICS_LINK_TYPE_SEARCH_ACTIVITY,
     );
     newsListContainer.append(searchHeader);
+    totalResults = shortIndex.length;
   } else if (key && value) {
-    shortIndex = index.filter((e) => {
-      const values = e[key.trim()].toLowerCase().split(',').map((v) => v.trim());
-      if (values.includes(value.trim().toLowerCase())) {
-        return true;
-      }
-      return false;
-    });
+    shortIndex = await ffetch('/query-index.json')
+      .sheet('articles')
+      .filter((article) => ifArticleBelongsToCategories(article, key, value)).all();
     const years = getYears(shortIndex);
     let options = years.map((y) => (`<div class="newslist-filter-year-item" value="${y}" >${y}</div>`)).join('');
     options = `<div class="newslist-filter-year-item" value="" >YEAR</div> ${options}`;
@@ -341,7 +360,14 @@ export default async function decorate(block) {
     } else if (year) {
       shortIndex = filterByYear(shortIndex, year);
     }
+    totalResults = shortIndex.length;
   } else {
+    const rawIndex = await fetchIndex('/query-index.json', 'articles', limit, offset);
+    index = rawIndex.data;
+    shortIndex = index;
+    start = 0;
+    end = limit;
+    totalResults = rawIndex.total;
     // prepend search form and date picker
     const newsListHeader = document.createElement('div');
     newsListHeader.classList.add('newslist-header-container');
@@ -375,7 +401,7 @@ export default async function decorate(block) {
   }
 
   const range = document.createRange();
-  for (let i = offset; i < l && i < shortIndex.length; i += 1) {
+  for (let i = start; i < end && i < shortIndex.length; i += 1) {
     const e = shortIndex[i];
     let itemHtml;
     if (isSearch) {
@@ -433,8 +459,8 @@ export default async function decorate(block) {
   }
 
   // add pagination information
-  if (shortIndex.length > 10) {
-    const totalPages = Math.ceil(shortIndex.length / 10);
+  if (totalResults > 10) {
+    const totalPages = Math.ceil(totalResults / 10);
     const paginationGroups = getPaginationGroups(totalPages, pageOffset);
     const paginationContainer = document.createElement('div');
     paginationContainer.classList.add('newslist-pagination-container');
