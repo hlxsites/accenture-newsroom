@@ -14,7 +14,9 @@ import {
 async function generatePDF(pageTitle) {
   // Source HTMLElement or a string containing HTML.
   const main = document.querySelector('main').cloneNode(true);
+  const oHeroContainer = main.querySelector('.section.hero-container');
   const asideContainer = main.querySelector('.aside-container');
+  oHeroContainer.remove();
   asideContainer.remove();
   const pageName = pageTitle.replace(/[^a-z0-9]/gi, '-');
   const { jsPDF } = window.jspdf;
