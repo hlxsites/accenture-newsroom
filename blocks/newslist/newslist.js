@@ -55,7 +55,10 @@ function filterByQuery(article, query) {
   if (!query) return true;
   const queryTokens = query.split(' ').map((t) => t.toLowerCase());
   const title = article.title.toLowerCase();
-  const longdescription = getDescription(article).toLowerCase();
+  // use the longdescriptionextracted field even though it has the html tags in it,
+  // DOM manipulation in getDescrption function is very expensive to use for every
+  // article filtering
+  const longdescription = article.longdescriptionextracted.toLowerCase();
   return queryTokens.every((token) => {
     if (title.includes(token) || longdescription.includes(token)) {
       return true;
