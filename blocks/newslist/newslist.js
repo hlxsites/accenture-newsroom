@@ -375,6 +375,7 @@ export default async function decorate(block) {
       <div class="search-sub-header">
         <h3> ${shortIndex.length > 0 ? 'ALL RESULTS' : '0 RESULTS WERE FOUND'} </h3>
         <div class="search-sub-header-right">
+          ${`Showing ${start + 1} - ${Math.min(end, shortIndex.length)} results`}
         </div>
       </div>
       `;

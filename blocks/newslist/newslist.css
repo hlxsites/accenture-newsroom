@@ -167,6 +167,7 @@
   width: 100%;
   justify-content: space-between;
   padding-bottom: 20px;
+  height: 55px;
 }
 
 .search-header-container .search-sub-header .search-sub-header-right {
@@ -181,6 +182,7 @@
   font-weight: bold;
   margin-top: 0;
   margin-bottom: 10px;
+  width: 30%;
 }
 
 .newslist .search-results-container .search-results-item {
@@ -426,6 +428,7 @@
 
   .search-header-container .search-sub-header {
     width: 66.66%;
+    height: auto;
   }
 
   #newslist-filter-year {
