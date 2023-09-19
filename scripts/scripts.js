@@ -28,6 +28,8 @@ const LCP_BLOCKS = []; // add your LCP blocks to the list
 // regex to find abstract paragraph
 export const ABSTRACT_REGEX = /(.*?);.*?(\d{4})|(.*?)(\d{4})\s+–\s+\b|(.*?)(\d{4})\s+-\s+\b/;
 
+const isMobile = () => window.innerWidth < 600;
+
 export function getLocale(path) {
   const locale = path.split('/')[1];
   if (/^[a-z]{2}$/.test(locale)) {
@@ -135,14 +137,15 @@ export async function fetchIndex(indexURL = '/query-index.json', sheet = 'articl
 }
 
 /**
- * Iterates the {limit} number of articles from the query index and store the iterator and articles in window object
- * @param {*} indexURL 
- * @param {*} sheet 
- * @param {*} limit 
- * @param {*} filter 
- * @returns 
+ * Iterates the {limit} number of articles from the query index and store the
+ * iterator and articles in window object
+ * @param {*} indexURL
+ * @param {*} sheet
+ * @param {*} limit
+ * @param {*} filter
+ * @returns
  */
-export async function ffetchArticles(indexURL = '/query-index.json', sheet = 'articles', limit = 100, filter) {
+export async function ffetchArticles(indexURL = '/query-index.json', sheet = 'articles', limit = 100, filter = null) {
   let ffetchIterator;
   if (filter) {
     ffetchIterator = await ffetch(indexURL)
@@ -154,6 +157,7 @@ export async function ffetchArticles(indexURL = '/query-index.json', sheet = 'ar
   }
   const articles = [];
   for (let i = 0; i < limit; i += 1) {
+    // eslint-disable-next-line no-await-in-loop
     const article = await ffetchIterator.next();
     if (article.done) {
       break;
@@ -210,17 +214,33 @@ async function addPrevNextLinksToArticles() {
   if (template !== 'Article' || !heroBlock) {
     return;
   }
-  const indexURL = '/query-index.json';
-  const limit = 10000;
-  const queryIndex = await fetchIndex(indexURL, limit, 0);
+  const queryIndex = await ffetchArticles('/query-index.json', 'articles', 100);
   // iterate queryIndex to find current article and add prev/next links
   const currentArticlePath = window.location.pathname;
-  const currentArticleIndex = findArticleIndex(queryIndex, currentArticlePath);
+  let currentArticleIndex = findArticleIndex(queryIndex, currentArticlePath);
+  let prevArticle;
+  let nextArticle;
   if (currentArticleIndex === -1) {
-    return;
+    // eslint-disable-next-line no-restricted-syntax
+    for await (const article of window.ffetchIterator) {
+      window.articles.push(article);
+      if (article.path === currentArticlePath) {
+        currentArticleIndex = window.articles.length - 1;
+        nextArticle = window.articles[currentArticleIndex - 1];
+        const a = await window.ffetchIterator.next();
+        if (!a.done) {
+          prevArticle = a.value;
+        } else {
+          prevArticle = '';
+        }
+        break;
+      }
+    }
+  } else {
+    prevArticle = queryIndex[currentArticleIndex + 1];
+    nextArticle = queryIndex[currentArticleIndex - 1];
   }
-  const prevArticle = queryIndex[currentArticleIndex + 1];
-  const nextArticle = queryIndex[currentArticleIndex - 1];
+
   const heroLinkContainer = heroBlock.querySelector('.hero-link-container');
   let prevLink = '';
   let nextLink = '';
@@ -508,6 +528,11 @@ async function completeFFetchIteration() {
   if (!window.articles || !window.ffetchIterator) {
     return false;
   }
+  const template = getMetadata('template');
+  if (template === 'Category' && isMobile()) {
+    return false;
+  }
+  // eslint-disable-next-line no-restricted-syntax
   for await (const article of window.ffetchIterator) {
     window.articles.push(article);
   }
@@ -515,7 +540,7 @@ async function completeFFetchIteration() {
 }
 
 async function loadSemiDelayed() {
-  if(await completeFFetchIteration()) {
+  if (await completeFFetchIteration()) {
     // trigger an event 'ffetch-articles-completed'
     const event = new CustomEvent('ffetch-articles-completed', { detail: window.articles });
     document.dispatchEvent(event);

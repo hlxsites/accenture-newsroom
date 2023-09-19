@@ -18,7 +18,6 @@ import {
   ANALYTICS_MODULE_SEARCH_PAGINATION,
   ANALYTICS_LINK_TYPE_NAV_PAGINATE,
 } from '../../scripts/constants.js';
-import ffetch from '../../scripts/ffetch.js';
 
 function getHumanReadableDate(dateString) {
   if (!dateString) return dateString;
@@ -62,17 +61,6 @@ function filterByQuery(article, query) {
       return true;
     }
     return false;
-  });
-}
-
-function filterByDate(index, fromDate, toDate) {
-  if (!fromDate || !toDate) return index;
-  const from = new Date(fromDate);
-  const to = new Date(toDate);
-  if (from > to) return [];
-  return index.filter((e) => {
-    const date = new Date(parseInt(e.publisheddateinseconds * 1000, 10));
-    return date >= from && date <= to;
   });
 }
 
@@ -179,9 +167,20 @@ function getYears(index) {
   return years;
 }
 
+/**
+ * cache the years of all the articles in window object so that we
+ * can show these years in years filter
+ * @param {*} article
+ * @param {*} year
+ * @returns
+ */
 function filterByYear(article, year) {
   if (!year) return true;
   const date = new Date(parseInt(article.publisheddateinseconds * 1000, 10));
+  window.categoryArticleYears = window.categoryArticleYears || [date.getFullYear()];
+  if (!window.categoryArticleYears.includes(date.getFullYear())) {
+    window.categoryArticleYears.push(date.getFullYear());
+  }
   return date.getFullYear() === parseInt(year, 10);
 }
 
@@ -196,19 +195,22 @@ function collapseWhenOutofFocus(event) {
   }
 }
 
+function yearPickerEventHandler(event) {
+  const yearDropdown = event.target.querySelector('.newslist-filter-year-dropdown');
+  const isExpanded = yearDropdown.getAttribute('aria-expanded');
+  if (isExpanded === 'true') {
+    yearDropdown.setAttribute('aria-expanded', 'false');
+    window.removeEventListener('click', collapseWhenOutofFocus);
+  } else {
+    yearDropdown.setAttribute('aria-expanded', 'true');
+    window.addEventListener('click', collapseWhenOutofFocus);
+  }
+}
+
 function addEventListenerToYearPicker(newsListContainer) {
   const yearPicker = newsListContainer.querySelector('#newslist-filter-year');
-  yearPicker.addEventListener('click', () => {
-    const yearDropdown = yearPicker.querySelector('.newslist-filter-year-dropdown');
-    const isExpanded = yearDropdown.getAttribute('aria-expanded');
-    if (isExpanded === 'true') {
-      yearDropdown.setAttribute('aria-expanded', 'false');
-      window.removeEventListener('click', collapseWhenOutofFocus);
-    } else {
-      yearDropdown.setAttribute('aria-expanded', 'true');
-      window.addEventListener('click', collapseWhenOutofFocus);
-    }
-  });
+  yearPicker.removeEventListener('click', yearPickerEventHandler);
+  yearPicker.addEventListener('click', yearPickerEventHandler);
   const yearItems = newsListContainer.querySelectorAll('.newslist-filter-year-item');
   yearItems.forEach((item) => {
     item.addEventListener('click', () => {
@@ -258,7 +260,6 @@ function updatePagination(paginationContainer, totalResults, pageOffset) {
   if (totalResults > 10) {
     const totalPages = Math.ceil(totalResults / 10);
     const paginationGroups = getPaginationGroups(totalPages, pageOffset);
-    
     for (let i = 0; i < paginationGroups.length; i += 1) {
       const pageGroup = paginationGroups[i];
       pageGroup.forEach((pageNumber) => {
@@ -313,6 +314,24 @@ function updatePagination(paginationContainer, totalResults, pageOffset) {
   }
 }
 
+function updateSearchSubHeader(block, start, end, totalResults) {
+  const searchSubHeader = block.querySelector('.search-sub-header-right');
+  if (searchSubHeader) {
+    searchSubHeader.innerHTML = `
+    ${totalResults > 0 ? `Showing ${start + 1} - ${Math.min(end, totalResults)} of ${totalResults} results` : ''}
+    `;
+  }
+}
+
+function updateYearsDropdown(block, articles) {
+  const years = window.categoryArticleYears || getYears(articles);
+  let options = years.map((y) => (`<div class="newslist-filter-year-item" value="${y}" >${y}</div>`)).join('');
+  options = `<div class="newslist-filter-year-item" value="" >YEAR</div> ${options}`;
+  const yearsDropdown = block.querySelector('.newslist-filter-year-dropdown');
+  yearsDropdown.innerHTML = options;
+  addEventListenerToYearPicker(block);
+}
+
 export default async function decorate(block) {
   const limit = 10;
   // get request parameter page as limit
@@ -324,12 +343,11 @@ export default async function decorate(block) {
   const offset = (Math.max(pageOffset, 1) - 1) * 10;
   let start = offset;
   let end = offset + limit;
-  let totalResults;
+  let totalResults = -1;
   const cfg = readBlockConfig(block);
   const key = Object.keys(cfg)[0];
   const value = Object.values(cfg)[0];
   const isSearch = key === 'query';
-  let index;
   let shortIndex;
   const newsListContainer = document.createElement('div');
   newsListContainer.classList.add('newslist-container');
@@ -338,11 +356,8 @@ export default async function decorate(block) {
     newsListContainer.classList.add('search-results-container');
     const query = usp.get('q') || '';
     if (query) {
-      shortIndex = await ffetchArticles('/query-index.json', 'articles', end, (article) => {
-        return filterByQuery(article, query);
-      });
+      shortIndex = await ffetchArticles('/query-index.json', 'articles', end, (article) => filterByQuery(article, query));
     } else {
-      index = [];
       shortIndex = [];
     }
     const searchHeader = document.createElement('div');
@@ -360,7 +375,6 @@ export default async function decorate(block) {
       <div class="search-sub-header">
         <h3> ${shortIndex.length > 0 ? 'ALL RESULTS' : '0 RESULTS WERE FOUND'} </h3>
         <div class="search-sub-header-right">
-          ${shortIndex.length > 0 ? `Showing ${offset + 1} - ${Math.min(end, shortIndex.length)} of ${shortIndex.length} results` : ''}
         </div>
       </div>
       `;
@@ -384,20 +398,30 @@ export default async function decorate(block) {
       ANALYTICS_LINK_TYPE_SEARCH_ACTIVITY,
     );
     newsListContainer.append(searchHeader);
-    totalResults = shortIndex.length;
   } else if (key && value) {
     if (fromDate && toDate) {
-      shortIndex = await ffetchArticles('/query-index.json', 'articles', end, (article) => {
-        return ifArticleBelongsToCategories(article, key, value) && ifArticleBetweenDates(article, fromDate, toDate);
-      });
+      shortIndex = await ffetchArticles(
+        '/query-index.json',
+        'articles',
+        end,
+        (article) => ifArticleBelongsToCategories(article, key, value)
+           && ifArticleBetweenDates(article, fromDate, toDate),
+      );
     } else if (year) {
-      shortIndex = await ffetchArticles('/query-index.json', 'articles', end, (article) => {
-        return ifArticleBelongsToCategories(article, key, value) && filterByYear(article, year);
-      });
+      shortIndex = await ffetchArticles(
+        '/query-index.json',
+        'articles',
+        end,
+        (article) => ifArticleBelongsToCategories(article, key, value)
+          && filterByYear(article, year),
+      );
     } else {
-      shortIndex = await ffetchArticles('/query-index.json', 'articles', end, (article) => {
-        return ifArticleBelongsToCategories(article, key, value);
-      });
+      shortIndex = await ffetchArticles(
+        '/query-index.json',
+        'articles',
+        end,
+        (article) => ifArticleBelongsToCategories(article, key, value),
+      );
     }
     const years = getYears(shortIndex);
     let options = years.map((y) => (`<div class="newslist-filter-year-item" value="${y}" >${y}</div>`)).join('');
@@ -430,15 +454,21 @@ export default async function decorate(block) {
       );
     });
     newsListContainer.append(newsListHeader);
-    
-    totalResults = shortIndex.length;
   } else {
-    const rawIndex = await fetchIndex('/query-index.json', 'articles', limit, offset);
-    index = rawIndex.data;
-    shortIndex = index;
-    start = 0;
-    end = limit;
-    totalResults = rawIndex.total;
+    if (fromDate && toDate) {
+      shortIndex = await ffetchArticles(
+        '/query-index.json',
+        'articles',
+        end,
+        (article) => ifArticleBetweenDates(article, fromDate, toDate),
+      );
+    } else {
+      const rawIndex = await fetchIndex('/query-index.json', 'articles', limit, offset);
+      shortIndex = rawIndex.data;
+      start = 0;
+      end = limit;
+      totalResults = rawIndex.total;
+    }
     // prepend search form and date picker
     const newsListHeader = document.createElement('div');
     newsListHeader.classList.add('newslist-header-container');
@@ -466,9 +496,6 @@ export default async function decorate(block) {
       ANALYTICS_LINK_TYPE_SEARCH_INTENT,
     );
     newsListContainer.append(newsListHeader);
-    if (fromDate && toDate) {
-      shortIndex = filterByDate(index, fromDate, toDate);
-    }
   }
 
   const range = document.createRange();
@@ -532,11 +559,17 @@ export default async function decorate(block) {
   // add pagination information
   const paginationContainer = document.createElement('div');
   paginationContainer.classList.add('newslist-pagination-container');
-  if (!isSearch && !(key && value)) {
+  if (totalResults !== -1) {
     updatePagination(paginationContainer, totalResults, pageOffset);
   } else {
     document.addEventListener('ffetch-articles-completed', (event) => {
       updatePagination(paginationContainer, event.detail.length, pageOffset);
+      if (isSearch) {
+        updateSearchSubHeader(block, start, end, event.detail.length);
+      }
+      if (key && value) {
+        updateYearsDropdown(block, event.detail);
+      }
     });
   }
   block.append(paginationContainer);
