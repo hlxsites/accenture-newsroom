@@ -159,7 +159,7 @@
   font-weight: bold;
   line-height: 1.1;
   margin-top: 40px;
-  margin-bottom: 50px;  
+  margin-bottom: 50px;
 }
 
 .search-header-container .search-sub-header {
@@ -356,7 +356,7 @@
 }
 
 
-@media (min-width: 1000px) {
+@media (min-width: 768px) {
   .newslist.block {
     width: 100%;
   }
@@ -441,7 +441,7 @@
   #filter-form label {
     width: 120px;
   }
-  
+
   #filter-form input[type='submit'] {
     display: inline;
     position: relative;
