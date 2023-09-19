@@ -134,16 +134,35 @@ export async function fetchIndex(indexURL = '/query-index.json', sheet = 'articl
   }
 }
 
-export async function fetchAllArticles(indexURL = '/query-index.json', sheet = 'articles') {
-  if (window.queryIndex && window.queryIndex[indexURL]) {
-    return window.queryIndex[indexURL];
+/**
+ * Iterates the {limit} number of articles from the query index and store the iterator and articles in window object
+ * @param {*} indexURL 
+ * @param {*} sheet 
+ * @param {*} limit 
+ * @param {*} filter 
+ * @returns 
+ */
+export async function ffetchArticles(indexURL = '/query-index.json', sheet = 'articles', limit = 100, filter) {
+  let ffetchIterator;
+  if (filter) {
+    ffetchIterator = await ffetch(indexURL)
+      .sheet(sheet)
+      .filter(filter);
+  } else {
+    ffetchIterator = await ffetch(indexURL)
+      .sheet(sheet);
   }
-  const allArticles = await ffetch(indexURL)
-    .sheet(sheet)
-    .all();
-  window.queryIndex = window.queryIndex || {};
-  window.queryIndex[indexURL] = allArticles;
-  return allArticles;
+  const articles = [];
+  for (let i = 0; i < limit; i += 1) {
+    const article = await ffetchIterator.next();
+    if (article.done) {
+      break;
+    }
+    articles.push(article.value);
+  }
+  window.articles = articles;
+  window.ffetchIterator = ffetchIterator;
+  return articles;
 }
 
 // DOM helper
@@ -485,13 +504,32 @@ async function loadLazy(doc) {
   sampleRUM.observe(main.querySelectorAll('picture > img'));
 }
 
+async function completeFFetchIteration() {
+  if (!window.articles || !window.ffetchIterator) {
+    return false;
+  }
+  for await (const article of window.ffetchIterator) {
+    window.articles.push(article);
+  }
+  return true;
+}
+
+async function loadSemiDelayed() {
+  if(await completeFFetchIteration()) {
+    // trigger an event 'ffetch-articles-completed'
+    const event = new CustomEvent('ffetch-articles-completed', { detail: window.articles });
+    document.dispatchEvent(event);
+  }
+  addPrevNextLinksToArticles();
+}
+
 /**
  * Loads everything that happens a lot later,
  * without impacting the user experience.
  */
 function loadDelayed() {
   // article processing
-  window.setTimeout(() => addPrevNextLinksToArticles(), 2000);
+  window.setTimeout(() => loadSemiDelayed(), 2000);
   // eslint-disable-next-line import/no-cycle
   window.setTimeout(() => import('./delayed.js'), 3000);
   // load anything that can be postponed to the latest here

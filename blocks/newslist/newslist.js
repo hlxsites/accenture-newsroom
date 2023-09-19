@@ -1,7 +1,7 @@
 import { readBlockConfig } from '../../scripts/lib-franklin.js';
 import {
   fetchIndex,
-  fetchAllArticles,
+  ffetchArticles,
   ABSTRACT_REGEX,
   annotateElWithAnalyticsTracking,
 } from '../../scripts/scripts.js';
@@ -52,18 +52,16 @@ function getDescription(queryIndexEntry) {
   return longdescription;
 }
 
-function filterByQuery(index, query) {
-  if (!query) return [];
+function filterByQuery(article, query) {
+  if (!query) return true;
   const queryTokens = query.split(' ').map((t) => t.toLowerCase());
-  return index.filter((e) => {
-    const title = e.title.toLowerCase();
-    const longdescription = getDescription(e).toLowerCase();
-    return queryTokens.every((token) => {
-      if (title.includes(token) || longdescription.includes(token)) {
-        return true;
-      }
-      return false;
-    });
+  const title = article.title.toLowerCase();
+  const longdescription = getDescription(article).toLowerCase();
+  return queryTokens.every((token) => {
+    if (title.includes(token) || longdescription.includes(token)) {
+      return true;
+    }
+    return false;
   });
 }
 
@@ -76,6 +74,15 @@ function filterByDate(index, fromDate, toDate) {
     const date = new Date(parseInt(e.publisheddateinseconds * 1000, 10));
     return date >= from && date <= to;
   });
+}
+
+function ifArticleBetweenDates(article, fromDate, toDate) {
+  if (!fromDate || !toDate) return true;
+  const from = new Date(fromDate);
+  const to = new Date(toDate);
+  if (from > to) return false;
+  const date = new Date(parseInt(article.publisheddateinseconds * 1000, 10));
+  return date >= from && date <= to;
 }
 
 /**
@@ -172,12 +179,10 @@ function getYears(index) {
   return years;
 }
 
-function filterByYear(index, year) {
-  if (!year) return index;
-  return index.filter((e) => {
-    const date = new Date(parseInt(e.publisheddateinseconds * 1000, 10));
-    return date.getFullYear() === parseInt(year, 10);
-  });
+function filterByYear(article, year) {
+  if (!year) return true;
+  const date = new Date(parseInt(article.publisheddateinseconds * 1000, 10));
+  return date.getFullYear() === parseInt(year, 10);
 }
 
 function collapseWhenOutofFocus(event) {
@@ -249,6 +254,65 @@ function ifArticleBelongsToCategories(article, key, value) {
   return false;
 }
 
+function updatePagination(paginationContainer, totalResults, pageOffset) {
+  if (totalResults > 10) {
+    const totalPages = Math.ceil(totalResults / 10);
+    const paginationGroups = getPaginationGroups(totalPages, pageOffset);
+    
+    for (let i = 0; i < paginationGroups.length; i += 1) {
+      const pageGroup = paginationGroups[i];
+      pageGroup.forEach((pageNumber) => {
+        const pageUrl = addParam('page', pageNumber);
+        const pageLink = document.createElement('a');
+        pageLink.classList.add('pagination-link');
+        pageLink.setAttribute('href', pageUrl);
+        pageLink.innerText = pageNumber;
+        if (pageNumber === pageOffset) {
+          pageLink.classList.add('current-page');
+        }
+        paginationContainer.append(pageLink);
+      });
+      if (i < paginationGroups.length - 1 && paginationGroups[i + 1].length > 0) {
+        const ellipsis = document.createElement('a');
+        ellipsis.setAttribute('href', '#');
+        ellipsis.classList.add('pagination-ellipsis');
+        ellipsis.innerText = '...';
+        paginationContainer.append(ellipsis);
+      }
+    }
+    const prev = document.createElement('a');
+    if (pageOffset === 1) {
+      prev.setAttribute('aria-disabled', 'true');
+    } else {
+      prev.setAttribute('href', addParam('page', pageOffset - 1));
+    }
+    prev.classList.add('pagination-prev');
+    prev.innerHTML = '<span class="pagination-prev-arrow"/>';
+    paginationContainer.prepend(prev);
+    const next = document.createElement('a');
+    if (pageOffset === totalPages) {
+      next.setAttribute('aria-disabled', 'true');
+    } else {
+      next.setAttribute('href', addParam('page', pageOffset + 1));
+    }
+    next.innerHTML = '<span class="pagination-next-arrow"/>';
+    next.classList.add('pagination-next');
+    paginationContainer.append(next);
+    paginationContainer.querySelectorAll('a').forEach((link) => {
+      if (link.textContent === '...') {
+        return;
+      }
+      annotateElWithAnalyticsTracking(
+        link,
+        link.textContent,
+        ANALYTICS_MODULE_SEARCH_PAGINATION,
+        ANALYTICS_TEMPLATE_ZONE_BODY,
+        ANALYTICS_LINK_TYPE_NAV_PAGINATE,
+      );
+    });
+  }
+}
+
 export default async function decorate(block) {
   const limit = 10;
   // get request parameter page as limit
@@ -274,8 +338,9 @@ export default async function decorate(block) {
     newsListContainer.classList.add('search-results-container');
     const query = usp.get('q') || '';
     if (query) {
-      index = await fetchAllArticles();
-      shortIndex = filterByQuery(index, query);
+      shortIndex = await ffetchArticles('/query-index.json', 'articles', end, (article) => {
+        return filterByQuery(article, query);
+      });
     } else {
       index = [];
       shortIndex = [];
@@ -321,9 +386,19 @@ export default async function decorate(block) {
     newsListContainer.append(searchHeader);
     totalResults = shortIndex.length;
   } else if (key && value) {
-    shortIndex = await ffetch('/query-index.json')
-      .sheet('articles')
-      .filter((article) => ifArticleBelongsToCategories(article, key, value)).all();
+    if (fromDate && toDate) {
+      shortIndex = await ffetchArticles('/query-index.json', 'articles', end, (article) => {
+        return ifArticleBelongsToCategories(article, key, value) && ifArticleBetweenDates(article, fromDate, toDate);
+      });
+    } else if (year) {
+      shortIndex = await ffetchArticles('/query-index.json', 'articles', end, (article) => {
+        return ifArticleBelongsToCategories(article, key, value) && filterByYear(article, year);
+      });
+    } else {
+      shortIndex = await ffetchArticles('/query-index.json', 'articles', end, (article) => {
+        return ifArticleBelongsToCategories(article, key, value);
+      });
+    }
     const years = getYears(shortIndex);
     let options = years.map((y) => (`<div class="newslist-filter-year-item" value="${y}" >${y}</div>`)).join('');
     options = `<div class="newslist-filter-year-item" value="" >YEAR</div> ${options}`;
@@ -355,11 +430,7 @@ export default async function decorate(block) {
       );
     });
     newsListContainer.append(newsListHeader);
-    if (fromDate && toDate) {
-      shortIndex = filterByDate(shortIndex, fromDate, toDate);
-    } else if (year) {
-      shortIndex = filterByYear(shortIndex, year);
-    }
+    
     totalResults = shortIndex.length;
   } else {
     const rawIndex = await fetchIndex('/query-index.json', 'articles', limit, offset);
@@ -459,62 +530,14 @@ export default async function decorate(block) {
   }
 
   // add pagination information
-  if (totalResults > 10) {
-    const totalPages = Math.ceil(totalResults / 10);
-    const paginationGroups = getPaginationGroups(totalPages, pageOffset);
-    const paginationContainer = document.createElement('div');
-    paginationContainer.classList.add('newslist-pagination-container');
-    for (let i = 0; i < paginationGroups.length; i += 1) {
-      const pageGroup = paginationGroups[i];
-      pageGroup.forEach((pageNumber) => {
-        const pageUrl = addParam('page', pageNumber);
-        const pageLink = document.createElement('a');
-        pageLink.classList.add('pagination-link');
-        pageLink.setAttribute('href', pageUrl);
-        pageLink.innerText = pageNumber;
-        if (pageNumber === pageOffset) {
-          pageLink.classList.add('current-page');
-        }
-        paginationContainer.append(pageLink);
-      });
-      if (i < paginationGroups.length - 1 && paginationGroups[i + 1].length > 0) {
-        const ellipsis = document.createElement('a');
-        ellipsis.setAttribute('href', '#');
-        ellipsis.classList.add('pagination-ellipsis');
-        ellipsis.innerText = '...';
-        paginationContainer.append(ellipsis);
-      }
-    }
-    const prev = document.createElement('a');
-    if (pageOffset === 1) {
-      prev.setAttribute('aria-disabled', 'true');
-    } else {
-      prev.setAttribute('href', addParam('page', pageOffset - 1));
-    }
-    prev.classList.add('pagination-prev');
-    prev.innerHTML = '<span class="pagination-prev-arrow"/>';
-    paginationContainer.prepend(prev);
-    const next = document.createElement('a');
-    if (pageOffset === totalPages) {
-      next.setAttribute('aria-disabled', 'true');
-    } else {
-      next.setAttribute('href', addParam('page', pageOffset + 1));
-    }
-    next.innerHTML = '<span class="pagination-next-arrow"/>';
-    next.classList.add('pagination-next');
-    paginationContainer.append(next);
-    paginationContainer.querySelectorAll('a').forEach((link) => {
-      if (link.textContent === '...') {
-        return;
-      }
-      annotateElWithAnalyticsTracking(
-        link,
-        link.textContent,
-        ANALYTICS_MODULE_SEARCH_PAGINATION,
-        ANALYTICS_TEMPLATE_ZONE_BODY,
-        ANALYTICS_LINK_TYPE_NAV_PAGINATE,
-      );
+  const paginationContainer = document.createElement('div');
+  paginationContainer.classList.add('newslist-pagination-container');
+  if (!isSearch && !(key && value)) {
+    updatePagination(paginationContainer, totalResults, pageOffset);
+  } else {
+    document.addEventListener('ffetch-articles-completed', (event) => {
+      updatePagination(paginationContainer, event.detail.length, pageOffset);
     });
-    block.append(paginationContainer);
   }
+  block.append(paginationContainer);
 }
