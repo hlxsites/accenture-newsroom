@@ -280,10 +280,10 @@ export default {
       });
     }
 
-    // find pdf links
+    // find internal pdf links
     main.querySelectorAll('a').forEach((a) => {
       const href = a.getAttribute('href');
-      if (href && href.endsWith('.pdf')) {
+      if (href && href.endsWith('.pdf') && href.includes('newsroom.accenture')) {
         const newUrl = new URL(url);
         const host = newUrl.searchParams.get('host');
         if (href.startsWith('/')) {
