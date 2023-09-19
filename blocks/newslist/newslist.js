@@ -351,7 +351,7 @@ export default async function decorate(block) {
         <input type="text" id="newslist-search-input" title="Keywords" name="q" value="" size="40" maxlength="60">
         <input type="submit" value="Search">
       </form>
-      
+
       <form action="${window.location.pathname}" method="get" id="filter-form">
         <label for="newslist-filter-input">Filter News
           <span class="newslist-filter-arrow"></span>
@@ -395,7 +395,7 @@ export default async function decorate(block) {
       itemHtml = `
         <div class="newslist-item">
           <div class="newslist-item-title">
-            <h4> 
+            <h4>
               <a href="${e.path}" title="${e.title}">${e.title}</a>
             </h4>
           </div>
@@ -445,6 +445,7 @@ export default async function decorate(block) {
         const pageLink = document.createElement('a');
         pageLink.classList.add('pagination-link');
         pageLink.setAttribute('href', pageUrl);
+        pageLink.setAttribute('title', pageNumber);
         pageLink.innerText = pageNumber;
         if (pageNumber === pageOffset) {
           pageLink.classList.add('current-page');
@@ -454,8 +455,10 @@ export default async function decorate(block) {
       if (i < paginationGroups.length - 1 && paginationGroups[i + 1].length > 0) {
         const ellipsis = document.createElement('a');
         ellipsis.setAttribute('href', '#');
+        ellipsis.setAttribute('tabIndex', '-1');
         ellipsis.classList.add('pagination-ellipsis');
         ellipsis.innerText = '...';
+        ellipsis.addEventListener('click', (e) => e.preventDefault());
         paginationContainer.append(ellipsis);
       }
     }
@@ -466,6 +469,7 @@ export default async function decorate(block) {
       prev.setAttribute('href', addParam('page', pageOffset - 1));
     }
     prev.classList.add('pagination-prev');
+    prev.setAttribute('title', 'Prev');
     prev.innerHTML = '<span class="pagination-prev-arrow"/>';
     paginationContainer.prepend(prev);
     const next = document.createElement('a');
@@ -476,6 +480,7 @@ export default async function decorate(block) {
     }
     next.innerHTML = '<span class="pagination-next-arrow"/>';
     next.classList.add('pagination-next');
+    next.setAttribute('title', 'Next');
     paginationContainer.append(next);
     paginationContainer.querySelectorAll('a').forEach((link) => {
       if (link.textContent === '...') {
