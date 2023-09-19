@@ -176,6 +176,9 @@ export default {
     if (features) features.remove();
     const pageType = main.querySelector('#tek-wrap-centerwell .page-type');
     if (pageType) pageType.remove();
+    // remove filter form
+    const filterForm = main.querySelector('form.filterForm');
+    if (filterForm) filterForm.remove();
     // remove search modal
     const searchModal = main.querySelector('#myModal');
     if (searchModal) searchModal.remove();
