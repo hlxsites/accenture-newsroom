@@ -420,7 +420,7 @@ async function loadJQueryDateRangePicker() {
 
   const filterSubmit = filterInput.closest('form').querySelector('input[type="submit"]');
   const url = new URL(window.location);
-  const usp = new URLSearchParams(url.search);
+  let usp = new URLSearchParams(url.search);
   if (filterInput) {
     filterInput.removeAttribute('disabled');
     filterSubmit.removeAttribute('disabled');
@@ -442,6 +442,7 @@ async function loadJQueryDateRangePicker() {
       .bind('datepicker-change', (evt, obj) => {
         const fullDtFrm = `${(obj.date1.getMonth() + 1)}/${obj.date1.getDate()}/${obj.date1.getFullYear()}`;
         const fullDtTo = `${(obj.date2.getMonth() + 1)}/${obj.date2.getDate()}/${obj.date2.getFullYear()}`;
+        usp = new URLSearchParams();
         usp.set('from_date', fullDtFrm);
         usp.set('to_date', fullDtTo);
         window.location.search = decodeURIComponent(usp);
