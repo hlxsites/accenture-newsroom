@@ -75,7 +75,6 @@
   text-transform: uppercase;
   font-size: var(--body-font-size-xs);
   font-weight: 600;
-  color: var(--link-color);
 }
 
 .newslist .newslist-container .newslist-item .newslist-item-footer a .read-more-arrow {
