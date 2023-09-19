@@ -263,7 +263,7 @@ export default async function decorate(block) {
     const form = `
       <form action="/search" method="get" id="search-form">
         <input type="text" id="search-input" title="Keywords" placeholder="Keywords" name="q" value="${query}" size="40" maxlength="60">
-        <input type="submit" value="Search">
+        <input type="submit" title="Search" value="Search">
       </form>
     `;
     if (query) {
@@ -385,7 +385,7 @@ export default async function decorate(block) {
           ${getHumanReadableDate(e.publisheddateinseconds * 1000)}
         </div>
         <div class="search-results-item-title">
-          <a href="${e.path}" title="${e.title}">${e.title}</a>
+          <a href="${e.path}" title="${e.title}" target="_blank">${e.title}</a>
         </div>
         <div class="search-results-item-content">${getDescription(e)}</div>
       </div>
