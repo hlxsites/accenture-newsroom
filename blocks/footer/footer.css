@@ -54,7 +54,7 @@ footer .footer-black {
   left: 0;
   color: var(--secondary-text-color);
   background-color: var(--footer-background-color);
-  width: 100vw;
+  width: 100%;
 }
 
 footer .footer-black > div {

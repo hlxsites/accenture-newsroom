@@ -136,6 +136,12 @@
   max-width: none;
 }
 
+#search-input:focus {
+  border-color: #66afe9;
+  outline: 0;
+  box-shadow: inset 0 1px 1px #00000013, 0 0 8px #66AFE999;
+}
+
 #search-form input[type='submit'] {
   width: 13.4rem;
   padding: 15px 18px;
@@ -151,6 +157,7 @@
   text-align: center;
   border: 0;
   white-space: nowrap;
+  cursor: pointer;
 }
 
 .search-header-container h2 {
@@ -159,7 +166,7 @@
   font-weight: bold;
   line-height: 1.1;
   margin-top: 40px;
-  margin-bottom: 50px;  
+  margin-bottom: 50px;
 }
 
 .search-header-container .search-sub-header {
@@ -167,6 +174,7 @@
   width: 100%;
   justify-content: space-between;
   padding-bottom: 20px;
+  height: 55px;
 }
 
 .search-header-container .search-sub-header .search-sub-header-right {
@@ -181,6 +189,7 @@
   font-weight: bold;
   margin-top: 0;
   margin-bottom: 10px;
+  width: 30%;
 }
 
 .newslist .search-results-container .search-results-item {
@@ -356,7 +365,7 @@
 }
 
 
-@media (min-width: 1000px) {
+@media (min-width: 768px) {
   .newslist.block {
     width: 100%;
   }
@@ -370,7 +379,8 @@
 
   .newslist .newslist-container .newslist-header-container {
     grid-column: 1 / span 2;
-    display: flex;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
     border: 0.5px solid #ccc;
     margin-bottom: 10px;
     padding-top: 10px;
@@ -380,6 +390,10 @@
   .newslist .newslist-container .newslist-header-container form {
     display: flex;
     align-items: center;
+  }
+
+  body.category .newslist .newslist-container .newslist-header-container {
+    display: flex;
   }
 
   #newslist-search-form input[type='submit'] {
@@ -415,33 +429,29 @@
     font-weight: 400;
   }
 
-  #newslist-search-form {
-    display: flex;
-    width: 50%;
-  }
-
   .newslist .search-results-container .search-results-item {
     width: 66.66%;
   }
 
   .search-header-container .search-sub-header {
     width: 66.66%;
+    height: auto;
   }
 
   #newslist-filter-year {
     display: block;
-    width: 370px;
-    margin-left: 258px;
+    width: 194px;
+    margin: 0 auto;
   }
 
   #filter-form {
-    width: auto;
+    width: 100%;
   }
 
   #filter-form label {
     width: 120px;
   }
-  
+
   #filter-form input[type='submit'] {
     display: inline;
     position: relative;
@@ -480,6 +490,10 @@
       display: inline-block;
   }
 
+  .newslist .newslist-pagination-container .pagination-ellipsis {
+    cursor: default;
+  }
+
   .newslist .newslist-pagination-container a {
     font-family: var(--graphik-semibold);
     font-size: var(--body-font-size-s);
@@ -490,6 +504,17 @@
 
   .newslist .newslist-pagination-container a.current-page {
     color: var(--link-color);
+  }
+}
+
+@media (min-width: 1000px) {
+  #newslist-search-form {
+    display: flex;
+    width: 50%;
+  }
+
+  #newslist-filter-year {
+    width: 370px;
   }
 }
 

@@ -14,7 +14,9 @@ import {
 async function generatePDF(pageTitle) {
   // Source HTMLElement or a string containing HTML.
   const main = document.querySelector('main').cloneNode(true);
+  const oHeroContainer = main.querySelector('.section.hero-container');
   const asideContainer = main.querySelector('.aside-container');
+  oHeroContainer.remove();
   asideContainer.remove();
   const pageName = pageTitle.replace(/[^a-z0-9]/gi, '-');
   const { jsPDF } = window.jspdf;
@@ -116,7 +118,7 @@ export default async function decorate(block) {
   // PDF Download button
   const addPDF = getMetadata('pdf');
   if (addPDF && (addPDF === 'true')) {
-    const pdfButton = createEl('a', { class: 'pdf-button button' }, 'DOWNLOAD PRESS RELEASE', share);
+    const pdfButton = createEl('a', { class: 'pdf-button button', title: ' Convert to PDF' }, 'DOWNLOAD PRESS RELEASE', share);
     annotateElWithAnalyticsTracking(
       pdfButton,
       pdfButton.textContent,
