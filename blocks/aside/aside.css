@@ -3,10 +3,13 @@
   background-color: #f2f2f2;
   padding: 20px;
   max-width: 302px;
+  margin-bottom: 26px;
 }
 
 .aside .share h4 {
   margin: unset;
+  font-size: 25px;
+  font-weight: 900;
 }
 
 .aside .social {
@@ -77,8 +80,13 @@
   border-bottom: 2px solid #004dff;
   line-height: 35px;
 }
+
 @media (min-width: 900px) {
   .section.aside-container {
     padding-left: 30px;
   }
+}
+
+.section.aside-container {
+  padding-bottom: 0;
 }

@@ -5,6 +5,7 @@ import {
   ANALYTICS_MODULE_CONTENT,
   ANALYTICS_LINK_TYPE_CONTENT_MODULE,
 } from './constants.js';
+import ffetch from './ffetch.js';
 import {
   sampleRUM,
   buildBlock,
@@ -26,6 +27,8 @@ const LCP_BLOCKS = []; // add your LCP blocks to the list
 
 // regex to find abstract paragraph
 export const ABSTRACT_REGEX = /(.*?);.*?(\d{4})|(.*?)(\d{4})\s+–\s+\b|(.*?)(\d{4})\s+-\s+\b/;
+
+const isMobile = () => window.innerWidth < 600;
 
 export function getLocale(path) {
   const locale = path.split('/')[1];
@@ -117,23 +120,53 @@ function skipInternalPaths(jsonData) {
   });
 }
 
-export async function fetchIndex(indexURL = '/query-index.json', limit = 1000) {
-  if (window.queryIndex && window.queryIndex[indexURL]) {
-    return window.queryIndex[indexURL];
-  }
+export async function fetchIndex(indexURL = '/query-index.json', sheet = 'articles', limit = 1000, offset = 0) {
   try {
-    const resp = await fetch(`${indexURL}?limit=${limit}`);
+    const resp = await fetch(`${indexURL}?sheet=${sheet}&limit=${limit}&offset=${offset}`);
     const json = await resp.json();
     replaceEmptyValues(json.data);
-    const queryIndex = skipInternalPaths(json.data);
+    skipInternalPaths(json.data);
     window.queryIndex = window.queryIndex || {};
-    window.queryIndex[indexURL] = queryIndex;
-    return queryIndex;
+    window.queryIndex[indexURL] = json;
+    return json;
   } catch (e) {
     // eslint-disable-next-line no-console
     console.log(`error while fetching ${indexURL}`, e);
     return [];
   }
+}
+
+/**
+ * Iterates the {limit} number of articles from the query index and store the
+ * iterator and articles in window object
+ * @param {*} indexURL
+ * @param {*} sheet
+ * @param {*} limit
+ * @param {*} filter
+ * @returns
+ */
+export async function ffetchArticles(indexURL = '/query-index.json', sheet = 'articles', limit = 100, filter = null) {
+  let ffetchIterator;
+  if (filter) {
+    ffetchIterator = await ffetch(indexURL)
+      .sheet(sheet)
+      .filter(filter);
+  } else {
+    ffetchIterator = await ffetch(indexURL)
+      .sheet(sheet);
+  }
+  const articles = [];
+  for (let i = 0; i < limit; i += 1) {
+    // eslint-disable-next-line no-await-in-loop
+    const article = await ffetchIterator.next();
+    if (article.done) {
+      break;
+    }
+    articles.push(article.value);
+  }
+  window.articles = articles;
+  window.ffetchIterator = ffetchIterator;
+  return articles;
 }
 
 // DOM helper
@@ -181,17 +214,33 @@ async function addPrevNextLinksToArticles() {
   if (template !== 'Article' || !heroBlock) {
     return;
   }
-  const indexURL = '/query-index.json';
-  const limit = 10000;
-  const queryIndex = await fetchIndex(indexURL, limit);
+  const queryIndex = await ffetchArticles('/query-index.json', 'articles', 100);
   // iterate queryIndex to find current article and add prev/next links
   const currentArticlePath = window.location.pathname;
-  const currentArticleIndex = findArticleIndex(queryIndex, currentArticlePath);
+  let currentArticleIndex = findArticleIndex(queryIndex, currentArticlePath);
+  let prevArticle;
+  let nextArticle;
   if (currentArticleIndex === -1) {
-    return;
+    // eslint-disable-next-line no-restricted-syntax
+    for await (const article of window.ffetchIterator) {
+      window.articles.push(article);
+      if (article.path === currentArticlePath) {
+        currentArticleIndex = window.articles.length - 1;
+        nextArticle = window.articles[currentArticleIndex - 1];
+        const a = await window.ffetchIterator.next();
+        if (!a.done) {
+          prevArticle = a.value;
+        } else {
+          prevArticle = '';
+        }
+        break;
+      }
+    }
+  } else {
+    prevArticle = queryIndex[currentArticleIndex + 1];
+    nextArticle = queryIndex[currentArticleIndex - 1];
   }
-  const prevArticle = queryIndex[currentArticleIndex + 1];
-  const nextArticle = queryIndex[currentArticleIndex - 1];
+
   const heroLinkContainer = heroBlock.querySelector('.hero-link-container');
   let prevLink = '';
   let nextLink = '';
@@ -371,7 +420,7 @@ async function loadJQueryDateRangePicker() {
 
   const filterSubmit = filterInput.closest('form').querySelector('input[type="submit"]');
   const url = new URL(window.location);
-  const usp = new URLSearchParams(url.search);
+  let usp = new URLSearchParams(url.search);
   if (filterInput) {
     filterInput.removeAttribute('disabled');
     filterSubmit.removeAttribute('disabled');
@@ -393,6 +442,7 @@ async function loadJQueryDateRangePicker() {
       .bind('datepicker-change', (evt, obj) => {
         const fullDtFrm = `${(obj.date1.getMonth() + 1)}/${obj.date1.getDate()}/${obj.date1.getFullYear()}`;
         const fullDtTo = `${(obj.date2.getMonth() + 1)}/${obj.date2.getDate()}/${obj.date2.getFullYear()}`;
+        usp = new URLSearchParams();
         usp.set('from_date', fullDtFrm);
         usp.set('to_date', fullDtTo);
         window.location.search = decodeURIComponent(usp);
@@ -475,13 +525,37 @@ async function loadLazy(doc) {
   sampleRUM.observe(main.querySelectorAll('picture > img'));
 }
 
+async function completeFFetchIteration() {
+  if (!window.articles || !window.ffetchIterator) {
+    return false;
+  }
+  const template = getMetadata('template');
+  if (template === 'Category' && isMobile()) {
+    return false;
+  }
+  // eslint-disable-next-line no-restricted-syntax
+  for await (const article of window.ffetchIterator) {
+    window.articles.push(article);
+  }
+  return true;
+}
+
+async function loadSemiDelayed() {
+  if (await completeFFetchIteration()) {
+    // trigger an event 'ffetch-articles-completed'
+    const event = new CustomEvent('ffetch-articles-completed', { detail: window.articles });
+    document.dispatchEvent(event);
+  }
+  addPrevNextLinksToArticles();
+}
+
 /**
  * Loads everything that happens a lot later,
  * without impacting the user experience.
  */
 function loadDelayed() {
   // article processing
-  window.setTimeout(() => addPrevNextLinksToArticles(), 2000);
+  window.setTimeout(() => loadSemiDelayed(), 2000);
   // eslint-disable-next-line import/no-cycle
   window.setTimeout(() => import('./delayed.js'), 3000);
   // load anything that can be postponed to the latest here
