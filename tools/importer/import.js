@@ -135,6 +135,7 @@ const findNextBrOrpNode = (node) => {
   if (node.parentElement.nodeName === 'DIV') currentNode = node.nextSibling;
   if (node.parentElement.nodeName === 'H1') currentNode = node.parentElement.parentElement;
   if (node.parentElement.nodeName === 'SPAN' && node.parentElement.parentElement.nodeName === 'STRONG') currentNode = node.parentElement.parentElement.parentElement;
+  if (node.parentElement.nodeName === 'STRONG' && node.parentElement.parentElement.nodeName === 'SPAN') currentNode = node.parentElement.parentElement.parentElement;
 
   // Check siblings first
   while (currentNode !== null) {
@@ -219,14 +220,16 @@ export default {
     // add section after abstract for news articles only
     if (url.includes('/news/') && rightNav) {
       const contentDetails = main.querySelector('#tek-wrap-centerwell article #content-details');
-      const abstractRegex = /(.*?);(.*?)(\d{4})|(.*?)(\d{4})\s+–\s+\b|(.*?)(\d{4})\s+-\s+\b|\b(\d+)\b(.*?)(\d{4})\b|(.*?),(.*?)(\d{4})\b/;
+      const primaryAbstractRegex = /(.*?);(.*?)(\d{4})/;
+      const secondaryAbstractRegex = /(.*?)(\d{4})\s+–\s+\b|(.*?)(\d{4})\s+-\s+\b|\b(\d+)\b(.*?)(\d{4})\b|(.*?),(.*?)(\d{4})\b/;
       const contentDetailsTextNodes = [];
       collectTextNodes(contentDetails, contentDetailsTextNodes);
-      const matchingParagraph = contentDetailsTextNodes.find(
-        (p) => abstractRegex.test(p.textContent),
+      const primaryMatchingParagraph = contentDetailsTextNodes.find(
+        (p) => primaryAbstractRegex.test(p.textContent),
       );
-      if (matchingParagraph) {
-        const nextBrNode = findNextBrOrpNode(matchingParagraph);
+      if (primaryMatchingParagraph) {
+        console.log('found primary match!');
+        const nextBrNode = findNextBrOrpNode(primaryMatchingParagraph);
         if (nextBrNode) {
           const br1 = document.createElement('br');
           const br2 = document.createElement('br');
@@ -234,12 +237,27 @@ export default {
           nextBrNode.after('---');
           nextBrNode.after(br2);
         } else {
-          const brNode = document.createElement('br');
-          const insertedBrNode = matchingParagraph.parentElement.insertAdjacentElement('afterend', brNode);
-          insertedBrNode.after('---');
+          console.warn(`${new URL(url).pathname} - abstract not found`);
         }
       } else {
-        console.error(`${new URL(url).pathname} - abstract not found`);
+        const secondaryMatchingParagraph = contentDetailsTextNodes.find(
+          (p) => secondaryAbstractRegex.test(p.textContent),
+        );
+        if (secondaryMatchingParagraph) {
+          console.log('found secondary match!');
+          const nextBrNode = findNextBrOrpNode(secondaryMatchingParagraph);
+          if (nextBrNode) {
+            const br1 = document.createElement('br');
+            const br2 = document.createElement('br');
+            nextBrNode.after(br1);
+            nextBrNode.after('---');
+            nextBrNode.after(br2);
+          } else {
+            console.warn(`${new URL(url).pathname} - abstract not found`);
+          }
+        } else {
+          console.warn(`${new URL(url).pathname} - abstract not found`);
+        }
       }
     }
 
@@ -254,7 +272,8 @@ export default {
     const meta = createMetadataBlock(main, document, url);
 
     // remove right nav
-    if (rightNav) rightNav.remove();
+    const rightNavStillExists = main.querySelector('#tek-wrap-rightrail');
+    if (rightNavStillExists) rightNavStillExists.remove();
 
     if (isCategoryPage(url)) {
       createNewsListBlock(main, document, url);
