@@ -91,7 +91,8 @@ function ifArticleBetweenDates(article, fromDate, toDate) {
       return true;
     }
     return date <= to;
-  }
+  };
+
   return date >= from && isDateLessThanTo();
 }
 
