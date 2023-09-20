@@ -77,3 +77,8 @@
   border-bottom: 2px solid #004dff;
   line-height: 35px;
 }
+@media (min-width: 900px) {
+  .section.aside-container {
+    padding-left: 30px;
+  }
+}
