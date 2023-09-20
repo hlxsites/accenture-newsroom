@@ -48,6 +48,10 @@ function getDescription(queryIndexEntry) {
   if (queryIndexEntry.description.length > longdescription.length) {
     return `<p>${queryIndexEntry.description}</p>`;
   }
+  const oBr = matchingParagraph.querySelector('br');
+  if (oBr) {
+    oBr.remove();
+  }
   return matchingParagraph.outerHTML;
 }
 
