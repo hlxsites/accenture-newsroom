@@ -27,19 +27,13 @@
 
 .newslist .newslist-container .newslist-item h4 a {
   font-family: var(--graphik-semibold);
-  font-size: 18px;
+  font-size: var(--body-font-size-s);
   font-weight: 600;
   color: #000;
   margin-bottom: 13px;
   line-height: 1.2;
   margin-left: auto;
   margin-right: auto;
-}
-
-@media (min-width: 1000px) {
-  .newslist .newslist-container .newslist-item h4 a {
-    font-size: 20px;
-  }
 }
 
 .newslist .newslist-container .newslist-item .newslist-item-description {
@@ -54,19 +48,13 @@
   margin-bottom: 0;
 }
 
-@media (min-width: 767px) {
+@media (min-width: 768px) {
   .newslist .newslist-container .newslist-item .newslist-item-description {
     margin-bottom: 20px;
   }
 
   .newslist .newslist-container .newslist-item .newslist-item-description p {
     margin-bottom: 1em;
-  }
-}
-
-@media (min-width: 1000px) {
-  .newslist .newslist-container .newslist-item .newslist-item-description {
-  font-size: var(--body-font-size-xs);
   }
 }
 
@@ -514,6 +502,14 @@
 
   .newslist .newslist-pagination-container a.current-page {
     color: var(--link-color);
+  }
+
+  .newslist .newslist-container .newslist-item h4 a {
+    font-size: 20px;
+  }
+
+  .newslist .newslist-container .newslist-item .newslist-item-description {
+    font-size: var(--body-font-size-xs);
   }
 }
 
