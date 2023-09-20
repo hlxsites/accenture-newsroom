@@ -114,15 +114,103 @@ function getUniquePageName(template, path) {
   return path.split('/').pop();
 }
 
+function getResponsiveLayout() {
+  const vpWidth = window.innerWidth;
+  let layout = '';
+  if (vpWidth >= 480 && vpWidth <= 767) {
+    layout = 'xs';
+  } else if (vpWidth >= 768 && vpWidth <= 999) {
+    layout = 'sm';
+  } else if (vpWidth >= 1000 && vpWidth <= 1199) {
+    layout = 'lg/md';
+  } else if (vpWidth >= 1200) {
+    layout = 'lg/md';
+  }
+  return layout;
+}
+
 function addDataLayer() {
   const template = getMetadata('template');
   const path = window.location.pathname;
   const pageInstanceId = getPageInstanceId(template, path);
-  const pageName = getPageName(path);
+  const pageName = `nws::${getPageName(path)}`;
   const uniquePageName = getUniquePageName(template, path);
-  const countryLanguage = getCountryLanguage(getLocale(path));
+  const country = getLocale(path);
+  const countryLanguage = getCountryLanguage(country);
   const pageId = getPageInstanceId(template, path, countryLanguage);
   const language = countryLanguage.split('-').length === 2 ? countryLanguage.split('-')[1] : 'en';
+  const responsiveLayout = getResponsiveLayout();
+  window.dataModel = {
+    pending_data: '',
+    user: {
+      guid: '',
+      profileIndustry: '',
+      profileSkill: '',
+      socialIndustry: '',
+      socialSkill: '',
+      loginStatus: 'anon',
+      candidateID: '',
+      candidateType: '',
+      accentureEmployeeType: '',
+      visitorGroup: 'none',
+    },
+    page: {
+      pageInfo: {
+        pageInstanceId,
+        version: '',
+        contentAuthor: '',
+        siteId: 'nws',
+        siteBranch: 'newsroom',
+        country,
+        pageName,
+        pageType: '',
+        responsiveLayout,
+        errorMessage: '',
+        language,
+        clientType: '',
+      },
+      category: {
+        content1: '',
+        content2: '',
+        content3: '',
+        content4: '',
+        content5: '',
+        theme1: '',
+        theme2: '',
+        capability2: '',
+        capability3: '',
+        industry2: '',
+        industry3: '',
+        intiative: '',
+        skill1: '',
+        skill2: '',
+        contentType: '',
+      },
+      meta: {
+        'service-meta': '',
+        'industry-meta': '',
+        'contentType-meta': '',
+        'contentFormat-meta': '',
+        'pageCategory-meta': '',
+        'externalMarketingCampaigns-meta': '',
+        'appliedNowTheme-meta': '',
+      },
+    },
+    job: {
+      jobID: '',
+      jobTitle: '',
+      jobRegion: '',
+      jobLocation: '',
+      areaOfBusiness: '',
+    },
+    forms: {
+      formErrors: '',
+    },
+    'internal search': {
+      serpType: '',
+    },
+  };
+
   window.digitalData = {
     pageInstanceId,
     version: '1.0',
