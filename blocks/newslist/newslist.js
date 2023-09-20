@@ -73,7 +73,26 @@ function ifArticleBetweenDates(article, fromDate, toDate) {
   const to = new Date(toDate);
   if (from > to) return false;
   const date = new Date(parseInt(article.publisheddateinseconds * 1000, 10));
-  return date >= from && date <= to;
+
+  // Check if the "date" and "to" has the same year, month and day, if so then return true,
+  // No need to compare dates, time may affect the result.
+  const isDateLessThanTo = () => {
+    const dateYear = date.getFullYear();
+    const dateMonth = date.getMonth();
+    const dateDay = date.getDate();
+
+    const toYear = to.getFullYear();
+    const toMonth = to.getMonth();
+    const toDay = to.getDate();
+
+    const isSameDay = dateYear === toYear && dateMonth === toMonth && dateDay === toDay;
+
+    if (isSameDay) {
+      return true;
+    }
+    return date <= to;
+  }
+  return date >= from && isDateLessThanTo();
 }
 
 /**
@@ -471,6 +490,9 @@ export default async function decorate(block) {
         end,
         (article) => ifArticleBetweenDates(article, fromDate, toDate),
       );
+      console.log(end);
+      console.log(shortIndex);
+      console.log('fromDate && toDate')
     } else {
       const rawIndex = await fetchIndex('/query-index.json', 'articles', limit, offset);
       shortIndex = rawIndex.data;
