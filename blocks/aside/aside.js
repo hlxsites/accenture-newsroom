@@ -26,10 +26,10 @@ async function generatePDF(pageTitle) {
     if (oAnchorElements.length === 0) {
       return;
     }
-    for (const oElement of oAnchorElements) {
+    oAnchorElements.forEach((oElement) => {
       const oInnerText = document.createTextNode(oElement.innerText);
       oElement.parentNode.replaceChild(oInnerText, oElement);
-    }
+    });
   });
 
   const { jsPDF } = window.jspdf;
