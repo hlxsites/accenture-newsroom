@@ -42,5 +42,12 @@ export default async function decorate(block) {
     const title = document.createElement('h1');
     title.innerHTML = 'Page not found';
     block.append(title);
+  } else {
+    const pageTitle = getMetadata('og:title');
+    if (pageTitle.includes('|')) {
+      const title = document.createElement('h1');
+      title.innerHTML = pageTitle.split('|')[0].trim();
+      block.append(title);
+    }
   }
 }

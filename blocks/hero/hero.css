@@ -8,6 +8,10 @@
   margin-bottom: 20px;
 }
 
+.section.hero-container + .section {
+  padding-top: 0;
+}
+
 .hero.block h1 {
   font-family: var(--heading-font-family);
   font-size: 36px;
