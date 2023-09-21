@@ -14,9 +14,24 @@ import {
 async function generatePDF(pageTitle) {
   // Source HTMLElement or a string containing HTML.
   const main = document.querySelector('main').cloneNode(true);
+  const heroContainer = main.querySelector('.section.hero-container');
   const asideContainer = main.querySelector('.aside-container');
+  const allParagraphs = main.querySelectorAll('p');
+  heroContainer.remove();
   asideContainer.remove();
   const pageName = pageTitle.replace(/[^a-z0-9]/gi, '-');
+
+  allParagraphs.forEach((paragraph) => {
+    const anchorElements = paragraph.querySelectorAll('a');
+    if (anchorElements.length === 0) {
+      return;
+    }
+    anchorElements.forEach((el) => {
+      const innerText = document.createTextNode(el.innerText);
+      el.parentNode.replaceChild(innerText, el);
+    });
+  });
+
   const { jsPDF } = window.jspdf;
   // eslint-disable-next-line new-cap
   const doc = new jsPDF();
@@ -116,7 +131,7 @@ export default async function decorate(block) {
   // PDF Download button
   const addPDF = getMetadata('pdf');
   if (addPDF && (addPDF === 'true')) {
-    const pdfButton = createEl('a', { class: 'pdf-button button' }, 'DOWNLOAD PRESS RELEASE', share);
+    const pdfButton = createEl('a', { class: 'pdf-button button', title: ' Convert to PDF' }, 'DOWNLOAD PRESS RELEASE', share);
     annotateElWithAnalyticsTracking(
       pdfButton,
       pdfButton.textContent,

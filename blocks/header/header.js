@@ -56,6 +56,17 @@ function toggleSection(section) {
   }
 }
 
+const toggleLevelTwoSectionLabel = (section) => {
+  const expanded = section.getAttribute('aria-expanded') === 'true';
+  const menuBackButton = section.querySelector('span');
+
+  if (expanded) {
+    menuBackButton.nextSibling.nodeValue = section.parentNode.parentNode.firstChild.nodeValue;
+    return;
+  }
+  menuBackButton.nextSibling.nodeValue = section.getAttribute('data-label');
+};
+
 /**
  * decorates the header, mainly the nav
  * @param {Element} block The header block element
@@ -167,11 +178,13 @@ export default async function decorate(block) {
           const backButton = document.createElement('span');
           backButton.classList.add('menu-back-button');
           levelTwoElement.prepend(backButton);
+          levelTwoElement.setAttribute('data-label', backButton.nextSibling.nodeValue.trim());
         });
 
         levelTwo.addEventListener('click', (event) => {
           if (!isDesktop.matches) {
             toggleSection(levelTwo);
+            toggleLevelTwoSectionLabel(levelTwo);
           }
           event.stopPropagation();
         });

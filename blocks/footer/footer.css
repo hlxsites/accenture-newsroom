@@ -54,7 +54,7 @@ footer .footer-black {
   left: 0;
   color: var(--secondary-text-color);
   background-color: var(--footer-background-color);
-  width: 100vw;
+  width: 100%;
 }
 
 footer .footer-black > div {
@@ -171,5 +171,10 @@ footer .footer-black .columns.copyright ul li a {
     height: 46px;
     max-width: 46px;
     background: transparent url('../../icons/acn-brand-icon.svg') no-repeat;
+    padding-right: 15px;
+  }
+
+  footer .footer-black .columns:not(.columns.copyright) ul{
+    column-gap: 45px;
   }
 }

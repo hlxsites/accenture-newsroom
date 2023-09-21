@@ -1,5 +1,12 @@
 import { readBlockConfig } from '../../scripts/lib-franklin.js';
-import { fetchIndex, ABSTRACT_REGEX, annotateElWithAnalyticsTracking } from '../../scripts/scripts.js';
+import {
+  fetchIndex,
+  ffetchArticles,
+  ABSTRACT_REGEX,
+  annotateElWithAnalyticsTracking,
+  createFilterYear,
+  addEventListenerToFilterYear,
+} from '../../scripts/scripts.js';
 import {
   ANALYTICS_MODULE_SEARCH,
   ANALYTICS_TEMPLATE_ZONE_BODY,
@@ -41,35 +48,38 @@ function getDescription(queryIndexEntry) {
   const matchingParagraph = longdescriptionElements.find((p) => ABSTRACT_REGEX.test(p.innerText));
   const longdescription = matchingParagraph ? matchingParagraph.innerText : '';
   if (queryIndexEntry.description.length > longdescription.length) {
-    return queryIndexEntry.description;
+    return `<p>${queryIndexEntry.description}</p>`;
   }
-  return longdescription;
+  const oBr = matchingParagraph.querySelector('br');
+  if (oBr) {
+    oBr.remove();
+  }
+  return matchingParagraph.outerHTML;
 }
 
-function filterByQuery(index, query) {
-  if (!query) return [];
+function filterByQuery(article, query) {
+  if (!query) return true;
   const queryTokens = query.split(' ').map((t) => t.toLowerCase());
-  return index.filter((e) => {
-    const title = e.title.toLowerCase();
-    const longdescription = getDescription(e).toLowerCase();
-    return queryTokens.every((token) => {
-      if (title.includes(token) || longdescription.includes(token)) {
-        return true;
-      }
-      return false;
-    });
+  const title = article.title.toLowerCase();
+  // use the longdescriptionextracted field even though it has the html tags in it,
+  // DOM manipulation in getDescrption function is very expensive to use for every
+  // article filtering
+  const longdescription = article.longdescriptionextracted.toLowerCase();
+  return queryTokens.every((token) => {
+    if (title.includes(token) || longdescription.includes(token)) {
+      return true;
+    }
+    return false;
   });
 }
 
-function filterByDate(index, fromDate, toDate) {
-  if (!fromDate || !toDate) return index;
+function ifArticleBetweenDates(article, fromDate, toDate) {
+  if (!fromDate || !toDate) return true;
   const from = new Date(fromDate);
   const to = new Date(toDate);
-  if (from > to) return [];
-  return index.filter((e) => {
-    const date = new Date(parseInt(e.publisheddateinseconds * 1000, 10));
-    return date >= from && date <= to;
-  });
+  if (from > to) return false;
+  const date = new Date(parseInt(article.publisheddateinseconds * 1000, 10));
+  return date >= from && date <= to;
 }
 
 /**
@@ -166,46 +176,21 @@ function getYears(index) {
   return years;
 }
 
-function filterByYear(index, year) {
-  if (!year) return index;
-  return index.filter((e) => {
-    const date = new Date(parseInt(e.publisheddateinseconds * 1000, 10));
-    return date.getFullYear() === parseInt(year, 10);
-  });
-}
-
-function collapseWhenOutofFocus(event) {
-  if (!event.target.closest('#newslist-filter-year')) {
-    const yearPicker = document.querySelector('#newslist-filter-year');
-    const yearDropdown = yearPicker.querySelector('.newslist-filter-year-dropdown');
-    const isExpanded = yearDropdown.getAttribute('aria-expanded');
-    if (isExpanded) {
-      yearDropdown.setAttribute('aria-expanded', 'false');
-    }
+/**
+ * cache the years of all the articles in window object so that we
+ * can show these years in years filter
+ * @param {*} article
+ * @param {*} year
+ * @returns
+ */
+function filterByYear(article, year) {
+  if (!year) return true;
+  const date = new Date(parseInt(article.publisheddateinseconds * 1000, 10));
+  window.categoryArticleYears = window.categoryArticleYears || [date.getFullYear()];
+  if (!window.categoryArticleYears.includes(date.getFullYear())) {
+    window.categoryArticleYears.push(date.getFullYear());
   }
-}
-
-function addEventListenerToYearPicker(newsListContainer) {
-  const yearPicker = newsListContainer.querySelector('#newslist-filter-year');
-  yearPicker.addEventListener('click', () => {
-    const yearDropdown = yearPicker.querySelector('.newslist-filter-year-dropdown');
-    const isExpanded = yearDropdown.getAttribute('aria-expanded');
-    if (isExpanded === 'true') {
-      yearDropdown.setAttribute('aria-expanded', 'false');
-      window.removeEventListener('click', collapseWhenOutofFocus);
-    } else {
-      yearDropdown.setAttribute('aria-expanded', 'true');
-      window.addEventListener('click', collapseWhenOutofFocus);
-    }
-  });
-  const yearItems = newsListContainer.querySelectorAll('.newslist-filter-year-item');
-  yearItems.forEach((item) => {
-    item.addEventListener('click', () => {
-      const year = item.getAttribute('value');
-      const yearUrl = `${window.location.pathname}?year=${year}`;
-      window.location.href = yearUrl;
-    });
-  });
+  return date.getFullYear() === parseInt(year, 10);
 }
 
 function addEventListenerToFilterForm(block) {
@@ -214,7 +199,7 @@ function addEventListenerToFilterForm(block) {
   const filterArrow = filterForm.querySelector('.newslist-filter-arrow');
   const filterInput = filterForm.querySelector('#newslist-filter-input');
   const filterFormSubmit = filterForm.querySelector('input[type="submit"]');
-  const filterYear = filterForm.querySelector('#newslist-filter-year');
+  const filterYear = filterForm.querySelector('#filter-year');
   filterFormLabel.addEventListener('click', () => {
     const isActive = filterArrow.classList.contains('active');
     if (isActive) {
@@ -235,6 +220,99 @@ function addEventListenerToFilterForm(block) {
   });
 }
 
+function ifArticleBelongsToCategories(article, key, value) {
+  const values = article[key.trim()].toLowerCase().split(',').map((v) => v.trim());
+  if (values.includes(value.trim().toLowerCase())) {
+    return true;
+  }
+  return false;
+}
+
+function updatePagination(paginationContainer, totalResults, pageOffset) {
+  if (totalResults > 10) {
+    const totalPages = Math.ceil(totalResults / 10);
+    const paginationGroups = getPaginationGroups(totalPages, pageOffset);
+    for (let i = 0; i < paginationGroups.length; i += 1) {
+      const pageGroup = paginationGroups[i];
+      pageGroup.forEach((pageNumber) => {
+        const pageUrl = addParam('page', pageNumber);
+        const pageLink = document.createElement('a');
+        pageLink.classList.add('pagination-link');
+        pageLink.setAttribute('href', pageUrl);
+        pageLink.setAttribute('title', pageNumber);
+        pageLink.innerText = pageNumber;
+        if (pageNumber === pageOffset) {
+          pageLink.classList.add('current-page');
+        }
+        paginationContainer.append(pageLink);
+      });
+      if (i < paginationGroups.length - 1 && paginationGroups[i + 1].length > 0) {
+        const ellipsis = document.createElement('a');
+        ellipsis.setAttribute('href', '#');
+        ellipsis.setAttribute('tabIndex', '-1');
+        ellipsis.classList.add('pagination-ellipsis');
+        ellipsis.innerText = '...';
+        ellipsis.addEventListener('click', (e) => e.preventDefault());
+        paginationContainer.append(ellipsis);
+      }
+    }
+    const prev = document.createElement('a');
+    if (pageOffset === 1) {
+      prev.setAttribute('aria-disabled', 'true');
+    } else {
+      prev.setAttribute('href', addParam('page', pageOffset - 1));
+    }
+    prev.classList.add('pagination-prev');
+    prev.setAttribute('title', 'Prev');
+    prev.innerHTML = '<span class="pagination-prev-arrow"/>';
+    paginationContainer.prepend(prev);
+    const next = document.createElement('a');
+    if (pageOffset === totalPages) {
+      next.setAttribute('aria-disabled', 'true');
+    } else {
+      next.setAttribute('href', addParam('page', pageOffset + 1));
+    }
+    next.innerHTML = '<span class="pagination-next-arrow"/>';
+    next.classList.add('pagination-next');
+    next.setAttribute('title', 'Next');
+    paginationContainer.append(next);
+    paginationContainer.querySelectorAll('a').forEach((link) => {
+      if (link.textContent === '...') {
+        return;
+      }
+      annotateElWithAnalyticsTracking(
+        link,
+        link.textContent,
+        ANALYTICS_MODULE_SEARCH_PAGINATION,
+        ANALYTICS_TEMPLATE_ZONE_BODY,
+        ANALYTICS_LINK_TYPE_NAV_PAGINATE,
+      );
+    });
+  }
+}
+
+function updateSearchSubHeader(block, start, end, totalResults) {
+  const searchSubHeader = block.querySelector('.search-sub-header-right');
+  if (searchSubHeader) {
+    searchSubHeader.innerHTML = `
+    ${totalResults > 0 ? `Showing ${start + 1} - ${Math.min(end, totalResults)} of ${totalResults} results` : ''}
+    `;
+  }
+}
+
+function updateYearsDropdown(block, articles) {
+  const years = window.categoryArticleYears || getYears(articles);
+  let options = years.map((y) => (`<div class="filter-year-item" value="${y}"  data-analytics-link-name="${y}"
+  data-analytics-module-name=${ANALYTICS_MODULE_YEAR_FILTER} data-analytics-template-zone=""
+  data-analytics-link-type="${ANALYTICS_LINK_TYPE_FILTER}">${y}</div>`)).join('');
+  options = `<div class="filter-year-item" value="" data-analytics-link-name="YEAR"
+  data-analytics-module-name=${ANALYTICS_MODULE_YEAR_FILTER} data-analytics-template-zone=""
+  data-analytics-link-type="${ANALYTICS_LINK_TYPE_FILTER}">YEAR</div> ${options}`;
+  const yearsDropdown = block.querySelector('.filter-year-dropdown');
+  yearsDropdown.innerHTML = options;
+  addEventListenerToFilterYear(document.getElementById('filter-year'), window.location.pathname);
+}
+
 export default async function decorate(block) {
   const limit = 10;
   // get request parameter page as limit
@@ -244,26 +322,31 @@ export default async function decorate(block) {
   const year = usp.get('year');
   const pageOffset = parseInt(usp.get('page'), 10) || 1;
   const offset = (Math.max(pageOffset, 1) - 1) * 10;
-  const l = offset + limit;
+  let start = offset;
+  let end = offset + limit;
+  let totalResults = -1;
   const cfg = readBlockConfig(block);
   const key = Object.keys(cfg)[0];
   const value = Object.values(cfg)[0];
   const isSearch = key === 'query';
-  const index = await fetchIndex();
-  let shortIndex = index;
+  let shortIndex;
   const newsListContainer = document.createElement('div');
   newsListContainer.classList.add('newslist-container');
 
   if (isSearch) {
     newsListContainer.classList.add('search-results-container');
     const query = usp.get('q') || '';
-    shortIndex = filterByQuery(index, query);
+    if (query) {
+      shortIndex = await ffetchArticles('/query-index.json', 'articles', end, (article) => filterByQuery(article, query));
+    } else {
+      shortIndex = [];
+    }
     const searchHeader = document.createElement('div');
     searchHeader.classList.add('search-header-container');
     const form = `
       <form action="/search" method="get" id="search-form">
         <input type="text" id="search-input" title="Keywords" placeholder="Keywords" name="q" value="${query}" size="40" maxlength="60">
-        <input type="submit" value="Search">
+        <input type="submit" title="Search" value="Search">
       </form>
     `;
     if (query) {
@@ -273,7 +356,7 @@ export default async function decorate(block) {
       <div class="search-sub-header">
         <h3> ${shortIndex.length > 0 ? 'ALL RESULTS' : '0 RESULTS WERE FOUND'} </h3>
         <div class="search-sub-header-right">
-          ${shortIndex.length > 0 ? `Showing ${offset + 1} - ${Math.min(l, shortIndex.length)} of ${shortIndex.length} results` : ''}
+          ${`Showing ${start + 1} - ${Math.min(end, shortIndex.length)} results`}
         </div>
       </div>
       `;
@@ -298,16 +381,32 @@ export default async function decorate(block) {
     );
     newsListContainer.append(searchHeader);
   } else if (key && value) {
-    shortIndex = index.filter((e) => {
-      const values = e[key.trim()].toLowerCase().split(',').map((v) => v.trim());
-      if (values.includes(value.trim().toLowerCase())) {
-        return true;
-      }
-      return false;
-    });
+    if (fromDate && toDate) {
+      shortIndex = await ffetchArticles(
+        '/query-index.json',
+        'articles',
+        end,
+        (article) => ifArticleBelongsToCategories(article, key, value)
+           && ifArticleBetweenDates(article, fromDate, toDate),
+      );
+    } else if (year) {
+      shortIndex = await ffetchArticles(
+        '/query-index.json',
+        'articles',
+        end,
+        (article) => ifArticleBelongsToCategories(article, key, value)
+          && filterByYear(article, year),
+      );
+    } else {
+      shortIndex = await ffetchArticles(
+        '/query-index.json',
+        'articles',
+        end,
+        (article) => ifArticleBelongsToCategories(article, key, value),
+      );
+    }
     const years = getYears(shortIndex);
-    let options = years.map((y) => (`<div class="newslist-filter-year-item" value="${y}" >${y}</div>`)).join('');
-    options = `<div class="newslist-filter-year-item" value="" >YEAR</div> ${options}`;
+    const filterYear = createFilterYear(years, year, window.location.pathname);
     // prepend filter form and year picker
     const newsListHeader = document.createElement('div');
     newsListHeader.classList.add('newslist-header-container');
@@ -318,30 +417,25 @@ export default async function decorate(block) {
         </label>
         <input type="text" id="newslist-filter-input" title="Date Range" name="date" value="DATE RANGE" size="40" maxlength="60" disabled>
         <input type="submit" value="" disabled>
-        <div id="newslist-filter-year" name="year">
-          ${year || 'YEAR'}
-          <div class="newslist-filter-year-dropdown">
-            ${options}
-          </div>
-        </div>
       </form>
     `;
-    newsListHeader.querySelectorAll('.newslist-filter-year-item').forEach((item) => {
-      annotateElWithAnalyticsTracking(
-        item,
-        item.textContent,
-        ANALYTICS_MODULE_YEAR_FILTER,
-        '',
-        ANALYTICS_LINK_TYPE_FILTER,
-      );
-    });
+    newsListHeader.querySelector('#filter-form').append(filterYear);
     newsListContainer.append(newsListHeader);
-    if (fromDate && toDate) {
-      shortIndex = filterByDate(shortIndex, fromDate, toDate);
-    } else if (year) {
-      shortIndex = filterByYear(shortIndex, year);
-    }
   } else {
+    if (fromDate && toDate) {
+      shortIndex = await ffetchArticles(
+        '/query-index.json',
+        'articles',
+        end,
+        (article) => ifArticleBetweenDates(article, fromDate, toDate),
+      );
+    } else {
+      const rawIndex = await fetchIndex('/query-index.json', 'articles', limit, offset);
+      shortIndex = rawIndex.data;
+      start = 0;
+      end = limit;
+      totalResults = rawIndex.total;
+    }
     // prepend search form and date picker
     const newsListHeader = document.createElement('div');
     newsListHeader.classList.add('newslist-header-container');
@@ -351,7 +445,7 @@ export default async function decorate(block) {
         <input type="text" id="newslist-search-input" title="Keywords" name="q" value="" size="40" maxlength="60">
         <input type="submit" value="Search">
       </form>
-      
+
       <form action="${window.location.pathname}" method="get" id="filter-form">
         <label for="newslist-filter-input">Filter News
           <span class="newslist-filter-arrow"></span>
@@ -369,13 +463,10 @@ export default async function decorate(block) {
       ANALYTICS_LINK_TYPE_SEARCH_INTENT,
     );
     newsListContainer.append(newsListHeader);
-    if (fromDate && toDate) {
-      shortIndex = filterByDate(index, fromDate, toDate);
-    }
   }
 
   const range = document.createRange();
-  for (let i = offset; i < l && i < shortIndex.length; i += 1) {
+  for (let i = start; i < end && i < shortIndex.length; i += 1) {
     const e = shortIndex[i];
     let itemHtml;
     if (isSearch) {
@@ -385,7 +476,7 @@ export default async function decorate(block) {
           ${getHumanReadableDate(e.publisheddateinseconds * 1000)}
         </div>
         <div class="search-results-item-title">
-          <a href="${e.path}" title="${e.title}">${e.title}</a>
+          <a href="${e.path}" title="${e.title}" target="_blank">${e.title}</a>
         </div>
         <div class="search-results-item-content">${getDescription(e)}</div>
       </div>
@@ -395,12 +486,12 @@ export default async function decorate(block) {
       itemHtml = `
         <div class="newslist-item">
           <div class="newslist-item-title">
-            <h4> 
+            <h4>
               <a href="${e.path}" title="${e.title}">${e.title}</a>
             </h4>
           </div>
           <div class="newslist-item-description">
-            <p>${getDescription(e)}</p>
+            ${getDescription(e)}
           </div>
           <div class="newslist-item-footer">
             <a href="${e.path}" title="Read More">Read More <span class="read-more-arrow"></span></a>
@@ -425,70 +516,25 @@ export default async function decorate(block) {
   }
   block.innerHTML = newsListContainer.outerHTML;
 
-  if (key && value) {
-    addEventListenerToYearPicker(block);
-  }
   if (!isSearch) {
     addEventListenerToFilterForm(block);
   }
 
   // add pagination information
-  if (shortIndex.length > 10) {
-    const totalPages = Math.ceil(shortIndex.length / 10);
-    const paginationGroups = getPaginationGroups(totalPages, pageOffset);
-    const paginationContainer = document.createElement('div');
-    paginationContainer.classList.add('newslist-pagination-container');
-    for (let i = 0; i < paginationGroups.length; i += 1) {
-      const pageGroup = paginationGroups[i];
-      pageGroup.forEach((pageNumber) => {
-        const pageUrl = addParam('page', pageNumber);
-        const pageLink = document.createElement('a');
-        pageLink.classList.add('pagination-link');
-        pageLink.setAttribute('href', pageUrl);
-        pageLink.innerText = pageNumber;
-        if (pageNumber === pageOffset) {
-          pageLink.classList.add('current-page');
-        }
-        paginationContainer.append(pageLink);
-      });
-      if (i < paginationGroups.length - 1 && paginationGroups[i + 1].length > 0) {
-        const ellipsis = document.createElement('a');
-        ellipsis.setAttribute('href', '#');
-        ellipsis.classList.add('pagination-ellipsis');
-        ellipsis.innerText = '...';
-        paginationContainer.append(ellipsis);
+  const paginationContainer = document.createElement('div');
+  paginationContainer.classList.add('newslist-pagination-container');
+  if (totalResults !== -1) {
+    updatePagination(paginationContainer, totalResults, pageOffset);
+  } else {
+    document.addEventListener('ffetch-articles-completed', (event) => {
+      updatePagination(paginationContainer, event.detail.length, pageOffset);
+      if (isSearch) {
+        updateSearchSubHeader(block, start, end, event.detail.length);
       }
-    }
-    const prev = document.createElement('a');
-    if (pageOffset === 1) {
-      prev.setAttribute('aria-disabled', 'true');
-    } else {
-      prev.setAttribute('href', addParam('page', pageOffset - 1));
-    }
-    prev.classList.add('pagination-prev');
-    prev.innerHTML = '<span class="pagination-prev-arrow"/>';
-    paginationContainer.prepend(prev);
-    const next = document.createElement('a');
-    if (pageOffset === totalPages) {
-      next.setAttribute('aria-disabled', 'true');
-    } else {
-      next.setAttribute('href', addParam('page', pageOffset + 1));
-    }
-    next.innerHTML = '<span class="pagination-next-arrow"/>';
-    next.classList.add('pagination-next');
-    paginationContainer.append(next);
-    paginationContainer.querySelectorAll('a').forEach((link) => {
-      if (link.textContent === '...') {
-        return;
+      if (key && value) {
+        updateYearsDropdown(block, event.detail);
       }
-      annotateElWithAnalyticsTracking(
-        link,
-        link.textContent,
-        ANALYTICS_MODULE_SEARCH_PAGINATION,
-        ANALYTICS_TEMPLATE_ZONE_BODY,
-        ANALYTICS_LINK_TYPE_NAV_PAGINATE,
-      );
     });
-    block.append(paginationContainer);
   }
+  block.append(paginationContainer);
 }

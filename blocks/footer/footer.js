@@ -21,7 +21,7 @@ export default async function decorate(block) {
     linkedin: 'Follow us on Linkedin',
     twitter: 'Follow us on Twitter',
     facebook: 'Follow us on Facebook',
-    youtube: 'Follow us on Youtube',
+    youtube: 'See Accenture on YouTube',
   };
   const cfg = readBlockConfig(block);
   block.textContent = '';
@@ -69,6 +69,10 @@ export default async function decorate(block) {
         const iconClass = [...icon.classList].find((className) => className.startsWith('icon-'));
         // remove the icon class from the iconClass
         text = socialTitlesMapping[iconClass.replace('icon-', '')] || '';
+        link.setAttribute('title', text);
+
+        const socialLink = icon.closest('a');
+        socialLink.setAttribute('target', '_blank');
       }
       annotateElWithAnalyticsTracking(
         link,

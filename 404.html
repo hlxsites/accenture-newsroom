@@ -9,55 +9,155 @@
   </script>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta property="og:title" content="Page not found">
+  <meta name="template" content="error">
   <script src="/scripts/scripts.js" type="module" crossorigin="use-credentials"></script>
   <script type="module">
     import { sampleRUM } from '/scripts/lib-franklin.js';
+    import { createFilterYear } from '/scripts/scripts.js';
+
+    function getYearsFrom(year) {
+      const years = [];
+      const currentYear = new Date().getFullYear();
+      for (let i = currentYear; i >= year; i--) {
+        years.push(i);
+      }
+      return years;
+    }
+
+    function addEventListenerToFilterForm(block) {
+      const filterForm = block.querySelector('#filter-form');
+      const filterFormLabel = filterForm.querySelector('label');
+      const filterArrow = filterForm.querySelector('.newslist-filter-arrow');
+      const filterInput = filterForm.querySelector('#newslist-filter-input');
+      const filterFormSubmit = filterForm.querySelector('input[type="submit"]');
+      const filterYear = filterForm.querySelector('#filter-year');
+      filterFormLabel.addEventListener('click', () => {
+        const isActive = filterArrow.classList.contains('active');
+        if (isActive) {
+          filterArrow.classList.remove('active');
+          filterInput.style.display = 'none';
+          filterFormSubmit.style.display = 'none';
+          if (filterYear) {
+            filterYear.style.display = 'none';
+          }
+        } else {
+          filterArrow.classList.add('active');
+          filterInput.style.display = 'inline';
+          filterFormSubmit.style.display = 'inline';
+          if (filterYear) {
+            filterYear.style.display = 'inline-block';
+          }
+        }
+      });
+    }
 
     window.addEventListener('load', () => {
-      if (document.referrer) {
-        const { origin, pathname } = new URL(document.referrer);
-        if (origin === window.location.origin) {
-          const backBtn = document.createElement('a');
-          backBtn.classList.add('button', 'error-button-back');
-          backBtn.href = pathname;
-          backBtn.textContent = 'Go back';
-          backBtn.title = 'Go back';
-          const btnContainer = document.querySelector('.button-container');
-          btnContainer.append(backBtn);
-        }
-      }
+      const filterForm = document.getElementById('filter-form');
+      const years = getYearsFrom(parseInt(filterForm.dataset.year, 10));
+      const filterYear = createFilterYear(years, 'YEAR', '/');
+      filterForm.appendChild(filterYear);
+      const message = `
+					<p>
+            We apologize for the inconvenience, but an error was encountered on the page you have requested.
+            A system administrator has been automatically notified of the problem.
+          </p>
+          <p>
+            You may hit the BACK button on your browser to return to the previous page,
+            or you may use the link below to go back to the main index page.
+          </p>
+      `;
+      const messageContainer = document.createElement('div');
+      messageContainer.classList.add('error-message');
+      messageContainer.innerHTML = message;
+      addEventListenerToFilterForm(document);
+      const filterFormInDOM = document.getElementById('filter-form');
+      filterFormInDOM.insertAdjacentElement('afterend', messageContainer);
       sampleRUM('404', { source: document.referrer, target: window.location.href });
     });
   </script>
   <link rel="stylesheet" href="/styles/styles.css">
   <style>
     main.error {
-      min-height: calc(100vh - var(--nav-height));
-      display: flex;
-      align-items: center;
     }
 
-    main.error .error-number {
+    main.error #filter-form {
+      border: 0.5px solid #ccc;
+      margin-bottom: 10px;
+      padding-top: 10px;
+      padding-bottom: 10px;
+    }
+
+    main.error #filter-form label {
+      font-family: var(--graphik-semibold);
+      padding-left: 15px;
+      margin-bottom: 5px;
+      font-size: 18px;
+      font-weight: 700;
+      line-height: 50px;
+      text-transform: uppercase;
+      color: #000;
+      width: auto;
+    }
+
+    main.error .section .error-message {
+      max-width: 1200px;
+      margin: 0 auto;
       width: 100%;
+      height: inherit;
+      font-size: 15px;
+      line-height: 20px;
+      font-family: Arial, Sans-Serif;
     }
 
     main.error .error-number text {
       font-family: var(--fixed-font-family);
     }
+
+    main.error .button-container a {
+      display: block;
+      border: none;
+      border-radius: 0;
+      background-color: #000;
+      background-image: none;
+      background-repeat: repeat-x;
+      color: #fff;
+      font-family: Arial, Sans-Serif;
+      font-weight: bold;
+      height: 100%;
+      width: 100%;
+      padding: 6px 12px;
+      margin-bottom: 0;
+      font-size: 14px;
+      line-height: 1.42857143;
+      text-align: center;
+      text-transform: none;
+    }
+
+    @media (min-width: 768px) {
+      main.error #filter-form {
+        display: flex;
+        height: 69px;
+        align-items: center;
+      }
+    }
   </style>
+  <link rel="stylesheet" href="/blocks/newslist/newslist.css">
   <link rel="stylesheet" href="/styles/lazy-styles.css">
 </head>
 
 <body>
   <header></header>
   <main class="error">
-    <div class="section">
-      <svg viewBox="1 0 38 18" class="error-number">
-        <text x="0" y="17">404</text>
-      </svg>
-      <h2 class="error-message">Page Not Found</h2>
+    <div class="section content">
+      <form action="/" method="get" id="filter-form" data-year="2005">
+        <label for="newslist-filter-input">Filter News
+          <span class="newslist-filter-arrow"></span>
+        </label>
+        <input type="text" id="newslist-filter-input" title="Date Range" name="date" value="DATE RANGE" size="40" maxlength="60" disabled>
+        <input type="submit" value="" disabled>
+      </form>
       <p class="button-container">
-        <a href="/" class="button secondary error-button-home">Go home</a>
+        <a href="/" class="button secondary error-button-home">Return to Accenture Newsroom</a>
       </p>
     </div>
   </main>

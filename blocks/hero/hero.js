@@ -38,5 +38,9 @@ export default async function decorate(block) {
     const heroLinkContainer = document.createElement('div');
     heroLinkContainer.classList.add('hero-link-container');
     block.append(heroLinkContainer);
+  } else if (template === 'error') {
+    const title = document.createElement('h1');
+    title.innerHTML = 'Page not found';
+    block.append(title);
   }
 }
