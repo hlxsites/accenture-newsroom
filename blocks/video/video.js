@@ -22,7 +22,7 @@ export default function decorate(block) {
     if (previewImage) {
       const img = document.createElement('img');
       img.src = previewImage;
-      img.alt = config.title;
+      img.alt = config.title || '';
       block.appendChild(img);
     }
   } else {
