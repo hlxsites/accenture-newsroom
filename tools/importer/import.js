@@ -294,6 +294,14 @@ export default {
 
     const meta = createMetadataBlock(main, document, url);
 
+    // remove tek-pager arrows
+    const pagerArrows = main.querySelectorAll('.tek-pager.p-l-arrow, .tek-pager.p-r-arrow');
+    if (pagerArrows && pagerArrows.length > 0) {
+      pagerArrows.forEach((arrow) => {
+        arrow.remove();
+      });
+    }
+
     // remove right nav
     const rightNavStillExists = main.querySelector('#tek-wrap-rightrail');
     if (rightNavStillExists) rightNavStillExists.remove();
@@ -352,6 +360,16 @@ export default {
         } catch (error) {
           console.warn(`Unable to create PDF link for ${href}: ${error.message}`);
         }
+      }
+    });
+
+    // remove section hero
+    const sectionHero = main.querySelector('#sec-hero');
+    if (sectionHero) sectionHero.remove();
+    // remove any elements that are display:none
+    main.querySelectorAll('[style]').forEach((el) => {
+      if (el.style.display === 'none') {
+        el.remove();
       }
     });
 
