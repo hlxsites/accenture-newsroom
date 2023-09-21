@@ -138,6 +138,8 @@ const findNextBrOrpNode = (node) => {
   if (node.parentElement.nodeName === 'H1' && node.parentElement.parentElement.nodeName === 'DIV') currentNode = node.parentElement.nextSibling;
   if (node.parentElement.nodeName === 'H1' && node.parentElement.parentElement.nodeName === 'SPAN' && node.parentElement.parentElement.parentElement.nodeName === 'P') currentNode = node.parentElement.parentElement.parentElement;
   if (node.parentElement.nodeName === 'SPAN' && node.parentElement.parentElement.nodeName === 'STRONG') currentNode = node.parentElement.parentElement.parentElement;
+  if (node.parentElement.nodeName === 'SPAN' && node.parentElement.parentElement.nodeName === 'STRONG' && node.parentElement.parentElement.parentElement.nodeName === 'SPAN' && node.parentElement.parentElement.parentElement.parentElement.nodeName === 'P') currentNode = node.parentElement.parentElement.parentElement.parentElement;
+  if (node.parentElement.nodeName === 'SPAN' && node.parentElement.parentElement.nodeName === 'B' && node.parentElement.parentElement.parentElement.nodeName === 'P') currentNode = node.parentElement.parentElement.parentElement.nextSibling;
   if (node.parentElement.nodeName === 'STRONG' && node.parentElement.parentElement.nodeName === 'SPAN') currentNode = node.parentElement.parentElement.parentElement;
   if (node.parentElement.nodeName === 'I' && node.parentElement.parentElement.nodeName === 'DIV') currentNode = node.parentElement.parentElement.nextSibling;
   if (node.parentElement.nodeName === 'STRONG' && node.parentElement.parentElement.nodeName === 'DIV') currentNode = node.parentElement.parentElement;
