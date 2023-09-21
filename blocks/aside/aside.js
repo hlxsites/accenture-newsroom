@@ -14,21 +14,21 @@ import {
 async function generatePDF(pageTitle) {
   // Source HTMLElement or a string containing HTML.
   const main = document.querySelector('main').cloneNode(true);
-  const oHeroContainer = main.querySelector('.section.hero-container');
+  const heroContainer = main.querySelector('.section.hero-container');
   const asideContainer = main.querySelector('.aside-container');
-  const oAllParagraphs = main.querySelectorAll('p');
-  oHeroContainer.remove();
+  const allParagraphs = main.querySelectorAll('p');
+  heroContainer.remove();
   asideContainer.remove();
   const pageName = pageTitle.replace(/[^a-z0-9]/gi, '-');
 
-  oAllParagraphs.forEach((oParagraph) => {
-    const oAnchorElements = oParagraph.querySelectorAll('a');
-    if (oAnchorElements.length === 0) {
+  allParagraphs.forEach((paragraph) => {
+    const anchorElements = paragraph.querySelectorAll('a');
+    if (anchorElements.length === 0) {
       return;
     }
-    oAnchorElements.forEach((oElement) => {
-      const oInnerText = document.createTextNode(oElement.innerText);
-      oElement.parentNode.replaceChild(oInnerText, oElement);
+    anchorElements.forEach((el) => {
+      const innerText = document.createTextNode(el.innerText);
+      el.parentNode.replaceChild(innerText, el);
     });
   });
 
