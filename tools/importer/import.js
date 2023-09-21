@@ -131,12 +131,16 @@ const collectTextNodes = (node, list) => {
 };
 
 const findNextBrOrpNode = (node) => {
+  console.log(`parent: ${node.parentElement.nodeName} gp: ${node.parentElement.parentElement.nodeName}`);
   let currentNode = node.parentElement.nextSibling;
   if (node.parentElement.nodeName === 'DIV') currentNode = node.nextSibling;
   if (node.parentElement.nodeName === 'H1') currentNode = node.parentElement.parentElement;
   if (node.parentElement.nodeName === 'H1' && node.parentElement.parentElement.nodeName === 'DIV') currentNode = node.parentElement.nextSibling;
+  if (node.parentElement.nodeName === 'H1' && node.parentElement.parentElement.nodeName === 'SPAN' && node.parentElement.parentElement.parentElement.nodeName === 'P') currentNode = node.parentElement.parentElement.parentElement;
   if (node.parentElement.nodeName === 'SPAN' && node.parentElement.parentElement.nodeName === 'STRONG') currentNode = node.parentElement.parentElement.parentElement;
   if (node.parentElement.nodeName === 'STRONG' && node.parentElement.parentElement.nodeName === 'SPAN') currentNode = node.parentElement.parentElement.parentElement;
+  if (node.parentElement.nodeName === 'I' && node.parentElement.parentElement.nodeName === 'DIV') currentNode = node.parentElement.parentElement.nextSibling;
+  if (node.parentElement.nodeName === 'STRONG' && node.parentElement.parentElement.nodeName === 'DIV') currentNode = node.parentElement.parentElement;
 
   // Check siblings first
   while (currentNode !== null) {
