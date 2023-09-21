@@ -128,7 +128,7 @@ export function createFilterYear(years, currentYear, url) {
   const filterYear = document.createElement('div');
   filterYear.id = 'filter-year';
   filterYear.name = 'year';
-  let options = years.map((y) =>(`
+  let options = years.map((y) => (`
     <div class="filter-year-item" value="${y}" data-analytics-link-name="${y}"
     data-analytics-module-name=${ANALYTICS_MODULE_YEAR_FILTER} data-analytics-template-zone=""
     data-analytics-link-type="${ANALYTICS_LINK_TYPE_FILTER}">${y}</div>
@@ -506,7 +506,9 @@ async function loadJQueryDateRangePicker() {
         usp = new URLSearchParams();
         usp.set('from_date', fullDtFrm);
         usp.set('to_date', fullDtTo);
-        window.location.search = decodeURIComponent(usp);
+        const closestForm = $filter.closest('form');
+        const formUrl = closestForm.length > 0 ? closestForm.attr('action') : window.location.pathname;
+        window.location.href = `${formUrl}?${usp.toString()}`;
       })
       .bind('datepicker-open', () => {
         // eslint-disable-next-line no-undef
