@@ -261,12 +261,15 @@ main .section {
 }
 
 body.article main .section.abstract {
-  padding-bottom: 0;
-  padding-top: 0;
+  padding: 0 25px;
+  margin-left: 10px;
 }
 
 body.article main .section.abstract + .section {
   padding-top: 0;
+  padding-left: 25px;
+  padding-right: 25px;
+  margin-left: 10px;
 }
 
 body.article main .section.abstract p.date {
@@ -291,7 +294,7 @@ body.article main .section.abstract h1 {
 
 @media (min-width: 600px) {
   main .section {
-    padding: 64px 32px;
+    padding: 64px 35px;
   }
 }
 
@@ -317,6 +320,10 @@ body.article main .section.abstract h1 {
     right: 5%;
     padding-top: 0;
     max-width: 25%;
+      }
+  body.article main .section.abstract, body.article main .section.abstract + .section {
+    padding-left: 15px;
+    margin-left: 0;
   }
 }
 
@@ -333,6 +340,12 @@ body.article main .section.abstract h1 {
     padding-top: 0;
     max-width: 350px;
   }
+
+  body.article main .section.abstract, body.article main .section.abstract + .section {
+    padding-left: 0;
+    margin-left: 0;
+  }
+
 }
 
 /* section metadata */
