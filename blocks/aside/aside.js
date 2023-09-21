@@ -16,21 +16,9 @@ async function generatePDF(pageTitle) {
   const main = document.querySelector('main').cloneNode(true);
   const heroContainer = main.querySelector('.section.hero-container');
   const asideContainer = main.querySelector('.aside-container');
-  const allParagraphs = main.querySelectorAll('p');
   heroContainer.remove();
   asideContainer.remove();
   const pageName = pageTitle.replace(/[^a-z0-9]/gi, '-');
-
-  allParagraphs.forEach((paragraph) => {
-    const anchorElements = paragraph.querySelectorAll('a');
-    if (anchorElements.length === 0) {
-      return;
-    }
-    anchorElements.forEach((el) => {
-      const innerText = document.createTextNode(el.innerText);
-      el.parentNode.replaceChild(innerText, el);
-    });
-  });
 
   const { jsPDF } = window.jspdf;
   // eslint-disable-next-line new-cap
