@@ -8,6 +8,21 @@ const isCategoryPage = (url) => (
   || url.includes('/argomento/')
 );
 
+function createVideoBlock(main, document) {
+  const vidyardImgs = main.querySelectorAll('img[src*="play.vidyard.com"]');
+  vidyardImgs.forEach((vidyardImg) => {
+    const previewUrl = vidyardImg.src;
+    const videoUrl = previewUrl.replace('.jpg', '');
+    const videoCells = [
+      ['Video'],
+      ['url', videoUrl],
+      ['preview', previewUrl],
+    ];
+    const videoBlock = WebImporter.DOMUtils.createTable(videoCells, document);
+    vidyardImg.replaceWith(videoBlock);
+  });
+}
+
 const createMetadataBlock = (main, document, url) => {
   const meta = {};
   // add the template
@@ -131,7 +146,6 @@ const collectTextNodes = (node, list) => {
 };
 
 const findNextBrOrpNode = (node) => {
-  console.log(`parent: ${node.parentElement.nodeName} gp: ${node.parentElement.parentElement.nodeName}`);
   let currentNode = node.parentElement.nextSibling;
   if (node.parentElement.nodeName === 'DIV') currentNode = node.nextSibling;
   if (node.parentElement.nodeName === 'H1') currentNode = node.parentElement.parentElement;
@@ -213,6 +227,9 @@ export default {
       .replace('<div style="text-align: center; background-image: none;"># # #</div>', '<br># # #')
       .replace('</strong> <br>', '</strong>')
       .replaceAll(/&nbsp;<br>/g, '<br>');
+
+    // create video block
+    createVideoBlock(main, document);
 
     // make proxy srcs for images
     makeProxySrcs(main, url);
