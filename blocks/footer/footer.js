@@ -70,6 +70,9 @@ export default async function decorate(block) {
         // remove the icon class from the iconClass
         text = socialTitlesMapping[iconClass.replace('icon-', '')] || '';
         link.setAttribute('title', text);
+
+        const socialLink = icon.closest('a');
+        socialLink.setAttribute('target', '_blank');
       }
       annotateElWithAnalyticsTracking(
         link,
