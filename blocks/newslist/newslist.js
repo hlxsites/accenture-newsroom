@@ -4,6 +4,8 @@ import {
   ffetchArticles,
   ABSTRACT_REGEX,
   annotateElWithAnalyticsTracking,
+  createFilterYear,
+  addEventListenerToFilterYear,
 } from '../../scripts/scripts.js';
 import {
   ANALYTICS_MODULE_SEARCH,
@@ -187,50 +189,13 @@ function filterByYear(article, year) {
   return date.getFullYear() === parseInt(year, 10);
 }
 
-function collapseWhenOutofFocus(event) {
-  if (!event.target.closest('#newslist-filter-year')) {
-    const yearPicker = document.querySelector('#newslist-filter-year');
-    const yearDropdown = yearPicker.querySelector('.newslist-filter-year-dropdown');
-    const isExpanded = yearDropdown.getAttribute('aria-expanded');
-    if (isExpanded) {
-      yearDropdown.setAttribute('aria-expanded', 'false');
-    }
-  }
-}
-
-function yearPickerEventHandler(event) {
-  const yearDropdown = event.target.querySelector('.newslist-filter-year-dropdown');
-  const isExpanded = yearDropdown.getAttribute('aria-expanded');
-  if (isExpanded === 'true') {
-    yearDropdown.setAttribute('aria-expanded', 'false');
-    window.removeEventListener('click', collapseWhenOutofFocus);
-  } else {
-    yearDropdown.setAttribute('aria-expanded', 'true');
-    window.addEventListener('click', collapseWhenOutofFocus);
-  }
-}
-
-function addEventListenerToYearPicker(newsListContainer) {
-  const yearPicker = newsListContainer.querySelector('#newslist-filter-year');
-  yearPicker.removeEventListener('click', yearPickerEventHandler);
-  yearPicker.addEventListener('click', yearPickerEventHandler);
-  const yearItems = newsListContainer.querySelectorAll('.newslist-filter-year-item');
-  yearItems.forEach((item) => {
-    item.addEventListener('click', () => {
-      const year = item.getAttribute('value');
-      const yearUrl = `${window.location.pathname}?year=${year}`;
-      window.location.href = yearUrl;
-    });
-  });
-}
-
 function addEventListenerToFilterForm(block) {
   const filterForm = block.querySelector('#filter-form');
   const filterFormLabel = filterForm.querySelector('label');
   const filterArrow = filterForm.querySelector('.newslist-filter-arrow');
   const filterInput = filterForm.querySelector('#newslist-filter-input');
   const filterFormSubmit = filterForm.querySelector('input[type="submit"]');
-  const filterYear = filterForm.querySelector('#newslist-filter-year');
+  const filterYear = filterForm.querySelector('#filter-year');
   filterFormLabel.addEventListener('click', () => {
     const isActive = filterArrow.classList.contains('active');
     if (isActive) {
@@ -333,11 +298,15 @@ function updateSearchSubHeader(block, start, end, totalResults) {
 
 function updateYearsDropdown(block, articles) {
   const years = window.categoryArticleYears || getYears(articles);
-  let options = years.map((y) => (`<div class="newslist-filter-year-item" value="${y}" >${y}</div>`)).join('');
-  options = `<div class="newslist-filter-year-item" value="" >YEAR</div> ${options}`;
-  const yearsDropdown = block.querySelector('.newslist-filter-year-dropdown');
+  let options = years.map((y) => (`<div class="filter-year-item" value="${y}"  data-analytics-link-name="${y}"
+  data-analytics-module-name=${ANALYTICS_MODULE_YEAR_FILTER} data-analytics-template-zone=""
+  data-analytics-link-type="${ANALYTICS_LINK_TYPE_FILTER}">${y}</div>`)).join('');
+  options = `<div class="filter-year-item" value="" data-analytics-link-name="YEAR"
+  data-analytics-module-name=${ANALYTICS_MODULE_YEAR_FILTER} data-analytics-template-zone=""
+  data-analytics-link-type="${ANALYTICS_LINK_TYPE_FILTER}">YEAR</div> ${options}`;
+  const yearsDropdown = block.querySelector('.filter-year-dropdown');
   yearsDropdown.innerHTML = options;
-  addEventListenerToYearPicker(block);
+  addEventListenerToFilterYear(document.getElementById('filter-year'), window.location.pathname);
 }
 
 export default async function decorate(block) {
@@ -433,8 +402,7 @@ export default async function decorate(block) {
       );
     }
     const years = getYears(shortIndex);
-    let options = years.map((y) => (`<div class="newslist-filter-year-item" value="${y}" >${y}</div>`)).join('');
-    options = `<div class="newslist-filter-year-item" value="" >YEAR</div> ${options}`;
+    const filterYear = createFilterYear(years, year, window.location.pathname);
     // prepend filter form and year picker
     const newsListHeader = document.createElement('div');
     newsListHeader.classList.add('newslist-header-container');
@@ -445,23 +413,9 @@ export default async function decorate(block) {
         </label>
         <input type="text" id="newslist-filter-input" title="Date Range" name="date" value="DATE RANGE" size="40" maxlength="60" disabled>
         <input type="submit" value="" disabled>
-        <div id="newslist-filter-year" name="year">
-          ${year || 'YEAR'}
-          <div class="newslist-filter-year-dropdown">
-            ${options}
-          </div>
-        </div>
       </form>
     `;
-    newsListHeader.querySelectorAll('.newslist-filter-year-item').forEach((item) => {
-      annotateElWithAnalyticsTracking(
-        item,
-        item.textContent,
-        ANALYTICS_MODULE_YEAR_FILTER,
-        '',
-        ANALYTICS_LINK_TYPE_FILTER,
-      );
-    });
+    newsListHeader.querySelector('#filter-form').append(filterYear);
     newsListContainer.append(newsListHeader);
   } else {
     if (fromDate && toDate) {
@@ -558,9 +512,6 @@ export default async function decorate(block) {
   }
   block.innerHTML = newsListContainer.outerHTML;
 
-  if (key && value) {
-    addEventListenerToYearPicker(block);
-  }
   if (!isSearch) {
     addEventListenerToFilterForm(block);
   }

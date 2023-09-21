@@ -4,6 +4,8 @@ import {
   ANALYTICS_MODULE_SEARCH_PAGINATION,
   ANALYTICS_MODULE_CONTENT,
   ANALYTICS_LINK_TYPE_CONTENT_MODULE,
+  ANALYTICS_MODULE_YEAR_FILTER,
+  ANALYTICS_LINK_TYPE_FILTER,
 } from './constants.js';
 import ffetch from './ffetch.js';
 import {
@@ -84,6 +86,65 @@ export function createAnnotatedLinkEl(href, text, moduleName, templateZone, link
   link.title = text;
   annotateElWithAnalyticsTracking(link, text, moduleName, templateZone, linkType);
   return link;
+}
+
+function collapseFilterYearWhenOutofFocus(event) {
+  if (!event.target.closest('#filter-year')) {
+    const filterYear = document.querySelector('#filter-year');
+    const yearDropdown = filterYear.querySelector('.filter-year-dropdown');
+    const isExpanded = yearDropdown.getAttribute('aria-expanded');
+    if (isExpanded) {
+      yearDropdown.setAttribute('aria-expanded', 'false');
+    }
+  }
+}
+
+function filterYearEventHandler(event) {
+  const yearDropdown = event.target.querySelector('.filter-year-dropdown');
+  const isExpanded = yearDropdown.getAttribute('aria-expanded');
+  if (isExpanded === 'true') {
+    yearDropdown.setAttribute('aria-expanded', 'false');
+    window.removeEventListener('click', collapseFilterYearWhenOutofFocus);
+  } else {
+    yearDropdown.setAttribute('aria-expanded', 'true');
+    window.addEventListener('click', collapseFilterYearWhenOutofFocus);
+  }
+}
+
+export function addEventListenerToFilterYear(yearPicker, url) {
+  yearPicker.removeEventListener('click', filterYearEventHandler);
+  yearPicker.addEventListener('click', filterYearEventHandler);
+  const yearItems = yearPicker.querySelectorAll('.filter-year-item');
+  yearItems.forEach((item) => {
+    item.addEventListener('click', () => {
+      const year = item.getAttribute('value');
+      const yearUrl = `${url}?year=${year}`;
+      window.location.href = yearUrl;
+    });
+  });
+}
+
+export function createFilterYear(years, currentYear, url) {
+  const filterYear = document.createElement('div');
+  filterYear.id = 'filter-year';
+  filterYear.name = 'year';
+  let options = years.map((y) =>(`
+    <div class="filter-year-item" value="${y}" data-analytics-link-name="${y}"
+    data-analytics-module-name=${ANALYTICS_MODULE_YEAR_FILTER} data-analytics-template-zone=""
+    data-analytics-link-type="${ANALYTICS_LINK_TYPE_FILTER}">${y}</div>
+    `)).join('');
+  options = `<div class="filter-year-item" value="" 
+    data-analytics-link-name="YEAR"
+    data-analytics-module-name=${ANALYTICS_MODULE_YEAR_FILTER} data-analytics-template-zone=""
+    data-analytics-link-type="${ANALYTICS_LINK_TYPE_FILTER}">YEAR</div> ${options}`;
+  filterYear.innerHTML = `
+  ${currentYear || 'YEAR'}
+  <div class="filter-year-dropdown">
+    ${options}
+  </div>
+  `;
+  addEventListenerToFilterYear(filterYear, url);
+  return filterYear;
 }
 
 /**
