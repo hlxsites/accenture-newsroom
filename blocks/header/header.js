@@ -233,6 +233,5 @@ export default async function decorate(block) {
   nav.append(hamburger);
   nav.setAttribute('aria-expanded', 'false');
   decorateIcons(nav);
-  console.log(nav)
   block.append(nav);
 }
