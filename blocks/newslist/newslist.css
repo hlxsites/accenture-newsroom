@@ -434,8 +434,6 @@
 
   .newslist .newslist-container .newslist-item .newslist-item-description {
     font-size: var(--body-font-size-xs);
-  }
-  .newslist .newslist-container .newslist-item .newslist-item-description {
     margin-bottom: 20px;
   }
 
