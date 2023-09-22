@@ -8,6 +8,10 @@
   margin-bottom: 20px;
 }
 
+.section.hero-container + .section {
+  padding-top: 0;
+}
+
 .hero.block h1 {
   font-family: var(--heading-font-family);
   font-size: 36px;
@@ -95,7 +99,7 @@
     position: relative;
     width: 100vw;
     max-width: 100vw;
-    padding: 47px 65px 0 67px;
+    padding: 47px 35px 0;
   }
 
   .hero.block h1 {
@@ -109,6 +113,12 @@
 
   .hero.block .hero-link-container {
     gap: 6em;
+  }
+}
+
+@media (min-width: 900px) {
+  body.article main .section.hero-container {
+    padding: 47px 15px 0;
   }
 }
 
