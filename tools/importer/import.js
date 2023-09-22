@@ -260,7 +260,7 @@ export default {
           nextBrNode.after('---');
           nextBrNode.after(br2);
         } else {
-          console.warn(`${new URL(url).pathname} - abstract not found`);
+          console.log(`${new URL(url).pathname} - abstract not found`);
         }
       } else {
         const secondaryMatchingParagraph = contentDetailsTextNodes.find(
@@ -276,10 +276,10 @@ export default {
             nextBrNode.after('---');
             nextBrNode.after(br2);
           } else {
-            console.warn(`${new URL(url).pathname} - abstract not found`);
+            console.log(`${new URL(url).pathname} - abstract not found`);
           }
         } else {
-          console.warn(`${new URL(url).pathname} - abstract not found`);
+          console.log(`${new URL(url).pathname} - abstract not found`);
         }
       }
     }
