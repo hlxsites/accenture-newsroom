@@ -46,15 +46,11 @@ function getDescription(queryIndexEntry) {
   div.innerHTML = longdescriptionextracted;
   const longdescriptionElements = Array.from(div.querySelectorAll('p'));
   const matchingParagraph = longdescriptionElements.find((p) => ABSTRACT_REGEX.test(p.innerText));
-  const longdescription = matchingParagraph ? matchingParagraph.innerText : '';
+  const longdescription = matchingParagraph ? matchingParagraph.outerHTML : '';
   if (queryIndexEntry.description.length > longdescription.length) {
     return `<p>${queryIndexEntry.description}</p>`;
   }
-  const oBr = matchingParagraph.querySelector('br');
-  if (oBr) {
-    oBr.remove();
-  }
-  return matchingParagraph.outerHTML;
+  return longdescription;
 }
 
 function filterByQuery(article, query) {
