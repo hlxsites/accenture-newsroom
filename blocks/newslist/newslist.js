@@ -21,6 +21,8 @@ import {
   ANALYTICS_LINK_TYPE_NAV_PAGINATE,
 } from '../../scripts/constants.js';
 
+const MAX_CHARS_IN_CARD_DESCRIPTION = 800;
+
 function getHumanReadableDate(dateString) {
   if (!dateString) return dateString;
   const date = new Date(parseInt(dateString, 10));
@@ -46,9 +48,12 @@ function getDescription(queryIndexEntry) {
   div.innerHTML = longdescriptionextracted;
   const longdescriptionElements = Array.from(div.querySelectorAll('p'));
   const matchingParagraph = longdescriptionElements.find((p) => ABSTRACT_REGEX.test(p.innerText));
-  const longdescription = matchingParagraph ? matchingParagraph.outerHTML : '';
+  let longdescription = matchingParagraph ? matchingParagraph.outerHTML : '';
   if (queryIndexEntry.description.length > longdescription.length) {
     return `<p>${queryIndexEntry.description}</p>`;
+  }
+  if (longdescription.length > MAX_CHARS_IN_CARD_DESCRIPTION) {
+    longdescription = `<p>${matchingParagraph.innerHTML.substring(0, MAX_CHARS_IN_CARD_DESCRIPTION)}...</p>`;
   }
   return longdescription;
 }
@@ -313,6 +318,22 @@ function updateYearsDropdown(block, articles) {
   addEventListenerToFilterYear(document.getElementById('filter-year'), window.location.pathname);
 }
 
+/**
+ * Removes any elements that are added by rendering engine to fix the unclosed tags in the html
+ * @param {*} container
+ */
+function removeNonArticleElements(container) {
+  const allowedClasses = ['newslist-item', 'search-results-item', 'newslist-header-container', 'search-header-container', 'newslist-pagination-container'];
+  const children = Array.from(container.children);
+  children.forEach((child) => {
+    // remove all the children that are not of type div and
+    // if at least one class from the allowedClasses in the classes on the element
+    if (child.tagName !== 'DIV' || !allowedClasses.some((allowedClass) => child.classList.contains(allowedClass))) {
+      container.removeChild(child);
+    }
+  });
+}
+
 export default async function decorate(block) {
   const limit = 10;
   // get request parameter page as limit
@@ -514,6 +535,7 @@ export default async function decorate(block) {
     });
     newsListContainer.append(item);
   }
+  removeNonArticleElements(newsListContainer);
   block.innerHTML = newsListContainer.outerHTML;
 
   if (!isSearch) {
