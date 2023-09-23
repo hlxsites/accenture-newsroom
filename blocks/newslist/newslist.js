@@ -326,8 +326,8 @@ function removeNonArticleElements(container) {
   const allowedClasses = ['newslist-item', 'search-results-item', 'newslist-header-container', 'search-header-container', 'newslist-pagination-container'];
   const children = Array.from(container.children);
   children.forEach((child) => {
-    // remove all the children that are not of type div and
-    // if at least one class from the allowedClasses in the classes on the element
+    // remove the children that are not of type div or
+    // if at least one class from the allowedClasses is not on the element
     if (child.tagName !== 'DIV' || !allowedClasses.some((allowedClass) => child.classList.contains(allowedClass))) {
       container.removeChild(child);
     }
