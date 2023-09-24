@@ -306,14 +306,16 @@ function updateSearchSubHeader(block, start, end, totalResults) {
   }
 }
 
-function updateYearsDropdown(block, articles) {
+async function updateYearsDropdown(block, articles) {
+  const placeholders = await fetchPlaceholders();
+  const pYear = getPlaceholder('year', placeholders);
   const years = window.categoryArticleYears || getYears(articles);
   let options = years.map((y) => (`<div class="filter-year-item" value="${y}"  data-analytics-link-name="${y}"
   data-analytics-module-name=${ANALYTICS_MODULE_YEAR_FILTER} data-analytics-template-zone=""
   data-analytics-link-type="${ANALYTICS_LINK_TYPE_FILTER}">${y}</div>`)).join('');
   options = `<div class="filter-year-item" value="" data-analytics-link-name="YEAR"
   data-analytics-module-name=${ANALYTICS_MODULE_YEAR_FILTER} data-analytics-template-zone=""
-  data-analytics-link-type="${ANALYTICS_LINK_TYPE_FILTER}">YEAR</div> ${options}`;
+  data-analytics-link-type="${ANALYTICS_LINK_TYPE_FILTER}">${pYear}</div> ${options}`;
   const yearsDropdown = block.querySelector('.filter-year-dropdown');
   yearsDropdown.innerHTML = options;
   addEventListenerToFilterYear(document.getElementById('filter-year'), window.location.pathname);
@@ -434,7 +436,7 @@ export default async function decorate(block) {
       );
     }
     const years = getYears(shortIndex);
-    const filterYear = createFilterYear(years, year, window.location.pathname);
+    const filterYear = await createFilterYear(years, year, window.location.pathname);
     // prepend filter form and year picker
     const newsListHeader = document.createElement('div');
     newsListHeader.classList.add('newslist-header-container');
@@ -555,13 +557,13 @@ export default async function decorate(block) {
   if (totalResults !== -1) {
     updatePagination(paginationContainer, totalResults, pageOffset);
   } else {
-    document.addEventListener('ffetch-articles-completed', (event) => {
+    document.addEventListener('ffetch-articles-completed', async (event) => {
       updatePagination(paginationContainer, event.detail.length, pageOffset);
       if (isSearch) {
         updateSearchSubHeader(block, start, end, event.detail.length);
       }
       if (key && value) {
-        updateYearsDropdown(block, event.detail);
+        await updateYearsDropdown(block, event.detail);
       }
     });
   }

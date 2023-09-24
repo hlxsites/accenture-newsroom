@@ -175,7 +175,9 @@ export function addEventListenerToFilterYear(yearPicker, url) {
   });
 }
 
-export function createFilterYear(years, currentYear, url) {
+export async function createFilterYear(years, currentYear, url) {
+  const placeholders = await fetchPlaceholders();
+  const pYear = getPlaceholder('year', placeholders);
   const filterYear = document.createElement('div');
   filterYear.id = 'filter-year';
   filterYear.name = 'year';
@@ -185,11 +187,11 @@ export function createFilterYear(years, currentYear, url) {
     data-analytics-link-type="${ANALYTICS_LINK_TYPE_FILTER}">${y}</div>
     `)).join('');
   options = `<div class="filter-year-item" value="" 
-    data-analytics-link-name="YEAR"
+    data-analytics-link-name="year"
     data-analytics-module-name=${ANALYTICS_MODULE_YEAR_FILTER} data-analytics-template-zone=""
-    data-analytics-link-type="${ANALYTICS_LINK_TYPE_FILTER}">YEAR</div> ${options}`;
+    data-analytics-link-type="${ANALYTICS_LINK_TYPE_FILTER}">${pYear}</div> ${options}`;
   filterYear.innerHTML = `
-  ${currentYear || 'YEAR'}
+  ${currentYear || pYear}
   <div class="filter-year-dropdown">
     ${options}
   </div>
