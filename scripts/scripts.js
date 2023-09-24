@@ -32,22 +32,72 @@ export const ABSTRACT_REGEX = /(.*?);.*?(\d{4})|(.*?)(\d{4})\s+–\s+\b|(.*?)(\d
 
 const isMobile = () => window.innerWidth < 600;
 
-export function getLocale(path) {
-  const locale = path.split('/')[1];
-  if (/^[a-z]{2}$/.test(locale)) {
-    return locale;
+export function getSiteFromHostName(hostname = window.location.hostname) {
+  const allowedSites = ['uk', 'de', 'fr', 'it', 'es', 'sg', 'pt', 'jp', 'br'];
+  if (hostname === 'localhost') {
+    return 'us';
+  }
+  // handle franklin hostnames
+  const franklinHostName = 'accenture-newsroom';
+  if (hostname.includes(franklinHostName)) {
+    for (let i = 0; i < allowedSites.length; i += 1) {
+      if (hostname.includes(`${franklinHostName}-${allowedSites[i]}`)) {
+        return allowedSites[i];
+      }
+    }
+    return 'us';
+  }
+  // handle main hostnames
+  const mainHostName = 'newsroom.accenture';
+  if (hostname.includes(mainHostName)) {
+    const remainingHostName = hostname.replace(`${mainHostName}`, '');
+    for (let i = 0; i < allowedSites.length; i += 1) {
+      if (remainingHostName.includes(`${allowedSites[i]}`)) {
+        return allowedSites[i];
+      }
+    }
   }
   return 'us';
 }
 
-export function getCountryLanguage(locale) {
-  const langs = {
-    us: 'us-en',
+export function getCountry() {
+  const siteToCountryMapping = {
+    us: 'us',
+    uk: 'gb',
+    de: 'gb',
+    fr: 'fr',
+    it: 'it',
+    es: 'sp',
+    sg: 'sg',
+    pt: 'pt',
+    jp: 'jp',
+    br: 'br',
   };
-  let language = langs[locale];
-  if (!language) language = 'us-en';
+  const site = getSiteFromHostName();
+  return siteToCountryMapping[site];
+}
 
-  return language;
+export function getLanguage(country) {
+  const countryToLanguageMapping = {
+    us: 'en',
+    uk: 'en',
+    de: 'de',
+    fr: 'fr',
+    it: 'it',
+    es: 'es',
+    sg: 'en',
+    pt: 'pt',
+    jp: 'ja',
+    br: 'pt',
+  };
+  return countryToLanguageMapping[country] || 'en';
+}
+
+export function getPlaceholder(key, placeholders) {
+  if (placeholders && placeholders[key]) {
+    return placeholders[key];
+  }
+  return key;
 }
 
 /**

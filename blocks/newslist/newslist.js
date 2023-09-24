@@ -1,4 +1,4 @@
-import { readBlockConfig } from '../../scripts/lib-franklin.js';
+import { readBlockConfig, fetchPlaceholders } from '../../scripts/lib-franklin.js';
 import {
   fetchIndex,
   ffetchArticles,
@@ -6,6 +6,7 @@ import {
   annotateElWithAnalyticsTracking,
   createFilterYear,
   addEventListenerToFilterYear,
+  getPlaceholder,
 } from '../../scripts/scripts.js';
 import {
   ANALYTICS_MODULE_SEARCH,
@@ -350,6 +351,12 @@ export default async function decorate(block) {
   const key = Object.keys(cfg)[0];
   const value = Object.values(cfg)[0];
   const isSearch = key === 'query';
+  const placeholders = await fetchPlaceholders();
+  const pSearch = getPlaceholder('search', placeholders);
+  const pKeywords = getPlaceholder('keywords', placeholders);
+  const pFilterNews = getPlaceholder('filterNews', placeholders);
+  const pDateRange = getPlaceholder('dateRange', placeholders);
+  const pReadMore = getPlaceholder('readMore', placeholders);
   let shortIndex;
   const newsListContainer = document.createElement('div');
   newsListContainer.classList.add('newslist-container');
@@ -366,8 +373,8 @@ export default async function decorate(block) {
     searchHeader.classList.add('search-header-container');
     const form = `
       <form action="/search" method="get" id="search-form">
-        <input type="text" id="search-input" title="Keywords" placeholder="Keywords" name="q" value="${query}" size="40" maxlength="60">
-        <input type="submit" title="Search" value="Search">
+        <input type="text" id="search-input" title="${pKeywords}" placeholder="${pKeywords}" name="q" value="${query}" size="40" maxlength="60">
+        <input type="submit" title="${pSearch}" value="${pSearch}">
       </form>
     `;
     if (query) {
@@ -433,10 +440,10 @@ export default async function decorate(block) {
     newsListHeader.classList.add('newslist-header-container');
     newsListHeader.innerHTML = `
       <form action="${window.location.pathname}" method="get" id="filter-form">
-        <label for="newslist-filter-input">Filter News
+        <label for="newslist-filter-input">${pFilterNews}
           <span class="newslist-filter-arrow"></span>
         </label>
-        <input type="text" id="newslist-filter-input" title="Date Range" name="date" value="DATE RANGE" size="40" maxlength="60" disabled>
+        <input type="text" id="newslist-filter-input" title="${pDateRange}" name="date" value="${pDateRange}" size="40" maxlength="60" disabled>
         <input type="submit" value="" disabled>
       </form>
     `;
@@ -462,16 +469,16 @@ export default async function decorate(block) {
     newsListHeader.classList.add('newslist-header-container');
     newsListHeader.innerHTML = `
       <form action="/search" method="get" id="newslist-search-form">
-        <label for="newslist-search-input">Search</label>
-        <input type="text" id="newslist-search-input" title="Keywords" name="q" value="" size="40" maxlength="60">
-        <input type="submit" value="Search">
+        <label for="newslist-search-input">${pSearch}</label>
+        <input type="text" id="newslist-search-input" title="${pKeywords}" name="q" value="" size="40" maxlength="60">
+        <input type="submit" value="${pSearch}">
       </form>
 
       <form action="${window.location.pathname}" method="get" id="filter-form">
-        <label for="newslist-filter-input">Filter News
+        <label for="newslist-filter-input">${pFilterNews}
           <span class="newslist-filter-arrow"></span>
         </label>
-        <input type="text" id="newslist-filter-input" title="Date Range" name="date" value="DATE RANGE" size="40" maxlength="60" disabled>
+        <input type="text" id="newslist-filter-input" title="${pDateRange}" name="date" value="${pDateRange}" size="40" maxlength="60" disabled>
         <input type="submit" value="" disabled>
       </form>
     `;
@@ -515,7 +522,7 @@ export default async function decorate(block) {
             ${getDescription(e)}
           </div>
           <div class="newslist-item-footer">
-            <a href="${e.path}" title="Read More">Read More <span class="read-more-arrow"></span></a>
+            <a href="${e.path}" title="${pReadMore}">${pReadMore} <span class="read-more-arrow"></span></a>
             <div class="newslist-item-publisheddate">
               ${getHumanReadableDate(e.publisheddateinseconds * 1000)}
             </div>

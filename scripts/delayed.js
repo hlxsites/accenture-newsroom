@@ -1,7 +1,7 @@
 // eslint-disable-next-line import/no-cycle
 import { sampleRUM, loadScript, getMetadata } from './lib-franklin.js';
 // eslint-disable-next-line import/no-cycle
-import { getLocale, getCountryLanguage } from './scripts.js';
+import { getCountry, getLanguage } from './scripts.js';
 
 const ONETRUST_SDK = 'https://cdn.cookielaw.org/scripttemplates/otSDKStub.js';
 
@@ -135,10 +135,10 @@ function addDataLayer() {
   const pageInstanceId = getPageInstanceId(template, path);
   const pageName = `nws::${getPageName(path)}`;
   const uniquePageName = getUniquePageName(template, path);
-  const country = getLocale(path);
-  const countryLanguage = getCountryLanguage(country);
+  const country = getCountry();
+  const language = getLanguage(country);
+  const countryLanguage = `${country}-${language}`;
   const pageId = getPageInstanceId(template, path, countryLanguage);
-  const language = countryLanguage.split('-').length === 2 ? countryLanguage.split('-')[1] : 'en';
   const responsiveLayout = getResponsiveLayout();
   window.dataModel = {
     pending_data: '',
