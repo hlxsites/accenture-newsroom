@@ -23,6 +23,7 @@ import {
   loadCSS,
   getMetadata,
   loadScript,
+  fetchPlaceholders,
 } from './lib-franklin.js';
 
 const LCP_BLOCKS = []; // add your LCP blocks to the list
@@ -325,6 +326,9 @@ async function addPrevNextLinksToArticles() {
   if (template !== 'Article' || !heroBlock) {
     return;
   }
+  const placeholders = await fetchPlaceholders();
+  const pPrevious = getPlaceholder('previous', placeholders);
+  const pNext = getPlaceholder('next', placeholders);
   const queryIndex = await ffetchArticles('/query-index.json', 'articles', 100);
   // iterate queryIndex to find current article and add prev/next links
   const currentArticlePath = window.location.pathname;
@@ -356,14 +360,14 @@ async function addPrevNextLinksToArticles() {
   let prevLink = '';
   let nextLink = '';
   if (prevArticle) {
-    prevLink = createEl('a', { href: prevArticle.path, class: 'prev', title: 'Prev' }, 'Previous');
+    prevLink = createEl('a', { href: prevArticle.path, class: 'prev', title: pPrevious }, pPrevious);
   } else {
-    prevLink = createEl('a', { href: '#', class: 'prev disabled', title: 'Prev' }, 'Previous');
+    prevLink = createEl('a', { href: '#', class: 'prev disabled', title: pPrevious }, pPrevious);
   }
   if (nextArticle) {
-    nextLink = createEl('a', { href: nextArticle.path, class: 'next', title: 'Next' }, 'Next');
+    nextLink = createEl('a', { href: nextArticle.path, class: 'next', title: pNext }, pNext);
   } else {
-    nextLink = createEl('a', { href: '#', class: 'next disabled', title: 'Next' }, 'Next');
+    nextLink = createEl('a', { href: '#', class: 'next disabled', title: pNext }, pNext);
   }
   annotateElWithAnalyticsTracking(
     prevLink,

@@ -14,8 +14,8 @@ export default async function decorate(block) {
   template = template ? template.toLowerCase() : '';
   const newsRoomLink = document.createElement('h2');
   const placeholders = await fetchPlaceholders();
-  const pNewsroom  = getPlaceholder('Newsroom', placeholders);
-  const pPageNotFound = getPlaceholder('Page not found', placeholders);
+  const pNewsroom  = getPlaceholder('newsroom', placeholders);
+  const pPageNotFound = getPlaceholder('pageNotFound', placeholders);
   const annotatedLink = createAnnotatedLinkEl(
     '/',
     pNewsroom,
