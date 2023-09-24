@@ -2,7 +2,7 @@ import {
   fetchPlaceholders,
   getMetadata,
 } from '../../scripts/lib-franklin.js';
-import { createAnnotatedLinkEl, getCountry, getLanguage, getPlaceholder } from '../../scripts/scripts.js';
+import { createAnnotatedLinkEl, getPlaceholder } from '../../scripts/scripts.js';
 import { ANALYTICS_LINK_TYPE_BREADCRUMB, ANALYTICS_MODULE_MARQUEE, ANALYTICS_TEMPLATE_ZONE_HERO } from '../../scripts/constants.js';
 
 function isSearchPage() {
@@ -14,7 +14,7 @@ export default async function decorate(block) {
   template = template ? template.toLowerCase() : '';
   const newsRoomLink = document.createElement('h2');
   const placeholders = await fetchPlaceholders();
-  const pNewsroom  = getPlaceholder('newsroom', placeholders);
+  const pNewsroom = getPlaceholder('newsroom', placeholders);
   const pPageNotFound = getPlaceholder('pageNotFound', placeholders);
   const annotatedLink = createAnnotatedLinkEl(
     '/',

@@ -1,5 +1,15 @@
-import { annotateElWithAnalyticsTracking, createAnnotatedLinkEl, createEl, getPlaceholder } from '../../scripts/scripts.js';
-import { decorateIcons, getMetadata, loadScript, fetchPlaceholders } from '../../scripts/lib-franklin.js';
+import {
+  annotateElWithAnalyticsTracking,
+  createAnnotatedLinkEl,
+  createEl,
+  getPlaceholder,
+} from '../../scripts/scripts.js';
+import {
+  decorateIcons,
+  getMetadata,
+  loadScript,
+  fetchPlaceholders,
+} from '../../scripts/lib-franklin.js';
 import {
   ANALYTICS_LINK_TYPE_DOWNLOADABLE,
   ANALYTICS_LINK_TYPE_ENGAGEMENT,
