@@ -294,9 +294,7 @@ body.article main .section.abstract {
 }
 
 body.article main .section.abstract+.section {
-  padding-top: 0;
-  padding-left: 25px;
-  padding-right: 25px;
+  padding: 0 25px;
   margin-left: 10px;
 }
 
@@ -346,7 +344,7 @@ body.article main .section.abstract h1 {
     position: absolute;
     top: 160px;
     right: 0;
-    padding-top: 0;
+    padding-top: 10px;
     max-width: 28%;
     padding-right: 15px;
   }
