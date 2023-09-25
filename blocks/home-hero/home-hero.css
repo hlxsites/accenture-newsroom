@@ -38,7 +38,7 @@
   background-color: #004DFF;
   height: 21.5%;
   width: 100%;
-  top: 42%;
+  top: 37%;
   left: 0;
   position: absolute;
   z-index: 2;
@@ -105,6 +105,7 @@
     margin-top: 0;
     padding-top: 55px;
     line-height: 1.1;
+    left: 1%;
   }
 
   .home-hero.block .home-hero-content-container {
@@ -122,7 +123,7 @@
     background-color: #fff;
     z-index: 3;
     top: 55px;
-    left: 4px;
+    left: 19px;
     padding: 0 20px;
   }
 
@@ -177,5 +178,9 @@
 
   .home-hero.block .home-hero-links-container ul li:last-child::after {
     content: none;
+  }
+
+  .home-hero.block .home-hero-stripe{
+    top: 42%;
   }
 }
