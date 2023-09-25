@@ -65,7 +65,7 @@ export function getCountry() {
   const siteToCountryMapping = {
     us: 'us',
     uk: 'gb',
-    de: 'gb',
+    de: 'de',
     fr: 'fr',
     it: 'it',
     es: 'sp',
