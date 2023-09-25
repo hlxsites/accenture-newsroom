@@ -382,7 +382,7 @@ header nav[aria-expanded="true"] .nav-tools {
   }
 
   header nav .nav-sections > ul > li.nav-drop.active {
-    font-family: 'Graphik Semibold';
+    font-family: var(--graphik-semibold);
   }
 
   header nav .nav-sections > ul > li.nav-drop:first-child {
