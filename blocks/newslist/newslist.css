@@ -428,12 +428,7 @@
     color: var(--link-color);
   }
 
-  .newslist .newslist-container .newslist-item h4 a {
-    font-size: 20px;
-  }
-
   .newslist .newslist-container .newslist-item .newslist-item-description {
-    font-size: var(--body-font-size-xs);
     margin-bottom: 20px;
   }
 
@@ -450,6 +445,14 @@
 
   #newslist-filter-year {
     width: 370px;
+  }
+
+  .newslist .newslist-container .newslist-item h4 a {
+    font-size: 20px;
+  }
+  
+  .newslist .newslist-container .newslist-item .newslist-item-description {
+    font-size: var(--body-font-size-xs);
   }
 }
 
