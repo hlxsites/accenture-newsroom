@@ -381,6 +381,10 @@ header nav[aria-expanded="true"] .nav-tools {
     box-sizing: border-box;
   }
 
+  header nav .nav-sections > ul > li.nav-drop.active {
+    font-family: 'Graphik Semibold';
+  }
+
   header nav .nav-sections > ul > li.nav-drop:first-child {
     padding: 20px 20px 0 0;
   }
@@ -431,12 +435,13 @@ header nav[aria-expanded="true"] .nav-tools {
 
   header nav .nav-sections > ul > li.nav-drop[aria-expanded="true"] > ul li.level-two {
     border: none;
-    padding: 2em 1.875em 0 0;
+    padding: 2em 2em 0 0;
     width: 24.68%;
     font-size: 16px;
     line-height: normal;
     height: auto;
     margin: 0;
+    text-wrap: wrap;
   }
 
   header nav .nav-sections > ul > li[aria-expanded="true"] > ul.sub-menu-container > li.sub-menu > ul > li.level-three {
