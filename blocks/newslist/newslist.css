@@ -1,5 +1,6 @@
 .section.newslist-container {
   padding: 0 15px 64px;
+  border-top: .5px solid #cccccc;
 }
 
 .newslist.block {
@@ -277,9 +278,10 @@
   height: 50px;
   color: #000;
   text-transform: uppercase;
+  border-radius: 0;
 }
 
-.newslist .newslist-container .newslist-header-container label {
+.newslist-header-container label {
   font-family: var(--graphik-semibold);
   padding-left: 15px;
   margin-bottom: 5px;
@@ -290,6 +292,10 @@
   color: #000;
 }
 
+main .section.newslist-header-container {
+  padding: 0 36px 15px;
+  max-width: 1200px;
+}
 
 @media (min-width: 768px) {
   .newslist.block {
@@ -303,22 +309,20 @@
     margin: 0 auto; /* Center the grid container horizontally */
   }
 
-  .newslist .newslist-container .newslist-header-container {
+ main .section.newslist-header-container {
     grid-column: 1 / span 2;
     display: grid;
-    grid-template-columns: 1fr 1fr;
-    border: 0.5px solid #ccc;
-    margin-bottom: 10px;
-    padding-top: 10px;
-    padding-bottom: 10px;
+    grid-template-columns: 3fr 9fr;
+    padding-top: 15px;
+    padding-bottom: 15px;
   }
 
-  .newslist .newslist-container .newslist-header-container form {
-    display: flex;
+.newslist-header-container form {
+    /* display: flex; */
     align-items: center;
   }
 
-  body.category .newslist .newslist-container .newslist-header-container {
+  .newslist-header-container {
     display: flex;
   }
 
@@ -333,7 +337,7 @@
   }
 
   #newslist-search-input {
-    width: 410px;
+    width: 70%;
     height: 50px;
     margin-left: 10px;
     margin-bottom: 0;
@@ -344,6 +348,7 @@
     color: #000;
     font-size: var(--body-font-size-s);
     font-family: var(--graphik-semibold);
+    border-radius: 0;
   }
 
   #newslist-search-input::after {
@@ -374,13 +379,15 @@
 
   #filter-form input[type='submit'] {
     display: inline;
-    position: relative;
-    top: 5px;
+    margin-top: 30px;
+    /* position: relative; */
+    /* top: 5px; */
   }
 
   #newslist-filter-input {
     display: inline;
-    width: 265px;
+    /* width: 265px; */
+    margin-top: 25px;
     margin-bottom: 0;
   }
 
@@ -430,11 +437,33 @@
 @media (min-width: 1000px) {
   #newslist-search-form {
     display: flex;
-    width: 50%;
+    /* width: 50%; */
   }
 
   #newslist-filter-year {
     width: 370px;
+  }
+
+  #newslist-filter-input {
+    margin-top: 0;
+    width: 45%;
+  }
+
+  #filter-form input[type='submit'] {
+    margin-top: 5px;
+  }
+
+  main .section.newslist-header-container {
+    grid-template-columns: 6fr 6fr;
+    padding: 16px 15px;
+  }
+}
+
+@media (min-width: 1200px) {
+  main .section.newslist-header-container {
+    margin: auto;
+    padding-left: 0;
+    padding-right: 0;
   }
 }
 
