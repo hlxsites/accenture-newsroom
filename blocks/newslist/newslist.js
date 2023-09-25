@@ -413,7 +413,6 @@ export default async function decorate(block) {
     const years = getYears(shortIndex);
     const filterYear = createFilterYear(years, year, window.location.pathname);
     // prepend filter form and year picker
-    // const newsListHeader = document.createElement('div');
     newsListHeader.classList.add('section', 'newslist-header-container');
     newsListHeader.innerHTML = `
       <form action="${window.location.pathname}" method="get" id="filter-form">
@@ -425,7 +424,6 @@ export default async function decorate(block) {
       </form>
     `;
     newsListHeader.querySelector('#filter-form').append(filterYear);
-    // block.append(newsListHeader);
   } else {
     if (fromDate && toDate) {
       shortIndex = await ffetchArticles(
@@ -442,7 +440,6 @@ export default async function decorate(block) {
       totalResults = rawIndex.total;
     }
     // prepend search form and date picker
-    // const newsListHeader = document.createElement('div');
     newsListHeader.classList.add('section', 'newslist-header-container');
     newsListHeader.innerHTML = `
       <form action="/search" method="get" id="newslist-search-form">
@@ -467,7 +464,6 @@ export default async function decorate(block) {
       ANALYTICS_TEMPLATE_ZONE_BODY,
       ANALYTICS_LINK_TYPE_SEARCH_INTENT,
     );
-    // block.append(newsListHeader);
   }
 
   const range = document.createRange();

@@ -318,7 +318,6 @@ main .section.newslist-header-container {
   }
 
 .newslist-header-container form {
-    /* display: flex; */
     align-items: center;
   }
 
@@ -380,13 +379,10 @@ main .section.newslist-header-container {
   #filter-form input[type='submit'] {
     display: inline;
     margin-top: 30px;
-    /* position: relative; */
-    /* top: 5px; */
   }
 
   #newslist-filter-input {
     display: inline;
-    /* width: 265px; */
     margin-top: 25px;
     margin-bottom: 0;
   }
@@ -437,7 +433,6 @@ main .section.newslist-header-container {
 @media (min-width: 1000px) {
   #newslist-search-form {
     display: flex;
-    /* width: 50%; */
   }
 
   #newslist-filter-year {
