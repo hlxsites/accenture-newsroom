@@ -1,4 +1,5 @@
 const loadGeoScript = () => {
+	createOptanonWrapper();
 	const origin = window.location.origin.toLowerCase();
 	if (origin.indexOf(".cn") > 1 || origin.indexOf(".cdnsvc") > 1) {
 			window.otUserLocation = 'CN';
@@ -34,6 +35,13 @@ const loadGeoScript = () => {
 					window.otUserLocation = locationJson.country;
 			}
 	}
+};
+
+const createOptanonWrapper = () => {
+	const script = document.createElement('script');
+	script.type = 'text/javascript';
+	script.textContent = 'function OptanonWrapper() { }';
+	document.head.append(script);
 };
 
 loadGeoScript();
