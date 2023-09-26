@@ -12,8 +12,8 @@
   <meta name="template" content="error">
   <script src="/scripts/scripts.js" type="module" crossorigin="use-credentials"></script>
   <script type="module">
-    import { sampleRUM } from '/scripts/lib-franklin.js';
-    import { createFilterYear } from '/scripts/scripts.js';
+    import { sampleRUM, fetchPlaceholders } from '/scripts/lib-franklin.js';
+    import { createFilterYear, getPlaceholder } from '/scripts/scripts.js';
 
     function getYearsFrom(year) {
       const years = [];
@@ -51,27 +51,24 @@
       });
     }
 
-    window.addEventListener('load', () => {
+    window.addEventListener('load', async () => {
       const filterForm = document.getElementById('filter-form');
       const years = getYearsFrom(parseInt(filterForm.dataset.year, 10));
-      const filterYear = createFilterYear(years, 'YEAR', '/');
+      const placeholders = await fetchPlaceholders();
+      const pYear = getPlaceholder('year', placeholders);
+      const pMessage = getPlaceholder('pageNotFoundMessage', placeholders);
+      const pReturnButtonText = getPlaceholder('returnButtonText', placeholders);
+      const filterYear = await createFilterYear(years, pYear, '/');
       filterForm.appendChild(filterYear);
-      const message = `
-					<p>
-            We apologize for the inconvenience, but an error was encountered on the page you have requested.
-            A system administrator has been automatically notified of the problem.
-          </p>
-          <p>
-            You may hit the BACK button on your browser to return to the previous page,
-            or you may use the link below to go back to the main index page.
-          </p>
-      `;
+      const message = `<p>${pMessage}</p>`;
       const messageContainer = document.createElement('div');
       messageContainer.classList.add('error-message');
       messageContainer.innerHTML = message;
       addEventListenerToFilterForm(document);
       const filterFormInDOM = document.getElementById('filter-form');
       filterFormInDOM.insertAdjacentElement('afterend', messageContainer);
+      const returnButton = document.querySelector('.button-container .error-button-home');
+      returnButton.innerHTML = pReturnButtonText;
       sampleRUM('404', { source: document.referrer, target: window.location.href });
     });
   </script>
@@ -157,7 +154,7 @@
         <input type="submit" value="" disabled>
       </form>
       <p class="button-container">
-        <a href="/" class="button secondary error-button-home">Return to Accenture Newsroom</a>
+        <a href="/" class="button secondary error-button-home"></a>
       </p>
     </div>
   </main>

@@ -339,15 +339,16 @@ body.article main .section.abstract h1 {
   }
 
   body.article main .section:not(.aside-container) {
-    max-width: 60%;
+    max-width: 66.7%;
   }
 
   body.article main .section.aside-container {
     position: absolute;
     top: 160px;
-    right: 5%;
+    right: 0;
     padding-top: 0;
-    max-width: 25%;
+    max-width: 28%;
+    padding-right: 15px;
   }
 
   body.article main .section.abstract,
@@ -366,7 +367,7 @@ body.article main .section.abstract h1 {
   body.article main .section.aside-container {
     position: absolute;
     top: 160px;
-    right: 0;
+    right: 4%;
     padding-top: 0;
     max-width: 350px;
   }

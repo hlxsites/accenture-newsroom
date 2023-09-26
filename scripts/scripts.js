@@ -23,6 +23,7 @@ import {
   loadCSS,
   getMetadata,
   loadScript,
+  fetchPlaceholders,
 } from './lib-franklin.js';
 
 const LCP_BLOCKS = []; // add your LCP blocks to the list
@@ -32,22 +33,72 @@ export const ABSTRACT_REGEX = /(.*?);.*?(\d{4})|(.*?)(\d{4})\s+–\s+\b|(.*?)(\d
 
 const isMobile = () => window.innerWidth < 600;
 
-export function getLocale(path) {
-  const locale = path.split('/')[1];
-  if (/^[a-z]{2}$/.test(locale)) {
-    return locale;
+export function getSiteFromHostName(hostname = window.location.hostname) {
+  const allowedSites = ['uk', 'de', 'fr', 'it', 'es', 'sg', 'pt', 'jp', 'br'];
+  if (hostname === 'localhost') {
+    return 'us';
+  }
+  // handle franklin hostnames
+  const franklinHostName = 'accenture-newsroom';
+  if (hostname.includes(franklinHostName)) {
+    for (let i = 0; i < allowedSites.length; i += 1) {
+      if (hostname.includes(`${franklinHostName}-${allowedSites[i]}`)) {
+        return allowedSites[i];
+      }
+    }
+    return 'us';
+  }
+  // handle main hostnames
+  const mainHostName = 'newsroom.accenture';
+  if (hostname.includes(mainHostName)) {
+    const remainingHostName = hostname.replace(`${mainHostName}`, '');
+    for (let i = 0; i < allowedSites.length; i += 1) {
+      if (remainingHostName.includes(`${allowedSites[i]}`)) {
+        return allowedSites[i];
+      }
+    }
   }
   return 'us';
 }
 
-export function getCountryLanguage(locale) {
-  const langs = {
-    us: 'us-en',
+export function getCountry() {
+  const siteToCountryMapping = {
+    us: 'us',
+    uk: 'gb',
+    de: 'de',
+    fr: 'fr',
+    it: 'it',
+    es: 'sp',
+    sg: 'sg',
+    pt: 'pt',
+    jp: 'jp',
+    br: 'br',
   };
-  let language = langs[locale];
-  if (!language) language = 'us-en';
+  const site = getSiteFromHostName();
+  return siteToCountryMapping[site];
+}
 
-  return language;
+export function getLanguage(country) {
+  const countryToLanguageMapping = {
+    us: 'en',
+    uk: 'en',
+    de: 'de',
+    fr: 'fr',
+    it: 'it',
+    es: 'es',
+    sg: 'en',
+    pt: 'pt',
+    jp: 'ja',
+    br: 'pt',
+  };
+  return countryToLanguageMapping[country] || 'en';
+}
+
+export function getPlaceholder(key, placeholders) {
+  if (placeholders && placeholders[key]) {
+    return placeholders[key];
+  }
+  return key;
 }
 
 /**
@@ -124,7 +175,9 @@ export function addEventListenerToFilterYear(yearPicker, url) {
   });
 }
 
-export function createFilterYear(years, currentYear, url) {
+export async function createFilterYear(years, currentYear, url) {
+  const placeholders = await fetchPlaceholders();
+  const pYear = getPlaceholder('year', placeholders);
   const filterYear = document.createElement('div');
   filterYear.id = 'filter-year';
   filterYear.name = 'year';
@@ -134,11 +187,11 @@ export function createFilterYear(years, currentYear, url) {
     data-analytics-link-type="${ANALYTICS_LINK_TYPE_FILTER}">${y}</div>
     `)).join('');
   options = `<div class="filter-year-item" value="" 
-    data-analytics-link-name="YEAR"
+    data-analytics-link-name="year"
     data-analytics-module-name=${ANALYTICS_MODULE_YEAR_FILTER} data-analytics-template-zone=""
-    data-analytics-link-type="${ANALYTICS_LINK_TYPE_FILTER}">YEAR</div> ${options}`;
+    data-analytics-link-type="${ANALYTICS_LINK_TYPE_FILTER}">${pYear}</div> ${options}`;
   filterYear.innerHTML = `
-  ${currentYear || 'YEAR'}
+  ${currentYear || pYear}
   <div class="filter-year-dropdown">
     ${options}
   </div>
@@ -275,6 +328,9 @@ async function addPrevNextLinksToArticles() {
   if (template !== 'Article' || !heroBlock) {
     return;
   }
+  const placeholders = await fetchPlaceholders();
+  const pPrevious = getPlaceholder('previous', placeholders);
+  const pNext = getPlaceholder('next', placeholders);
   const queryIndex = await ffetchArticles('/query-index.json', 'articles', 100);
   // iterate queryIndex to find current article and add prev/next links
   const currentArticlePath = window.location.pathname;
@@ -306,14 +362,14 @@ async function addPrevNextLinksToArticles() {
   let prevLink = '';
   let nextLink = '';
   if (prevArticle) {
-    prevLink = createEl('a', { href: prevArticle.path, class: 'prev', title: 'Prev' }, 'Previous');
+    prevLink = createEl('a', { href: prevArticle.path, class: 'prev', title: pPrevious }, pPrevious);
   } else {
-    prevLink = createEl('a', { href: '#', class: 'prev disabled', title: 'Prev' }, 'Previous');
+    prevLink = createEl('a', { href: '#', class: 'prev disabled', title: pPrevious }, pPrevious);
   }
   if (nextArticle) {
-    nextLink = createEl('a', { href: nextArticle.path, class: 'next', title: 'Next' }, 'Next');
+    nextLink = createEl('a', { href: nextArticle.path, class: 'next', title: pNext }, pNext);
   } else {
-    nextLink = createEl('a', { href: '#', class: 'next disabled', title: 'Next' }, 'Next');
+    nextLink = createEl('a', { href: '#', class: 'next disabled', title: pNext }, pNext);
   }
   annotateElWithAnalyticsTracking(
     prevLink,

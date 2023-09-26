@@ -1,7 +1,8 @@
 import {
+  fetchPlaceholders,
   getMetadata,
 } from '../../scripts/lib-franklin.js';
-import { createAnnotatedLinkEl } from '../../scripts/scripts.js';
+import { createAnnotatedLinkEl, getPlaceholder } from '../../scripts/scripts.js';
 import { ANALYTICS_LINK_TYPE_BREADCRUMB, ANALYTICS_MODULE_MARQUEE, ANALYTICS_TEMPLATE_ZONE_HERO } from '../../scripts/constants.js';
 
 function isSearchPage() {
@@ -12,9 +13,12 @@ export default async function decorate(block) {
   block.innerHTML = '';
   template = template ? template.toLowerCase() : '';
   const newsRoomLink = document.createElement('h2');
+  const placeholders = await fetchPlaceholders();
+  const pNewsroom = getPlaceholder('newsroom', placeholders);
+  const pPageNotFound = getPlaceholder('pageNotFound', placeholders);
   const annotatedLink = createAnnotatedLinkEl(
     '/',
-    'Newsroom',
+    pNewsroom,
     ANALYTICS_MODULE_MARQUEE,
     ANALYTICS_TEMPLATE_ZONE_HERO,
     ANALYTICS_LINK_TYPE_BREADCRUMB,
@@ -24,7 +28,7 @@ export default async function decorate(block) {
 
   if (isSearchPage()) {
     const title = document.createElement('h1');
-    title.innerHTML = 'Newsroom Search';
+    title.innerHTML = getMetadata('subtitle');
     block.append(title);
   } else if (template === 'category') {
     const title = document.createElement('h1');
@@ -40,7 +44,7 @@ export default async function decorate(block) {
     block.append(heroLinkContainer);
   } else if (template === 'error') {
     const title = document.createElement('h1');
-    title.innerHTML = 'Page not found';
+    title.innerHTML = pPageNotFound;
     block.append(title);
   } else {
     const pageTitle = getMetadata('og:title');

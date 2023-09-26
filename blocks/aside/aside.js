@@ -1,5 +1,15 @@
-import { annotateElWithAnalyticsTracking, createAnnotatedLinkEl, createEl } from '../../scripts/scripts.js';
-import { decorateIcons, getMetadata, loadScript } from '../../scripts/lib-franklin.js';
+import {
+  annotateElWithAnalyticsTracking,
+  createAnnotatedLinkEl,
+  createEl,
+  getPlaceholder,
+} from '../../scripts/scripts.js';
+import {
+  decorateIcons,
+  getMetadata,
+  loadScript,
+  fetchPlaceholders,
+} from '../../scripts/lib-franklin.js';
 import {
   ANALYTICS_LINK_TYPE_DOWNLOADABLE,
   ANALYTICS_LINK_TYPE_ENGAGEMENT,
@@ -16,21 +26,9 @@ async function generatePDF(pageTitle) {
   const main = document.querySelector('main').cloneNode(true);
   const heroContainer = main.querySelector('.section.hero-container');
   const asideContainer = main.querySelector('.aside-container');
-  const allParagraphs = main.querySelectorAll('p');
   heroContainer.remove();
   asideContainer.remove();
   const pageName = pageTitle.replace(/[^a-z0-9]/gi, '-');
-
-  allParagraphs.forEach((paragraph) => {
-    const anchorElements = paragraph.querySelectorAll('a');
-    if (anchorElements.length === 0) {
-      return;
-    }
-    anchorElements.forEach((el) => {
-      const innerText = document.createTextNode(el.innerText);
-      el.parentNode.replaceChild(innerText, el);
-    });
-  });
 
   const { jsPDF } = window.jspdf;
   // eslint-disable-next-line new-cap
@@ -54,6 +52,12 @@ export default async function decorate(block) {
   block.innerText = '';
   const pageUrl = window.location.href;
   const pageTitle = getMetadata('og:title');
+  const placeholders = await fetchPlaceholders();
+  const pShare = getPlaceholder('share', placeholders);
+  const pDownloadPressRelease = getPlaceholder('downloadPressRelease', placeholders);
+  const pIndustryTags = getPlaceholder('industryTags', placeholders);
+  const pSubjectTags = getPlaceholder('subjectTags', placeholders);
+
   // Create social share icons
   const social = createEl('div', { class: 'social' });
 
@@ -124,14 +128,14 @@ export default async function decorate(block) {
 
   await decorateIcons(social);
   const share = createEl('div', { class: 'share' }, social);
-  const shareTitle = createEl('h4', {}, 'Share');
+  const shareTitle = createEl('h4', {}, pShare);
   share.prepend(shareTitle);
   block.append(share);
 
   // PDF Download button
   const addPDF = getMetadata('pdf');
   if (addPDF && (addPDF === 'true')) {
-    const pdfButton = createEl('a', { class: 'pdf-button button', title: ' Convert to PDF' }, 'DOWNLOAD PRESS RELEASE', share);
+    const pdfButton = createEl('a', { class: 'pdf-button button', title: ' Convert to PDF' }, pDownloadPressRelease, share);
     annotateElWithAnalyticsTracking(
       pdfButton,
       pdfButton.textContent,
@@ -152,8 +156,8 @@ export default async function decorate(block) {
   // Tags
   const industryTagValues = getMetadata('industries');
   const subjectTagValues = getMetadata('subjects');
-  const industryEl = industryTagValues ? createEl('div', { class: 'industry' }, '<h4>INDUSTRY TAGS</h4>') : null;
-  const subjectEl = subjectTagValues ? createEl('div', { class: 'subject' }, '<h4>SUBJECT TAGS</h4>') : null;
+  const industryEl = industryTagValues ? createEl('div', { class: 'industry' }, `<h4>${pIndustryTags}</h4>`) : null;
+  const subjectEl = subjectTagValues ? createEl('div', { class: 'subject' }, `<h4>${pSubjectTags}</h4>`) : null;
 
   const industryUl = industryEl ? createEl('ul', {}, '', industryEl) : null;
   industryTagValues.split(',').forEach((industryTag) => {

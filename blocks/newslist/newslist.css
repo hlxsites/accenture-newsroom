@@ -41,9 +41,12 @@
   font-family: var(--header-font-family);
   font-size: var(--body-font-size-xxs);
   color: #000;
-  margin-bottom: 20px;
   padding: 0 0 20px;
-  line-height: 1.83;
+  line-height: 1.6;
+}
+
+.newslist .newslist-container .newslist-item .newslist-item-description p {
+  margin-bottom: 0;
 }
 
 .newslist .newslist-container .newslist-item .newslist-item-footer a {
@@ -51,7 +54,6 @@
   text-transform: uppercase;
   font-size: var(--body-font-size-xs);
   font-weight: 600;
-  color: var(--link-color);
 }
 
 .newslist .newslist-container .newslist-item .newslist-item-footer a .read-more-arrow {
@@ -428,6 +430,14 @@ main .section.newslist-header-container {
   .newslist .newslist-pagination-container a.current-page {
     color: var(--link-color);
   }
+
+  .newslist .newslist-container .newslist-item .newslist-item-description {
+    margin-bottom: 20px;
+  }
+
+  .newslist .newslist-container .newslist-item .newslist-item-description p {
+    margin-bottom: 1em;
+  }
 }
 
 @media (min-width: 1000px) {
@@ -438,7 +448,7 @@ main .section.newslist-header-container {
   #newslist-filter-year {
     width: 370px;
   }
-
+  
   #newslist-filter-input {
     margin-top: 0;
     width: 45%;
@@ -459,6 +469,14 @@ main .section.newslist-header-container {
     margin: auto;
     padding-left: 0;
     padding-right: 0;
+  }
+  
+  .newslist .newslist-container .newslist-item h4 a {
+    font-size: 20px;
+  }
+  
+  .newslist .newslist-container .newslist-item .newslist-item-description {
+    font-size: var(--body-font-size-xs);
   }
 }
 
