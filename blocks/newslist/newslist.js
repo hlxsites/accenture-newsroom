@@ -20,6 +20,7 @@ import {
   ANALYTICS_LINK_TYPE_ENGAGEMENT,
   ANALYTICS_MODULE_SEARCH_PAGINATION,
   ANALYTICS_LINK_TYPE_NAV_PAGINATE,
+  ANALYTICS_MODULE_SEARCH_LIST,
 } from '../../scripts/constants.js';
 
 const MAX_CHARS_IN_CARD_DESCRIPTION = 800;
@@ -537,9 +538,9 @@ export default async function decorate(block) {
       annotateElWithAnalyticsTracking(
         link,
         link.textContent,
-        ANALYTICS_MODULE_CONTENT_CARDS,
+        isSearch ? ANALYTICS_MODULE_SEARCH_LIST : ANALYTICS_MODULE_CONTENT_CARDS,
         ANALYTICS_TEMPLATE_ZONE_BODY,
-        ANALYTICS_LINK_TYPE_ENGAGEMENT,
+        isSearch ? ANALYTICS_LINK_TYPE_SEARCH_ACTIVITY : ANALYTICS_LINK_TYPE_ENGAGEMENT,
       );
     });
     newsListContainer.append(item);
