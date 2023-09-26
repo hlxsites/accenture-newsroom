@@ -292,6 +292,20 @@ export default {
       });
     }
 
+    // Handle Tables from the source content
+    const tables = main.querySelectorAll('table');
+    if (tables.length > 0) {
+      tables.forEach((table) => {
+        const cells = [
+          ['Table'],
+          [table.outerHTML],
+        ];
+        const newTable = WebImporter.DOMUtils.createTable(cells, document);
+        table.after(newTable);
+        table.remove();
+      });
+    }
+
     const meta = createMetadataBlock(main, document, url);
 
     // remove tek-pager arrows
