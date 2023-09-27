@@ -77,7 +77,7 @@ async function addMartechStack() {
   // load jquery
   await loadScript('/scripts/jquery-3.5.1.min.js', { async: 'false' });
   // Add Adobe Analytics
-  await loadScript('https://assets.adobedtm.com/55621ea95d50/e22056dd1d90/launch-EN379c80f941604b408953a2df1776d1c6-staging.min.js', { async: 'false' });
+  await loadScript('https://assets.adobedtm.com/55621ea95d50/e22056dd1d90/launch-EN379c80f941604b408953a2df1776d1c6-staging.min.js');
 }
 
 function getPageInstanceId(template, path, countryLanguage = '') {
