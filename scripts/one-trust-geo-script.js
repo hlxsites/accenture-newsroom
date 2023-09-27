@@ -28,20 +28,19 @@ const loadGeoScript = () => {
     link4.setAttribute('href', geolink2);
     document.head.appendChild(link4);
 
-
-    fetch(geolink2, {
-      headers: {
-        'Accept': 'application/json'
-      }
-    })
-      .then(response => response.json())
-      .then(geo =>
-        jsonFeed(geo)
-      );
-
     function jsonFeed(locationJson) {
       window.otUserLocation = locationJson.country;
     }
+
+    fetch(geolink2, {
+      headers: {
+        Accept: 'application/json',
+      },
+    })
+      .then((response) => response.json())
+      .then((geo) =>
+        jsonFeed(geo)
+      );
   }
 };
 
