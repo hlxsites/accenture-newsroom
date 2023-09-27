@@ -296,6 +296,7 @@
 @media (min-width: 768px) {
   .newslist.block {
     width: 100%;
+    margin-left: 0;
   }
 
   .newslist .newslist-container {
