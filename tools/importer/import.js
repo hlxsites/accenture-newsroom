@@ -213,6 +213,10 @@ export default {
         noscript.remove();
       });
     }
+    const oneTrust = main.querySelector('#onetrust-consent-sdk');
+    if (oneTrust) oneTrust.remove();
+    const coachMarks = main.querySelector('#coach-marks-screen');
+    if (coachMarks) coachMarks.remove();
 
     // Remove Footer
     const footer = main.querySelector('#block-footer');
@@ -294,7 +298,7 @@ export default {
 
     // Handle Tables from the source content
     const tables = main.querySelectorAll('table');
-    if (tables.length > 0) {
+    if (tables && tables.length > 0) {
       tables.forEach((table) => {
         const cells = [
           ['Table'],
