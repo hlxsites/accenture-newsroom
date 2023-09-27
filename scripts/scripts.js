@@ -186,7 +186,7 @@ export async function createFilterYear(years, currentYear, url) {
     data-analytics-module-name=${ANALYTICS_MODULE_YEAR_FILTER} data-analytics-template-zone=""
     data-analytics-link-type="${ANALYTICS_LINK_TYPE_FILTER}">${y}</div>
     `)).join('');
-  options = `<div class="filter-year-item" value="" 
+  options = `<div class="filter-year-item" value=""
     data-analytics-link-name="year"
     data-analytics-module-name=${ANALYTICS_MODULE_YEAR_FILTER} data-analytics-template-zone=""
     data-analytics-link-type="${ANALYTICS_LINK_TYPE_FILTER}">${pYear}</div> ${options}`;
@@ -389,6 +389,32 @@ async function addPrevNextLinksToArticles() {
   heroLinkContainer.append(nextLink);
 }
 
+const scanAllTextNodes = (element) => {
+  const allChildNodes = element.childNodes;
+  allChildNodes.forEach((oNode) => {
+    if (oNode.nodeType !== Node.TEXT_NODE) {
+      scanAllTextNodes(oNode);
+      return;
+    }
+    if (oNode.nodeValue.trim() === '') {
+      return;
+    }
+    if (oNode.nodeValue !== '# # #') {
+      return;
+    }
+    const span = document.createElement('span');
+    span.classList.add('article-end-divider');
+    span.textContent = oNode.nodeValue;
+    element.replaceChild(span, oNode);
+  });
+};
+
+const centerArticleDivider = (articleSections) => {
+  articleSections.forEach((article) => {
+    scanAllTextNodes(article);
+  });
+};
+
 function annotateArticleSections() {
   const template = getMetadata('template');
   if (template !== 'Article') {
@@ -396,6 +422,7 @@ function annotateArticleSections() {
   }
   const articleSections = document.querySelectorAll('main > .section');
 
+  centerArticleDivider(articleSections);
   // eslint-disable-next-line no-restricted-syntax
   for (const section of articleSections) {
     const sectionText = section.innerText;
