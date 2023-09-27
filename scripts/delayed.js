@@ -281,10 +281,10 @@ function addDataLayer() {
   };
 }
 
+// add more delayed functionality here
 addDataLayer();
+addCookieOneTrust();
 addMartechStack();
 
-// add more delayed functionality here
-addCookieOneTrust();
 // Core Web Vitals RUM collection
 sampleRUM('cwv');
