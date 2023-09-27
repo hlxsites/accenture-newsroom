@@ -7,6 +7,11 @@ const createOptanonWrapper = () => {
 
 const loadGeoScript = () => {
   createOptanonWrapper();
+
+  const jsonFeed = (locationJson) => {
+    window.otUserLocation = locationJson.country;
+  };
+
   const origin = window.location.origin.toLowerCase();
   if (origin.indexOf('.cn') > 1 || origin.indexOf('.cdnsvc') > 1) {
     window.otUserLocation = 'CN';
@@ -28,19 +33,13 @@ const loadGeoScript = () => {
     link4.setAttribute('href', geolink2);
     document.head.appendChild(link4);
 
-    function jsonFeed(locationJson) {
-      window.otUserLocation = locationJson.country;
-    }
-
     fetch(geolink2, {
       headers: {
         Accept: 'application/json',
       },
     })
       .then((response) => response.json())
-      .then((geo) =>
-        jsonFeed(geo)
-      );
+      .then((geo) => jsonFeed(geo));
   }
 };
 
