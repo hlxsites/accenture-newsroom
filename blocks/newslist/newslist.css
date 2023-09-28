@@ -1,11 +1,10 @@
 .section.newslist-container {
-  padding: 0 15px 64px;
+  padding: 0 0 20px;
 }
 
 .newslist.block {
   width: 90%;
   margin-left: 10px;
-  padding-top: 25px;
 }
 
 .newslist .newslist-container .newslist-item {
@@ -117,6 +116,7 @@
   padding: 15px;
   border: 1px solid transparent;
   border-radius: 0;
+  padding-bottom: 0;
 
   /* stylelint-disable-next-line property-no-vendor-prefix */
   -webkit-box-shadow: 0 1px 1px rgb(0 0 0 / 5%);
@@ -436,6 +436,9 @@
   .newslist .newslist-container .newslist-item .newslist-item-description p {
     margin-bottom: 1em;
   }
+  .section.newslist-container {
+    padding: 0 20px 20px;
+  }
 }
 
 @media (min-width: 1000px) {
@@ -454,6 +457,9 @@
   
   .newslist .newslist-container .newslist-item .newslist-item-description {
     font-size: var(--body-font-size-xs);
+  }
+  #search-form {
+    padding: 5px;
   }
 }
 
