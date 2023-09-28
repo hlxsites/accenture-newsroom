@@ -422,7 +422,6 @@ function annotateArticleSections() {
   }
   const articleSections = document.querySelectorAll('main > .section');
 
-  centerArticleDivider(articleSections);
   // eslint-disable-next-line no-restricted-syntax
   for (const section of articleSections) {
     const sectionText = section.innerText;
@@ -652,6 +651,7 @@ async function loadJQueryDateRangePicker() {
  */
 async function loadLazy(doc) {
   const main = doc.querySelector('main');
+  const sectionDefaultArticles = main.querySelectorAll('main .section:not([class*=" "]) .default-content-wrapper');
   await loadBlocks(main);
 
   const { hash } = window.location;
@@ -669,6 +669,7 @@ async function loadLazy(doc) {
   sampleRUM('lazy');
   sampleRUM.observe(main.querySelectorAll('div[data-block-name]'));
   sampleRUM.observe(main.querySelectorAll('picture > img'));
+  centerArticleDivider(sectionDefaultArticles);
 }
 
 async function completeFFetchIteration() {
