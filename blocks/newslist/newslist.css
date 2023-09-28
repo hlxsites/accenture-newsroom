@@ -436,6 +436,7 @@
   .newslist .newslist-container .newslist-item .newslist-item-description p {
     margin-bottom: 1em;
   }
+
   .section.newslist-container {
     padding: 0 20px 20px;
   }
@@ -458,6 +459,7 @@
   .newslist .newslist-container .newslist-item .newslist-item-description {
     font-size: var(--body-font-size-xs);
   }
+  
   #search-form {
     padding: 5px;
   }
