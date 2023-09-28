@@ -281,10 +281,15 @@ function addDataLayer() {
   };
 }
 
+const addGeoScript = () => {
+  loadScript('/scripts/one-trust-geo-script.js');
+};
+
 // add more delayed functionality here
 addDataLayer();
 addCookieOneTrust();
 addMartechStack();
+addGeoScript();
 
 // Core Web Vitals RUM collection
 sampleRUM('cwv');
