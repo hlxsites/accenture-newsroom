@@ -176,8 +176,8 @@ export default async function decorate(block) {
   const subjectUl = subjectEl ? createEl('ul', {}, '', subjectEl) : null;
   subjectTagValues.split(',').forEach((subjectTag) => {
     const cleanedUpValue = subjectTag.trim().toLowerCase().replace(/&/g, 'and')
-    .replace(/[/]/g, '')
-    .replace(/[\W_]+/g, '-');
+      .replace(/[/]/g, '')
+      .replace(/[\W_]+/g, '-');
     const link = createEl('a', { href: `/subjects/${cleanedUpValue}` }, subjectTag);
     annotateElWithAnalyticsTracking(
       link,
