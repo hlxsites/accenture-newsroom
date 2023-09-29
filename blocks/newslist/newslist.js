@@ -327,6 +327,14 @@ async function updateYearsDropdown(block, articles) {
   addEventListenerToFilterYear(document.getElementById('filter-year'), window.location.pathname);
 }
 
+function ValidateSearchFormData(keyword) {
+  if (typeof keyword === 'undefined' || keyword === null) {
+    return '';
+  }
+  const sanitezedKeyword = keyword.replace(/[`%$^*()_+=[\]{}\\|<>/~]/g, '');
+  return sanitezedKeyword.trim();
+}
+
 export default async function decorate(block) {
   const limit = 10;
   // get request parameter page as limit
@@ -355,7 +363,7 @@ export default async function decorate(block) {
 
   if (isSearch) {
     newsListContainer.classList.add('search-results-container');
-    const query = usp.get('q') || '';
+    const query = ValidateSearchFormData(usp.get('q')) || '';
     if (query) {
       shortIndex = await ffetchArticles('/query-index.json', 'articles', end, (article) => filterByQuery(article, query));
     } else {
