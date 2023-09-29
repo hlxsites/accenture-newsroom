@@ -1,12 +1,12 @@
 .section.newslist-container {
   padding: 0 15px 64px;
   border-top: .5px solid #ccc;
+  padding: 0 0 20px;
 }
 
 .newslist.block {
   width: 90%;
   margin-left: 10px;
-  padding-top: 25px;
 }
 
 .newslist .newslist-container .newslist-item {
@@ -118,6 +118,7 @@
   padding: 15px;
   border: 1px solid transparent;
   border-radius: 0;
+  padding-bottom: 0;
 
   /* stylelint-disable-next-line property-no-vendor-prefix */
   -webkit-box-shadow: 0 1px 1px rgb(0 0 0 / 5%);
@@ -302,6 +303,7 @@ main .section.newslist-header-container {
 @media (min-width: 768px) {
   .newslist.block {
     width: 100%;
+    margin-left: 0;
   }
 
   .newslist .newslist-container {
@@ -438,6 +440,10 @@ main .section.newslist-header-container {
   .newslist .newslist-container .newslist-item .newslist-item-description p {
     margin-bottom: 1em;
   }
+
+  .section.newslist-container {
+    padding: 0 20px 20px;
+  }
 }
 
 @media (min-width: 1000px) {
@@ -477,6 +483,10 @@ main .section.newslist-header-container {
   
   .newslist .newslist-container .newslist-item .newslist-item-description {
     font-size: var(--body-font-size-xs);
+  }
+  
+  #search-form {
+    padding: 5px;
   }
 }
 

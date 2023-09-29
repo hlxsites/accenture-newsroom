@@ -18,8 +18,8 @@
   font-weight: 900;
   line-height: 1;
   color: #000;
-  margin: 8px 0 10px;
-  padding: 25px 0 10px;
+  margin: 0 10px;
+  padding: 0 0 10px;
 }
 
 .hero.block h2 {
@@ -85,7 +85,7 @@
 
 @media (min-width: 768px) {
   .section.hero-container {
-    padding: 47px 65px 50px 67px;
+    padding: 47px 65px 45px 67px;
   }
 
   body.article .hero.block {
@@ -125,5 +125,9 @@
 @media (min-width: 1200px) {
   body.article main .section.hero-container {
     margin-left: calc((1200px - 100vw) / 2);
+  }
+
+  .hero.block h2 {
+    padding-top: 5px;
   }
 }

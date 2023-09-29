@@ -77,7 +77,7 @@ async function addMartechStack() {
   // load jquery
   await loadScript('/scripts/jquery-3.5.1.min.js', { async: 'false' });
   // Add Adobe Analytics
-  loadScript('https://assets.adobedtm.com/55621ea95d50/e22056dd1d90/launch-EN379c80f941604b408953a2df1776d1c6-staging.min.js', { async: '' });
+  await loadScript('https://assets.adobedtm.com/55621ea95d50/e22056dd1d90/launch-EN379c80f941604b408953a2df1776d1c6-staging.min.js');
 }
 
 function getPageInstanceId(template, path, countryLanguage = '') {
@@ -281,10 +281,15 @@ function addDataLayer() {
   };
 }
 
-addDataLayer();
-addMartechStack();
+const addGeoScript = () => {
+  loadScript('/scripts/one-trust-geo-script.js');
+};
 
 // add more delayed functionality here
+addDataLayer();
 addCookieOneTrust();
+addMartechStack();
+addGeoScript();
+
 // Core Web Vitals RUM collection
 sampleRUM('cwv');

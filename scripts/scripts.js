@@ -186,7 +186,7 @@ export async function createFilterYear(years, currentYear, url) {
     data-analytics-module-name=${ANALYTICS_MODULE_YEAR_FILTER} data-analytics-template-zone=""
     data-analytics-link-type="${ANALYTICS_LINK_TYPE_FILTER}">${y}</div>
     `)).join('');
-  options = `<div class="filter-year-item" value="" 
+  options = `<div class="filter-year-item" value=""
     data-analytics-link-name="year"
     data-analytics-module-name=${ANALYTICS_MODULE_YEAR_FILTER} data-analytics-template-zone=""
     data-analytics-link-type="${ANALYTICS_LINK_TYPE_FILTER}">${pYear}</div> ${options}`;

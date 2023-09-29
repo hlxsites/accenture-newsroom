@@ -1,6 +1,6 @@
 import {
   ANALYTICS_LINK_TYPE_LOGO,
-  ANALYTICS_LINK_TYPE_NAVIGATION,
+  ANALYTICS_LINK_TYPE_NAV_PAGINATE,
   ANALYTICS_LINK_TYPE_SEARCH_ACTIVITY,
   ANALYTICS_MODULE_PRIMARY_NAV,
   ANALYTICS_MODULE_SECONDARY_NAV,
@@ -29,6 +29,7 @@ function collapseAllNavSections(sections) {
   }
   sections.querySelectorAll(':scope > ul li').forEach((section) => {
     section.setAttribute('aria-expanded', 'false');
+    section.classList.remove('active');
   });
 }
 
@@ -49,11 +50,25 @@ function toggleSection(section) {
   const expanded = section.getAttribute('aria-expanded') === 'true';
   collapseAllNavSections(section.closest('ul').parentElement);
   section.setAttribute('aria-expanded', expanded ? 'false' : 'true');
+  section.classList.add('active');
+
   if (!expanded && isDesktop.matches) {
     document.addEventListener('click', closeNav);
   } else {
     document.removeEventListener('click', closeNav);
   }
+}
+
+function getLiTextContent(li) {
+  let liText = '';
+  for (let i = 0; i < li.childNodes.length; i += 1) {
+    const node = li.childNodes[i];
+    if (node.nodeType === Node.TEXT_NODE) {
+      liText = node.textContent.trim();
+      break;
+    }
+  }
+  return liText;
 }
 
 const toggleLevelTwoSectionLabel = (section) => {
@@ -132,6 +147,13 @@ export default async function decorate(block) {
       if (navSection.querySelector('ul')) {
         navSection.classList.add('nav-drop');
         navSection.setAttribute('tabindex', '0');
+        annotateElWithAnalyticsTracking(
+          navSection,
+          getLiTextContent(navSection),
+          ANALYTICS_MODULE_PRIMARY_NAV,
+          ANALYTICS_TEMPLATE_ZONE_GLOBAL_HEADER,
+          ANALYTICS_LINK_TYPE_NAV_PAGINATE,
+        );
       }
       // replacing bold nav titles with divs for styling
       if (navSection.querySelector('strong')) {
@@ -163,9 +185,9 @@ export default async function decorate(block) {
           annotateElWithAnalyticsTracking(
             levelTwoLink,
             levelTwoLink.textContent,
-            ANALYTICS_MODULE_PRIMARY_NAV,
+            ANALYTICS_MODULE_SECONDARY_NAV,
             ANALYTICS_TEMPLATE_ZONE_GLOBAL_HEADER,
-            ANALYTICS_LINK_TYPE_NAVIGATION,
+            ANALYTICS_LINK_TYPE_NAV_PAGINATE,
           );
         }
         levelTwo.parentElement.classList.add('level-two');
@@ -206,7 +228,7 @@ export default async function decorate(block) {
               levelThreeLink.textContent,
               ANALYTICS_MODULE_SECONDARY_NAV,
               ANALYTICS_TEMPLATE_ZONE_GLOBAL_HEADER,
-              ANALYTICS_LINK_TYPE_NAVIGATION,
+              ANALYTICS_LINK_TYPE_NAV_PAGINATE,
             );
           }
         });
