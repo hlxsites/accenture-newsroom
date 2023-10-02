@@ -360,6 +360,7 @@ export default async function decorate(block) {
   let shortIndex;
   const newsListContainer = document.createElement('div');
   newsListContainer.classList.add('newslist-container');
+  const newsListHeader = document.createElement('div');
 
   if (isSearch) {
     newsListContainer.classList.add('search-results-container');
@@ -436,7 +437,7 @@ export default async function decorate(block) {
     const years = getYears(shortIndex);
     const filterYear = await createFilterYear(years, year, window.location.pathname);
     // prepend filter form and year picker
-    const newsListHeader = document.createElement('div');
+    newsListHeader.classList.add('section', 'newslist-header-container');
     newsListHeader.classList.add('newslist-header-container');
     newsListHeader.innerHTML = `
       <form action="${window.location.pathname}" method="get" id="filter-form">
@@ -448,7 +449,6 @@ export default async function decorate(block) {
       </form>
     `;
     newsListHeader.querySelector('#filter-form').append(filterYear);
-    newsListContainer.append(newsListHeader);
   } else {
     if (fromDate && toDate) {
       shortIndex = await ffetchArticles(
@@ -465,7 +465,7 @@ export default async function decorate(block) {
       totalResults = rawIndex.total;
     }
     // prepend search form and date picker
-    const newsListHeader = document.createElement('div');
+    newsListHeader.classList.add('section', 'newslist-header-container');
     newsListHeader.classList.add('newslist-header-container');
     newsListHeader.innerHTML = `
       <form action="/search" method="get" id="newslist-search-form">
@@ -490,7 +490,6 @@ export default async function decorate(block) {
       ANALYTICS_TEMPLATE_ZONE_BODY,
       ANALYTICS_LINK_TYPE_SEARCH_INTENT,
     );
-    newsListContainer.append(newsListHeader);
   }
 
   const range = document.createRange();
@@ -545,6 +544,8 @@ export default async function decorate(block) {
   block.innerHTML = newsListContainer.outerHTML;
 
   if (!isSearch) {
+    const listContainer = document.querySelector('.newslist-container');
+    listContainer.before(newsListHeader);
     addEventListenerToFilterForm(block);
   }
 
