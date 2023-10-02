@@ -10,7 +10,10 @@ import {
 import {
   readBlockConfig, decorateIcons, decorateSections, loadBlocks,
 } from '../../scripts/lib-franklin.js';
-import { annotateElWithAnalyticsTracking } from '../../scripts/scripts.js';
+import {
+  annotateElWithAnalyticsTracking,
+  getSiteFromHostName,
+} from '../../scripts/scripts.js';
 
 /**
  * loads and decorates the footer
@@ -23,6 +26,16 @@ export default async function decorate(block) {
     facebook: 'Follow us on Facebook',
     youtube: 'See Accenture on YouTube',
   };
+
+  const socialTitlesGeoMapping = {
+    fr: {
+      linkedin: 'Suivez-nous sur LinkedIn',
+      twitter: 'Suivez-nous sur Twitter',
+      facebook: 'Suivez-nous sur Facebook',
+      youtube: 'Découvrez nos vidéos sur YouTube',
+    },
+  };
+
   const cfg = readBlockConfig(block);
   block.textContent = '';
 
@@ -63,12 +76,18 @@ export default async function decorate(block) {
     const footerBlack = footer.querySelector('.section.footer-black');
     footerBlack.querySelectorAll('a').forEach((link) => {
       const icon = link.querySelector('span[class*="icon-"]');
+      const geo = getSiteFromHostName();
       let text = link.innerText;
       if (icon) {
         // find the class name with pattern icon- from the icon classList
         const iconClass = [...icon.classList].find((className) => className.startsWith('icon-'));
         // remove the icon class from the iconClass
-        text = socialTitlesMapping[iconClass.replace('icon-', '')] || '';
+        const iconName = iconClass.replace('icon-', '');
+        if (socialTitlesGeoMapping[geo]) {
+          text = socialTitlesGeoMapping[geo][iconName] || '';
+        } else {
+          text = socialTitlesMapping[iconName] || '';
+        }
         link.setAttribute('title', text);
 
         const socialLink = icon.closest('a');
