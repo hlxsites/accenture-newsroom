@@ -52,10 +52,9 @@ function getDescription(queryIndexEntry) {
   const matchingParagraph = longdescriptionElements.find((p) => ABSTRACT_REGEX.test(p.innerText));
   if (matchingParagraph) {
     const oBr = matchingParagraph.querySelector('br');
-    if (!oBr) {
-      return;
+    if (oBr) {
+      oBr.remove();
     }
-    oBr.remove();
   }
   let longdescription = matchingParagraph ? matchingParagraph.outerHTML : '';
   if (queryIndexEntry.description.length > longdescription.length) {
