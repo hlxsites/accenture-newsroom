@@ -50,8 +50,11 @@ function getDescription(queryIndexEntry) {
   div.innerHTML = longdescriptionextracted;
   const longdescriptionElements = Array.from(div.querySelectorAll('p'));
   const matchingParagraph = longdescriptionElements.find((p) => ABSTRACT_REGEX.test(p.innerText));
-  const oBr = matchingParagraph.querySelector('br');
-  if (oBr) {
+  if (matchingParagraph) {
+    const oBr = matchingParagraph.querySelector('br');
+    if (!oBr) {
+      return;
+    }
     oBr.remove();
   }
   let longdescription = matchingParagraph ? matchingParagraph.outerHTML : '';
