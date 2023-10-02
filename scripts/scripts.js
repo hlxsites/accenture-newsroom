@@ -410,6 +410,10 @@ const scanAllTextNodes = (element) => {
 };
 
 const centerArticleDivider = (articleSections) => {
+  const template = getMetadata('template');
+  if (template !== 'Article') {
+    return;
+  }
   articleSections.forEach((article) => {
     scanAllTextNodes(article);
   });
