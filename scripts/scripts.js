@@ -649,7 +649,8 @@ async function completeFFetchIteration() {
     return false;
   }
   const template = getMetadata('template');
-  if (template === 'Category' && isMobile()) {
+  const filterYearInput = document.querySelector('#filter-year');
+  if (template === 'Category' && isMobile() && !filterYearInput) {
     return false;
   }
   // eslint-disable-next-line no-restricted-syntax

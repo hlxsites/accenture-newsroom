@@ -212,7 +212,8 @@ function addEventListenerToFilterForm(block) {
   const filterInput = filterForm.querySelector('#newslist-filter-input');
   const filterFormSubmit = filterForm.querySelector('input[type="submit"]');
   const filterYear = filterForm.querySelector('#filter-year');
-  filterFormLabel.addEventListener('click', () => {
+  filterFormLabel.addEventListener('click', (e) => {
+    e.preventDefault();
     const isActive = filterArrow.classList.contains('active');
     if (isActive) {
       filterArrow.classList.remove('active');
