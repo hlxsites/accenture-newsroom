@@ -94,6 +94,22 @@ export function getLanguage(country) {
   return countryToLanguageMapping[country] || 'en';
 }
 
+export function getDateTranslation(country) {
+  const countryToLanguageMapping = {
+    us: 'en-US',
+    uk: 'en-US',
+    de: 'de-DE',
+    fr: 'fr-FR',
+    it: 'it-IT',
+    es: 'es-ES',
+    sg: 'en-US',
+    pt: 'pt-PT',
+    jp: 'ja-JP',
+    br: 'pt-BR',
+  };
+  return countryToLanguageMapping[country] || 'en-US';
+}
+
 export function getPlaceholder(key, placeholders) {
   if (placeholders && placeholders[key]) {
     return placeholders[key];
