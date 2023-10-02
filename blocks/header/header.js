@@ -29,6 +29,7 @@ function collapseAllNavSections(sections) {
   }
   sections.querySelectorAll(':scope > ul li').forEach((section) => {
     section.setAttribute('aria-expanded', 'false');
+    section.classList.remove('active');
   });
 }
 
@@ -49,6 +50,8 @@ function toggleSection(section) {
   const expanded = section.getAttribute('aria-expanded') === 'true';
   collapseAllNavSections(section.closest('ul').parentElement);
   section.setAttribute('aria-expanded', expanded ? 'false' : 'true');
+  section.classList.add('active');
+
   if (!expanded && isDesktop.matches) {
     document.addEventListener('click', closeNav);
   } else {

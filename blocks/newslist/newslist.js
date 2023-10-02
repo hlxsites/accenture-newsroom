@@ -20,6 +20,7 @@ import {
   ANALYTICS_LINK_TYPE_ENGAGEMENT,
   ANALYTICS_MODULE_SEARCH_PAGINATION,
   ANALYTICS_LINK_TYPE_NAV_PAGINATE,
+  ANALYTICS_MODULE_SEARCH_LIST,
 } from '../../scripts/constants.js';
 
 const MAX_CHARS_IN_CARD_DESCRIPTION = 800;
@@ -49,6 +50,10 @@ function getDescription(queryIndexEntry) {
   div.innerHTML = longdescriptionextracted;
   const longdescriptionElements = Array.from(div.querySelectorAll('p'));
   const matchingParagraph = longdescriptionElements.find((p) => ABSTRACT_REGEX.test(p.innerText));
+  const oBr = matchingParagraph.querySelector('br');
+  if (oBr) {
+    oBr.remove();
+  }
   let longdescription = matchingParagraph ? matchingParagraph.outerHTML : '';
   if (queryIndexEntry.description.length > longdescription.length) {
     longdescription = `<p>${queryIndexEntry.description}</p>`;
@@ -322,6 +327,14 @@ async function updateYearsDropdown(block, articles) {
   addEventListenerToFilterYear(document.getElementById('filter-year'), window.location.pathname);
 }
 
+function ValidateSearchFormData(keyword) {
+  if (typeof keyword === 'undefined' || keyword === null) {
+    return '';
+  }
+  const sanitezedKeyword = keyword.replace(/[`%$^*()_+=[\]{}\\|<>/~]/g, '');
+  return sanitezedKeyword.trim();
+}
+
 export default async function decorate(block) {
   const limit = 10;
   // get request parameter page as limit
@@ -350,7 +363,7 @@ export default async function decorate(block) {
 
   if (isSearch) {
     newsListContainer.classList.add('search-results-container');
-    const query = usp.get('q') || '';
+    const query = ValidateSearchFormData(usp.get('q')) || '';
     if (query) {
       shortIndex = await ffetchArticles('/query-index.json', 'articles', end, (article) => filterByQuery(article, query));
     } else {
@@ -522,9 +535,9 @@ export default async function decorate(block) {
       annotateElWithAnalyticsTracking(
         link,
         link.textContent,
-        ANALYTICS_MODULE_CONTENT_CARDS,
+        isSearch ? ANALYTICS_MODULE_SEARCH_LIST : ANALYTICS_MODULE_CONTENT_CARDS,
         ANALYTICS_TEMPLATE_ZONE_BODY,
-        ANALYTICS_LINK_TYPE_ENGAGEMENT,
+        isSearch ? ANALYTICS_LINK_TYPE_SEARCH_ACTIVITY : ANALYTICS_LINK_TYPE_ENGAGEMENT,
       );
     });
     newsListContainer.append(item);
