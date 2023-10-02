@@ -8,7 +8,7 @@ import {
   addEventListenerToFilterYear,
   getPlaceholder,
   getCountry,
-  getDateTranslation,
+  getDateLocales,
 } from '../../scripts/scripts.js';
 import {
   ANALYTICS_MODULE_SEARCH,
@@ -32,7 +32,7 @@ function getHumanReadableDate(dateString) {
   const date = new Date(parseInt(dateString, 10));
   // display the date in GMT timezone
   const country = getCountry();
-  return date.toLocaleDateString(getDateTranslation(country), {
+  return date.toLocaleDateString(getDateLocales(country), {
     timeZone: 'GMT',
     year: 'numeric',
     month: 'long',

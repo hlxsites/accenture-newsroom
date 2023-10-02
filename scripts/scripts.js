@@ -94,7 +94,7 @@ export function getLanguage(country) {
   return countryToLanguageMapping[country] || 'en';
 }
 
-export function getDateTranslation(country) {
+export function getDateLocales(country) {
   const countryToLanguageMapping = {
     us: 'en-US',
     uk: 'en-US',
