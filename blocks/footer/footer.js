@@ -8,11 +8,11 @@ import {
   ANALYTICS_TEMPLATE_ZONE_FOOTER,
 } from '../../scripts/constants.js';
 import {
-  readBlockConfig, decorateIcons, decorateSections, loadBlocks,
+  readBlockConfig, decorateIcons, decorateSections, loadBlocks, fetchPlaceholders,
 } from '../../scripts/lib-franklin.js';
 import {
   annotateElWithAnalyticsTracking,
-  getSiteFromHostName,
+  getPlaceholder,
 } from '../../scripts/scripts.js';
 
 /**
@@ -27,13 +27,11 @@ export default async function decorate(block) {
     youtube: 'See Accenture on YouTube',
   };
 
-  const socialTitlesGeoMapping = {
-    fr: {
-      linkedin: 'Suivez-nous sur LinkedIn',
-      twitter: 'Suivez-nous sur Twitter',
-      facebook: 'Suivez-nous sur Facebook',
-      youtube: 'Découvrez nos vidéos sur YouTube',
-    },
+  const getSocialIconTitle = async (iconName) => {
+    const placeholders = await fetchPlaceholders();
+    const placeHolderValue = await getPlaceholder(`${iconName}IconTitle`, placeholders);
+    const checkPlaceHolderValue = placeHolderValue === `${iconName}IconTitle` ? '' : placeHolderValue;
+    return checkPlaceHolderValue || socialTitlesMapping[iconName] || '';
   };
 
   const cfg = readBlockConfig(block);
@@ -74,21 +72,17 @@ export default async function decorate(block) {
     });
 
     const footerBlack = footer.querySelector('.section.footer-black');
-    footerBlack.querySelectorAll('a').forEach((link) => {
+    footerBlack.querySelectorAll('a').forEach(async (link) => {
       const icon = link.querySelector('span[class*="icon-"]');
-      const geo = getSiteFromHostName();
       let text = link.innerText;
       if (icon) {
         // find the class name with pattern icon- from the icon classList
         const iconClass = [...icon.classList].find((className) => className.startsWith('icon-'));
         // remove the icon class from the iconClass
         const iconName = iconClass.replace('icon-', '');
-        if (socialTitlesGeoMapping[geo]) {
-          text = socialTitlesGeoMapping[geo][iconName] || '';
-        } else {
-          text = socialTitlesMapping[iconName] || '';
-        }
-        link.setAttribute('title', text);
+        const iconTitle = await getSocialIconTitle(iconName);
+        text = iconTitle;
+        link.setAttribute('title', iconTitle);
 
         const socialLink = icon.closest('a');
         socialLink.setAttribute('target', '_blank');
