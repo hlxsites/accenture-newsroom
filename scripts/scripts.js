@@ -430,7 +430,7 @@ const centerArticleDivider = (main) => {
   if (template !== 'Article') {
     return;
   }
-  const sectionDefaultArticles = main.querySelectorAll('main .section:not([class*=" "]) .default-content-wrapper');
+  const sectionDefaultArticles = main.querySelectorAll('main .section:not([class]), main .section.video-container .default-content-wrapper');
   sectionDefaultArticles.forEach((article) => {
     scanAllTextNodes(article);
   });
