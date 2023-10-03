@@ -1,0 +1,20 @@
+{
+  "project": "Accenture Newsroom",
+  "host": "main--accenture-newsroom--hlxsites.hlx.live",
+  "plugins": [
+      {
+          "id": "publish",
+
+        "excludePaths": [
+          "**/drafts/**",
+          "**%2Fdrafts**"
+        ]
+      },
+      {
+          "id": "tagger",
+          "title": "Tagger",
+          "environments": [ "edit" ],
+          "url": "/tools/tagger/index.html"
+        }
+  ]
+}
