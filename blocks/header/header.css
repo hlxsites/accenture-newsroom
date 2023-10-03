@@ -399,7 +399,7 @@ header nav[aria-expanded="true"] .nav-tools {
     display: flex;
     gap: unset;
     flex-flow: wrap;
-    padding: 1.53em 10% 4.755em;
+    padding: 1.53em 11% 4.755em;
     position: absolute;
     left: 0;
     top: var(--nav-height);
@@ -446,7 +446,7 @@ header nav[aria-expanded="true"] .nav-tools {
 
   header nav .nav-sections > ul > li[aria-expanded="true"] > ul.sub-menu-container > li.sub-menu > ul > li.level-three {
     white-space: normal;
-    padding-right: 1.875em;
+    padding-right: 3em;
     padding-top: 1.45em;
     padding-bottom: 0;
     text-transform: none;
