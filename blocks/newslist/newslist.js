@@ -7,6 +7,8 @@ import {
   createFilterYear,
   addEventListenerToFilterYear,
   getPlaceholder,
+  getCountry,
+  getDateLocales,
 } from '../../scripts/scripts.js';
 import {
   ANALYTICS_MODULE_SEARCH,
@@ -29,7 +31,8 @@ function getHumanReadableDate(dateString) {
   if (!dateString) return dateString;
   const date = new Date(parseInt(dateString, 10));
   // display the date in GMT timezone
-  return date.toLocaleDateString('en-US', {
+  const country = getCountry();
+  return date.toLocaleDateString(getDateLocales(country), {
     timeZone: 'GMT',
     year: 'numeric',
     month: 'long',
@@ -50,7 +53,7 @@ function getDescription(queryIndexEntry) {
   div.innerHTML = longdescriptionextracted;
   const longdescriptionElements = Array.from(div.querySelectorAll('p'));
   const matchingParagraph = longdescriptionElements.find((p) => ABSTRACT_REGEX.test(p.innerText));
-  const oBr = matchingParagraph.querySelector('br');
+  const oBr = matchingParagraph?.querySelector('br');
   if (oBr) {
     oBr.remove();
   }
@@ -212,7 +215,8 @@ function addEventListenerToFilterForm(block) {
   const filterInput = filterForm.querySelector('#newslist-filter-input');
   const filterFormSubmit = filterForm.querySelector('input[type="submit"]');
   const filterYear = filterForm.querySelector('#filter-year');
-  filterFormLabel.addEventListener('click', () => {
+  filterFormLabel.addEventListener('click', (e) => {
+    e.preventDefault();
     const isActive = filterArrow.classList.contains('active');
     if (isActive) {
       filterArrow.classList.remove('active');
