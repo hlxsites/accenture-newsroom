@@ -19,11 +19,13 @@ import {
   decorateBlocks,
   decorateTemplateAndTheme,
   waitForLCP,
+  loadBlock,
   loadBlocks,
   loadCSS,
   getMetadata,
   loadScript,
   fetchPlaceholders,
+  decorateBlock,
 } from './lib-franklin.js';
 
 const LCP_BLOCKS = []; // add your LCP blocks to the list
@@ -115,6 +117,27 @@ export function getPlaceholder(key, placeholders) {
     return placeholders[key];
   }
   return key;
+}
+
+export function createTag(tag, attributes, html) {
+  const el = document.createElement(tag);
+  if (html) {
+    if (html instanceof HTMLElement
+      || html instanceof SVGElement
+      || html instanceof DocumentFragment) {
+      el.append(html);
+    } else if (Array.isArray(html)) {
+      el.append(...html);
+    } else {
+      el.insertAdjacentHTML('beforeend', html);
+    }
+  }
+  if (attributes) {
+    Object.entries(attributes).forEach(([key, val]) => {
+      el.setAttribute(key, val);
+    });
+  }
+  return el;
 }
 
 /**
@@ -666,6 +689,21 @@ async function loadJQueryDateRangePicker() {
   }
 }
 
+const preflightListener = async () => {
+  const section = createTag('div');
+  const wrapper = createTag('div');
+  section.appendChild(wrapper);
+  const preflightBlock = buildBlock('preflight', '');
+  wrapper.appendChild(preflightBlock);
+  decorateBlock(preflightBlock);
+  await loadBlock(preflightBlock);
+  const { default: getModal } = await import('../blocks/modal/modal.js');
+  const customModal = await getModal('dialog-modal', () => section.innerHTML, (modal) => {
+    modal.querySelector('button[name="close"]')?.addEventListener('click', () => modal.close());
+  });
+  customModal.showModal();
+};
+
 /**
  * Loads everything that doesn't need to be delayed.
  * @param {Element} doc The container element
@@ -686,10 +724,15 @@ async function loadLazy(doc) {
 
   loadJQueryDateRangePicker();
 
+  centerArticleDivider(main);
+  const sk = document.querySelector('helix-sidekick');
+
+  // Add plugin listeners here
+  sk.addEventListener('custom:preflight', preflightListener);
+
   sampleRUM('lazy');
   sampleRUM.observe(main.querySelectorAll('div[data-block-name]'));
   sampleRUM.observe(main.querySelectorAll('picture > img'));
-  centerArticleDivider(main);
 }
 
 async function completeFFetchIteration() {
