@@ -33,7 +33,7 @@ const LCP_BLOCKS = []; // add your LCP blocks to the list
 // regex to find abstract paragraph
 export const ABSTRACT_REGEX = /(.*?);.*?(\d{4})|(.*?)(\d{4})\s+–\s+\b|(.*?)(\d{4})\s+-\s+\b/;
 
-const isMobile = () => window.innerWidth < 600;
+export const isMobile = () => window.innerWidth < 600;
 
 export function getSiteFromHostName(hostname = window.location.hostname) {
   const allowedSites = ['uk', 'de', 'fr', 'it', 'es', 'sg', 'pt', 'jp', 'br'];
@@ -236,12 +236,12 @@ export async function createFilterYear(years, currentYear, url) {
   filterYear.name = 'year';
   let options = years.map((y) => (`
     <div class="filter-year-item" value="${y}" data-analytics-link-name="${y}"
-    data-analytics-module-name=${ANALYTICS_MODULE_YEAR_FILTER} data-analytics-template-zone=""
+    data-analytics-module-name=${ANALYTICS_MODULE_YEAR_FILTER} data-analytics-template-zone="${ANALYTICS_TEMPLATE_ZONE_BODY}"
     data-analytics-link-type="${ANALYTICS_LINK_TYPE_FILTER}">${y}</div>
     `)).join('');
   options = `<div class="filter-year-item" value=""
     data-analytics-link-name="year"
-    data-analytics-module-name=${ANALYTICS_MODULE_YEAR_FILTER} data-analytics-template-zone=""
+    data-analytics-module-name=${ANALYTICS_MODULE_YEAR_FILTER} data-analytics-template-zone="${ANALYTICS_TEMPLATE_ZONE_BODY}"
     data-analytics-link-type="${ANALYTICS_LINK_TYPE_FILTER}">${pYear}</div> ${options}`;
   filterYear.innerHTML = `
   ${currentYear || pYear}
@@ -740,10 +740,12 @@ async function loadLazy(doc) {
   loadJQueryDateRangePicker();
 
   centerArticleDivider(main);
-  const sk = document.querySelector('helix-sidekick');
 
   // Add plugin listeners here
-  sk.addEventListener('custom:preflight', preflightListener);
+  const sk = document.querySelector('helix-sidekick');
+  if (sk) {
+    sk.addEventListener('custom:preflight', preflightListener);
+  }
 
   sampleRUM('lazy');
   sampleRUM.observe(main.querySelectorAll('div[data-block-name]'));

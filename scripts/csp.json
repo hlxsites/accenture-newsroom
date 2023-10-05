@@ -10,7 +10,8 @@
       "assets.adobedtm.com",
       "cdn.cookielaw.org",
       "www.youtube.com",
-      "dpm.demdex.net"
+      "dpm.demdex.net",
+      "cdnjs.cloudflare.com"
   ],
   "connect-src": [
       "'self'",
