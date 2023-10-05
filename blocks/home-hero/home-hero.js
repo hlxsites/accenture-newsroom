@@ -6,7 +6,8 @@ import {
   ANALYTICS_TEMPLATE_ZONE_HERO,
   ANALYTICS_TEMPLATE_ZONE_BODY,
 } from '../../scripts/constants.js';
-import { annotateElWithAnalyticsTracking } from '../../scripts/scripts.js';
+
+import { annotateElWithAnalyticsTracking, getLanguage } from '../../scripts/scripts.js';
 
 function getBackgroundImage(picture) {
   const sources = picture.querySelectorAll('source[type="image/webp"');
@@ -24,11 +25,11 @@ export default async function decorate(block) {
   const title = block.querySelector('h1');
   const overlayContainer = document.createElement('div');
   overlayContainer.classList.add('overlay-container');
-  block.querySelectorAll('em').forEach((element) => {
-    const parent = element.parentNode;
-    parent.innerHTML = element.innerHTML;
-    overlayContainer.append(parent);
-  });
+
+  if (getLanguage() !== 'en') {
+    block.classList.add('non-en');
+  }
+
   overlayContainer.querySelectorAll('a').forEach((link) => {
     annotateElWithAnalyticsTracking(
       link,

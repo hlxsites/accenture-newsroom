@@ -9,6 +9,7 @@ import {
   getPlaceholder,
   getCountry,
   getDateLocales,
+  getLanguage,
 } from '../../scripts/scripts.js';
 import {
   ANALYTICS_MODULE_SEARCH,
@@ -364,6 +365,10 @@ export default async function decorate(block) {
   let shortIndex;
   const newsListContainer = document.createElement('div');
   newsListContainer.classList.add('newslist-container');
+
+  if (getLanguage() !== 'en') {
+    block.classList.add('non-en');
+  }
 
   if (isSearch) {
     newsListContainer.classList.add('search-results-container');

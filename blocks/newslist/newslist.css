@@ -7,6 +7,10 @@
   margin-left: 10px;
 }
 
+.newslist.block.non-en .newslist-item .newslist-item-footer a {
+  text-transform: none;
+}
+
 .newslist .newslist-container .newslist-item {
   border: 1px solid #ccc;
   border-top: 4px solid #6c2cb9;
