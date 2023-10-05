@@ -141,6 +141,20 @@ export function createTag(tag, attributes, html) {
 }
 
 /**
+ * Sets the Content-Security-Policy meta tag to the document based on JSON file
+ */
+async function setCSP() {
+  const resp = await fetch(`${window.hlx.codeBasePath}/scripts/csp.json`);
+  const json = await resp.json();
+  const directives = Object.keys(json);
+  const policy = directives.map((directive) => `${directive} ${json[directive].join(' ')}`).join('; ');
+  const meta = document.createElement('meta');
+  meta.setAttribute('http-equiv', 'Content-Security-Policy');
+  meta.setAttribute('content', policy);
+  document.head.appendChild(meta);
+}
+
+/**
  * Annotates given link element with click tracking attributes
  *
  * @param {*} el
@@ -709,6 +723,7 @@ const preflightListener = async () => {
  * @param {Element} doc The container element
  */
 async function loadLazy(doc) {
+  await setCSP();
   const main = doc.querySelector('main');
   await loadBlocks(main);
 
