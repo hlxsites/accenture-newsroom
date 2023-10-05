@@ -1,5 +1,5 @@
 mountpoints:
   /:
-    url: https://ts.accenture.com/sites/AdobePlatformAuthor/newsroom/Shared%20Documents/sites/accenture/newsroom
+    url: https://ts.accenture.com/sites/AdobePlatformAuthor/newsroom/Shared%20Documents/sites/accenture/newsroom/en
     type: onedrive
     tenantId: e0793d39-0939-496d-b129-198edd916feb
