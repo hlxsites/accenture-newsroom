@@ -335,8 +335,9 @@ function ValidateSearchFormData(keyword) {
   if (typeof keyword === 'undefined' || keyword === null) {
     return '';
   }
-  const sanitezedKeyword = keyword.replace(/[`%$^*()_+=[\]{}\\|<>/~]/g, '');
-  return sanitezedKeyword.trim();
+  let sanitizedKeyword = keyword.replace(/[`%$^*()_+=[\]{}\\|<>/~!@#&]/g, '');
+  sanitizedKeyword = sanitizedKeyword.slice(0, 60);
+  return sanitizedKeyword.trim();
 }
 
 export default async function decorate(block) {
@@ -377,14 +378,14 @@ export default async function decorate(block) {
     searchHeader.classList.add('search-header-container');
     const form = `
       <form action="/search" method="get" id="search-form">
-        <input type="text" id="search-input" title="${pKeywords}" placeholder="${pKeywords}" name="q" value="${query}" size="40" maxlength="60">
+        <input type="text" id="search-input" title="${pKeywords}" placeholder="${pKeywords}" name="q" value="" size="40" maxlength="60">
         <input type="submit" title="${pSearch}" value="${pSearch}">
       </form>
     `;
     if (query) {
       searchHeader.innerHTML = `
       ${form}
-      <h2>Results for "${query}"</h2>
+      <h2></h2>
       <div class="search-sub-header">
         <h3> ${shortIndex.length > 0 ? 'ALL RESULTS' : '0 RESULTS WERE FOUND'} </h3>
         <div class="search-sub-header-right">
@@ -392,6 +393,10 @@ export default async function decorate(block) {
         </div>
       </div>
       `;
+      const heading = searchHeader.querySelector('h2');
+      const searchInput = searchHeader.querySelector('#search-input');
+      heading.textContent = `Results for "${query}"`;
+      searchInput.setAttribute('value', query);
     } else {
       searchHeader.innerHTML = form;
     }
