@@ -37,6 +37,7 @@
   "frame-src": [
     "'self'",
     "play.vidyard.com",
+    "accenture.demdex.net",
     "*.accenture.com",
     "www.youtube.com"
   ],

@@ -4,7 +4,8 @@ const VIDYARD_URL = 'https://play.vidyard.com/';
 const VIDYARD_SCRIPT_URL = 'https://play.vidyard.com/embed/v4.js';
 
 function getUUID(url) {
-  return new URL(url).pathname;
+  const { pathname } = new URL(url);
+  return pathname.substring(1);
 }
 
 export default async function decorate(block) {
