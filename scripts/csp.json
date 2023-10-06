@@ -1,0 +1,67 @@
+{
+  "default-src": [
+      "'self'"
+  ],
+  "script-src": [
+      "'self'",
+      "'unsafe-inline'",
+      "'unsafe-eval'",
+      "rum.hlx.page",
+      "assets.adobedtm.com",
+      "cdn.cookielaw.org",
+      "https://*.cookielaw.org",
+      "www.youtube.com",
+      "dpm.demdex.net",
+      "cdnjs.cloudflare.com"
+  ],
+  "connect-src": [
+      "'self'",
+      "rum.hlx.page",
+      "*.accenture.com",
+      "*.onetrust.com",
+      "https://*.onetrust.com",
+      "assets.adobedtm.com",
+      "cdn.cookielaw.org",
+      "dpm.demdex.net",
+      "api.company-target.com"
+  ],
+  "img-src": [
+    "'self'",
+    "data:",
+    "*.accenture.com",
+    "assets.adobedtm.com",
+    "cdn.cookielaw.org",
+    "cm.everesttech.net"
+  ],
+  "frame-src": [
+    "'self'",
+    "*.accenture.com",
+    "www.youtube.com"
+  ],
+  "style-src": [
+    "'self'",
+    "'unsafe-inline'",
+    "*.accenture.com",
+    "assets.adobedtm.com",
+    "cdn.cookielaw.org"
+  ],
+  "font-src": [
+    "'self'",
+    "*.accenture.com",
+    "assets.adobedtm.com",
+    "cdn.cookielaw.org"
+  ],
+  "object-src": [
+    "'none'"
+  ],
+  "manifest-src": [
+    "'self'"
+  ],
+  "worker-src": [
+    "'none'"
+  ],
+  "media-src": [
+    "'self'",
+    "data: blob: *;"
+  ]
+}

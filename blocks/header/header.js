@@ -36,6 +36,7 @@ function collapseAllNavSections(sections) {
 function closeNav(e) {
   const escapePressed = e.code === 'Escape';
   const nav = document.querySelector('header nav');
+  nav.setAttribute('id', 'header-topnav');
   const navSections = nav.querySelector('.nav-sections');
   const navSectionExpanded = navSections.querySelector('[aria-expanded="true"]');
   const outSideNavClicked = !e.target.closest('header nav');
@@ -244,13 +245,17 @@ export default async function decorate(block) {
   // hamburger for mobile
   const hamburger = document.createElement('div');
   hamburger.classList.add('nav-hamburger');
-  hamburger.innerHTML = `<button type="button" aria-controls="nav" aria-label="Open navigation">
+  hamburger.innerHTML = `<button type="button" aria-controls="nav" aria-label="Open navigation"
+      data-analytics-link-name="menu" data-analytics-module-name=${ANALYTICS_MODULE_TOP_NAV}
+      data-analytics-template-zone="${ANALYTICS_TEMPLATE_ZONE_GLOBAL_HEADER}"
+      data-analytics-link-type="${ANALYTICS_LINK_TYPE_NAV_PAGINATE}">
       <span class="nav-hamburger-icon"></span>
     </button>`;
   hamburger.addEventListener('click', () => {
     const expanded = nav.getAttribute('aria-expanded') === 'true';
     document.body.style.overflowY = expanded ? '' : 'hidden';
     nav.setAttribute('aria-expanded', expanded ? 'false' : 'true');
+    document.querySelector('nav .nav-hamburger button').setAttribute('data-analytics-link-name', expanded ? 'menu' : 'menuclose');
   });
   nav.append(hamburger);
   nav.setAttribute('aria-expanded', 'false');
