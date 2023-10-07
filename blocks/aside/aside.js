@@ -9,6 +9,7 @@ import {
   getMetadata,
   loadScript,
   fetchPlaceholders,
+  toCamelCase,
 } from '../../scripts/lib-franklin.js';
 import {
   ANALYTICS_LINK_TYPE_DOWNLOADABLE,
@@ -45,6 +46,23 @@ async function generatePDF(pageName) {
     width: 190, // target width in the PDF document
     windowWidth: 900, // window width in CSS pixels
   });
+}
+
+/**
+ * Converts the given tagName to camelCase and look up the value in the placeholders object.
+ * If the value is not found, the defaultValue is returned.
+ * @param {*} tagName
+ * @param {*} placeholders
+ * @param {*} defaultValue
+ * @returns
+ */
+function getTagTitle(tagName, placeholders, defaultValue) {
+  const camelCaseTagName = toCamelCase(tagName);
+  const tagTitle = getPlaceholder(camelCaseTagName, placeholders);
+  if (tagTitle === camelCaseTagName) {
+    return defaultValue;
+  }
+  return tagTitle;
 }
 
 export default async function decorate(block) {
@@ -163,7 +181,7 @@ export default async function decorate(block) {
   const industryUl = industryEl ? createEl('ul', {}, '', industryEl) : null;
   industryTagValues.split(',').forEach((industryTag) => {
     const cleanedUpValue = industryTag.trim().toLowerCase().replace(/[\W_]+/g, '-');
-    const link = createEl('a', { href: `/industries/${cleanedUpValue}` }, industryTag);
+    const link = createEl('a', { href: `/industries/${cleanedUpValue}` }, getTagTitle(cleanedUpValue, placeholders, industryTag.trim()));
     annotateElWithAnalyticsTracking(
       link,
       link.textContent,
@@ -179,7 +197,7 @@ export default async function decorate(block) {
     const cleanedUpValue = subjectTag.trim().toLowerCase().replace(/&/g, 'and')
       .replace(/[/]/g, '')
       .replace(/[\W_]+/g, '-');
-    const link = createEl('a', { href: `/subjects/${cleanedUpValue}` }, subjectTag);
+    const link = createEl('a', { href: `/subjects/${cleanedUpValue}` }, getTagTitle(cleanedUpValue, placeholders, subjectTag.trim()));
     annotateElWithAnalyticsTracking(
       link,
       link.textContent,
