@@ -405,8 +405,25 @@ export default async function decorate(block) {
         </div>
       </div>
       `;
-    } else {
+    } else if (usp.get('q') === null) {
       searchHeader.innerHTML = form;
+    } else {
+      searchHeader.innerHTML = `
+      <div class="search-error">
+        <img class="search-error-icon" src="/icons/error.png" alt="Search Error">
+        <div class="search-error-content">
+          <h4>Errors Occurred</h4>
+          <ul>
+            <li>At least one keyword is required.</li>
+          </ul>
+        </div>
+      </div>
+      <a class="search-error-back" href="/search" title="Back" data-analytics-link-name="back" data-analytics-link-type="call to action"
+        data-analytics-content-type="call to action" data-analytics-template-zone="body"
+        data-analytics-module-name="nws-search">
+        Back
+      </a>
+      `;
     }
     const submitAction = searchHeader.querySelector('input[type="submit"]');
     annotateElWithAnalyticsTracking(
