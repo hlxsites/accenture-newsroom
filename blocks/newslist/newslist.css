@@ -329,6 +329,7 @@
 .newslist a.search-error-back {
   display: flex;
   align-items: center;
+  width: 100px;
   font-family: var(--subheading-font-family);
   font-size: 16px;
   font-weight: bold;
@@ -343,6 +344,10 @@
   transform: rotateY(180deg) !important;
   /* stylelint-disable-next-line property-no-vendor-prefix */
   -webkit-transform: rotateY(180deg) !important;
+}
+
+.newslist a.search-error-back:hover {
+  color: var(--link-color);
 }
 
 @media (min-width: 768px) {
