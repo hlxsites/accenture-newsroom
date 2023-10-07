@@ -19,11 +19,13 @@ import {
   decorateBlocks,
   decorateTemplateAndTheme,
   waitForLCP,
+  loadBlock,
   loadBlocks,
   loadCSS,
   getMetadata,
   loadScript,
   fetchPlaceholders,
+  decorateBlock,
 } from './lib-franklin.js';
 
 const LCP_BLOCKS = []; // add your LCP blocks to the list
@@ -31,7 +33,7 @@ const LCP_BLOCKS = []; // add your LCP blocks to the list
 // regex to find abstract paragraph
 export const ABSTRACT_REGEX = /(.*?);.*?(\d{4})|(.*?)(\d{4})\s+–\s+\b|(.*?)(\d{4})\s+-\s+\b/;
 
-const isMobile = () => window.innerWidth < 600;
+export const isMobile = () => window.innerWidth < 600;
 
 export function getSiteFromHostName(hostname = window.location.hostname) {
   const allowedSites = ['uk', 'de', 'fr', 'it', 'es', 'sg', 'pt', 'jp', 'br'];
@@ -94,11 +96,62 @@ export function getLanguage(country) {
   return countryToLanguageMapping[country] || 'en';
 }
 
+export function getDateLocales(country) {
+  const countryToLanguageMapping = {
+    us: 'en-US',
+    uk: 'en-US',
+    de: 'de-DE',
+    fr: 'fr-FR',
+    it: 'it-IT',
+    es: 'es-ES',
+    sg: 'en-US',
+    pt: 'pt-PT',
+    jp: 'ja-JP',
+    br: 'pt-BR',
+  };
+  return countryToLanguageMapping[country] || 'en-US';
+}
+
 export function getPlaceholder(key, placeholders) {
   if (placeholders && placeholders[key]) {
     return placeholders[key];
   }
   return key;
+}
+
+export function createTag(tag, attributes, html) {
+  const el = document.createElement(tag);
+  if (html) {
+    if (html instanceof HTMLElement
+      || html instanceof SVGElement
+      || html instanceof DocumentFragment) {
+      el.append(html);
+    } else if (Array.isArray(html)) {
+      el.append(...html);
+    } else {
+      el.insertAdjacentHTML('beforeend', html);
+    }
+  }
+  if (attributes) {
+    Object.entries(attributes).forEach(([key, val]) => {
+      el.setAttribute(key, val);
+    });
+  }
+  return el;
+}
+
+/**
+ * Sets the Content-Security-Policy meta tag to the document based on JSON file
+ */
+async function setCSP() {
+  const resp = await fetch(`${window.hlx.codeBasePath}/scripts/csp.json`);
+  const json = await resp.json();
+  const directives = Object.keys(json);
+  const policy = directives.map((directive) => `${directive} ${json[directive].join(' ')}`).join('; ');
+  const meta = document.createElement('meta');
+  meta.setAttribute('http-equiv', 'Content-Security-Policy');
+  meta.setAttribute('content', policy);
+  document.head.appendChild(meta);
 }
 
 /**
@@ -183,12 +236,12 @@ export async function createFilterYear(years, currentYear, url) {
   filterYear.name = 'year';
   let options = years.map((y) => (`
     <div class="filter-year-item" value="${y}" data-analytics-link-name="${y}"
-    data-analytics-module-name=${ANALYTICS_MODULE_YEAR_FILTER} data-analytics-template-zone=""
+    data-analytics-module-name=${ANALYTICS_MODULE_YEAR_FILTER} data-analytics-template-zone="${ANALYTICS_TEMPLATE_ZONE_BODY}"
     data-analytics-link-type="${ANALYTICS_LINK_TYPE_FILTER}">${y}</div>
     `)).join('');
   options = `<div class="filter-year-item" value=""
     data-analytics-link-name="year"
-    data-analytics-module-name=${ANALYTICS_MODULE_YEAR_FILTER} data-analytics-template-zone=""
+    data-analytics-module-name=${ANALYTICS_MODULE_YEAR_FILTER} data-analytics-template-zone="${ANALYTICS_TEMPLATE_ZONE_BODY}"
     data-analytics-link-type="${ANALYTICS_LINK_TYPE_FILTER}">${pYear}</div> ${options}`;
   filterYear.innerHTML = `
   ${currentYear || pYear}
@@ -388,6 +441,37 @@ async function addPrevNextLinksToArticles() {
   heroLinkContainer.append(prevLink);
   heroLinkContainer.append(nextLink);
 }
+
+const scanAllTextNodes = (element) => {
+  const allChildNodes = element.childNodes;
+  allChildNodes.forEach((oNode) => {
+    if (oNode.nodeType !== Node.TEXT_NODE) {
+      scanAllTextNodes(oNode);
+      return;
+    }
+    if (oNode.nodeValue.trim() === '') {
+      return;
+    }
+    if (oNode.nodeValue !== '# # #') {
+      return;
+    }
+    const span = document.createElement('span');
+    span.classList.add('article-end-divider');
+    span.textContent = oNode.nodeValue;
+    element.replaceChild(span, oNode);
+  });
+};
+
+const centerArticleDivider = (main) => {
+  const template = getMetadata('template');
+  if (template !== 'Article') {
+    return;
+  }
+  const sectionDefaultArticles = main.querySelectorAll('main .section:not([class]), main .section.video-container .default-content-wrapper');
+  sectionDefaultArticles.forEach((article) => {
+    scanAllTextNodes(article);
+  });
+};
 
 function annotateArticleSections() {
   const template = getMetadata('template');
@@ -619,11 +703,27 @@ async function loadJQueryDateRangePicker() {
   }
 }
 
+const preflightListener = async () => {
+  const section = createTag('div');
+  const wrapper = createTag('div');
+  section.appendChild(wrapper);
+  const preflightBlock = buildBlock('preflight', '');
+  wrapper.appendChild(preflightBlock);
+  decorateBlock(preflightBlock);
+  await loadBlock(preflightBlock);
+  const { default: getModal } = await import('../blocks/modal/modal.js');
+  const customModal = await getModal('dialog-modal', () => section.innerHTML, (modal) => {
+    modal.querySelector('button[name="close"]')?.addEventListener('click', () => modal.close());
+  });
+  customModal.showModal();
+};
+
 /**
  * Loads everything that doesn't need to be delayed.
  * @param {Element} doc The container element
  */
 async function loadLazy(doc) {
+  await setCSP();
   const main = doc.querySelector('main');
   await loadBlocks(main);
 
@@ -639,6 +739,14 @@ async function loadLazy(doc) {
 
   loadJQueryDateRangePicker();
 
+  centerArticleDivider(main);
+
+  // Add plugin listeners here
+  const sk = document.querySelector('helix-sidekick');
+  if (sk) {
+    sk.addEventListener('custom:preflight', preflightListener);
+  }
+
   sampleRUM('lazy');
   sampleRUM.observe(main.querySelectorAll('div[data-block-name]'));
   sampleRUM.observe(main.querySelectorAll('picture > img'));
@@ -649,7 +757,8 @@ async function completeFFetchIteration() {
     return false;
   }
   const template = getMetadata('template');
-  if (template === 'Category' && isMobile()) {
+  const filterYearInput = document.querySelector('#filter-year');
+  if (template === 'Category' && isMobile() && !filterYearInput) {
     return false;
   }
   // eslint-disable-next-line no-restricted-syntax

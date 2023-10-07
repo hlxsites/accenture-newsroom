@@ -318,6 +318,12 @@ body.article main .section.abstract h1 {
   margin: 0;
 }
 
+body.article main .section .article-end-divider {
+  display: inline-block;
+  width: 100%;
+  text-align: center;
+}
+
 @media (min-width: 600px) {
   main .section {
     padding: 64px 35px;

@@ -21,14 +21,13 @@ import {
   ANALYTICS_TEMPLATE_ZONE_RIGHT_RAIL,
 } from '../../scripts/constants.js';
 
-async function generatePDF(pageTitle) {
+async function generatePDF(pageName) {
   // Source HTMLElement or a string containing HTML.
   const main = document.querySelector('main').cloneNode(true);
   const heroContainer = main.querySelector('.section.hero-container');
   const asideContainer = main.querySelector('.aside-container');
   heroContainer.remove();
   asideContainer.remove();
-  const pageName = pageTitle.replace(/[^a-z0-9]/gi, '-');
 
   const { jsPDF } = window.jspdf;
   // eslint-disable-next-line new-cap
@@ -120,7 +119,7 @@ export default async function decorate(block) {
     'print',
     ANALYTICS_MODULE_SHARE,
     ANALYTICS_TEMPLATE_ZONE_RIGHT_RAIL,
-    ANALYTICS_LINK_TYPE_SHARE_INTENT,
+    ANALYTICS_LINK_TYPE_ENGAGEMENT,
   );
   printShare.innerHTML = '<span class="icon icon-social-print" />';
   printShare.setAttribute('onclick', 'window.print()');
@@ -135,7 +134,8 @@ export default async function decorate(block) {
   // PDF Download button
   const addPDF = getMetadata('pdf');
   if (addPDF && (addPDF === 'true')) {
-    const pdfButton = createEl('a', { class: 'pdf-button button', title: ' Convert to PDF' }, pDownloadPressRelease, share);
+    const pageName = pageTitle.replace(/[^a-z0-9]/gi, '-');
+    const pdfButton = createEl('a', { class: 'pdf-button button', title: ' Convert to PDF', 'data-analytics-download-fileName': `${pageName}.tekpdf` }, pDownloadPressRelease, share);
     annotateElWithAnalyticsTracking(
       pdfButton,
       pdfButton.textContent,
@@ -143,12 +143,13 @@ export default async function decorate(block) {
       ANALYTICS_TEMPLATE_ZONE_RIGHT_RAIL,
       ANALYTICS_LINK_TYPE_DOWNLOADABLE,
     );
+
     pdfButton.addEventListener('click', async () => {
       // Add the js2pdf script
       await loadScript('https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js');
       await loadScript('/scripts/html2canvas.min.js');
       if (window.jspdf) {
-        await generatePDF(pageTitle);
+        await generatePDF(pageName);
       }
     });
   }
