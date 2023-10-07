@@ -97,9 +97,15 @@ function getPageInstanceId(template, path, countryLanguage = '') {
   return pageId;
 }
 
-function getPageName(path) {
+function getPageName(path, template) {
   if (path === '/') {
     return 'accenture-newsroom-dashboard';
+  }
+  if (template === 'Search') {
+    return 'advanced-search';
+  }
+  if (template === 'error') {
+    return 'page-not-found';
   }
   return path.split('/').pop();
 }
@@ -133,7 +139,7 @@ function addDataLayer() {
   const template = getMetadata('template');
   const path = window.location.pathname;
   const pageInstanceId = getPageInstanceId(template, path);
-  const pageName = `nws::${getPageName(path)}`;
+  const pageName = `nws::${getPageName(path, template)}`;
   const uniquePageName = getUniquePageName(template, path);
   const country = getCountry();
   const language = getLanguage(country);

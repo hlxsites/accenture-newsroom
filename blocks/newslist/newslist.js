@@ -7,6 +7,9 @@ import {
   createFilterYear,
   addEventListenerToFilterYear,
   getPlaceholder,
+  getCountry,
+  getDateLocales,
+  isMobile,
 } from '../../scripts/scripts.js';
 import {
   ANALYTICS_MODULE_SEARCH,
@@ -16,11 +19,13 @@ import {
   ANALYTICS_LINK_TYPE_SEARCH_INTENT,
   ANALYTICS_MODULE_YEAR_FILTER,
   ANALYTICS_LINK_TYPE_FILTER,
-  ANALYTICS_MODULE_CONTENT_CARDS,
-  ANALYTICS_LINK_TYPE_ENGAGEMENT,
   ANALYTICS_MODULE_SEARCH_PAGINATION,
   ANALYTICS_LINK_TYPE_NAV_PAGINATE,
   ANALYTICS_MODULE_SEARCH_LIST,
+  ANALYTICS_MODULE_MOBILE_FILTER,
+  ANALYTICS_MODULE_ARTICLE_LIST,
+  ANALYTICS_LINK_TYPE_INLINE_LINK,
+  ANALYTICS_LINK_TYPE_CONTENT_MODULE,
 } from '../../scripts/constants.js';
 
 const MAX_CHARS_IN_CARD_DESCRIPTION = 800;
@@ -29,7 +34,8 @@ function getHumanReadableDate(dateString) {
   if (!dateString) return dateString;
   const date = new Date(parseInt(dateString, 10));
   // display the date in GMT timezone
-  return date.toLocaleDateString('en-US', {
+  const country = getCountry();
+  return date.toLocaleDateString(getDateLocales(country), {
     timeZone: 'GMT',
     year: 'numeric',
     month: 'long',
@@ -50,7 +56,7 @@ function getDescription(queryIndexEntry) {
   div.innerHTML = longdescriptionextracted;
   const longdescriptionElements = Array.from(div.querySelectorAll('p'));
   const matchingParagraph = longdescriptionElements.find((p) => ABSTRACT_REGEX.test(p.innerText));
-  const oBr = matchingParagraph.querySelector('br');
+  const oBr = matchingParagraph?.querySelector('br');
   if (oBr) {
     oBr.remove();
   }
@@ -206,13 +212,24 @@ function filterByYear(article, year) {
 }
 
 function addEventListenerToFilterForm(block) {
+  if (!isMobile()) {
+    return;
+  }
   const filterForm = block.querySelector('#filter-form');
   const filterFormLabel = filterForm.querySelector('label');
   const filterArrow = filterForm.querySelector('.newslist-filter-arrow');
   const filterInput = filterForm.querySelector('#newslist-filter-input');
   const filterFormSubmit = filterForm.querySelector('input[type="submit"]');
   const filterYear = filterForm.querySelector('#filter-year');
-  filterFormLabel.addEventListener('click', () => {
+  annotateElWithAnalyticsTracking(
+    filterFormLabel,
+    'filter now expand',
+    ANALYTICS_MODULE_MOBILE_FILTER,
+    ANALYTICS_TEMPLATE_ZONE_BODY,
+    ANALYTICS_LINK_TYPE_FILTER,
+  );
+  filterFormLabel.addEventListener('click', (e) => {
+    e.preventDefault();
     const isActive = filterArrow.classList.contains('active');
     if (isActive) {
       filterArrow.classList.remove('active');
@@ -294,7 +311,7 @@ function updatePagination(paginationContainer, totalResults, pageOffset) {
       }
       annotateElWithAnalyticsTracking(
         link,
-        link.textContent,
+        link.textContent || link.title,
         ANALYTICS_MODULE_SEARCH_PAGINATION,
         ANALYTICS_TEMPLATE_ZONE_BODY,
         ANALYTICS_LINK_TYPE_NAV_PAGINATE,
@@ -317,10 +334,10 @@ async function updateYearsDropdown(block, articles) {
   const pYear = getPlaceholder('year', placeholders);
   const years = window.categoryArticleYears || getYears(articles);
   let options = years.map((y) => (`<div class="filter-year-item" value="${y}"  data-analytics-link-name="${y}"
-  data-analytics-module-name=${ANALYTICS_MODULE_YEAR_FILTER} data-analytics-template-zone=""
+  data-analytics-module-name=${ANALYTICS_MODULE_YEAR_FILTER} data-analytics-template-zone="${ANALYTICS_TEMPLATE_ZONE_BODY}"
   data-analytics-link-type="${ANALYTICS_LINK_TYPE_FILTER}">${y}</div>`)).join('');
   options = `<div class="filter-year-item" value="" data-analytics-link-name="YEAR"
-  data-analytics-module-name=${ANALYTICS_MODULE_YEAR_FILTER} data-analytics-template-zone=""
+  data-analytics-module-name=${ANALYTICS_MODULE_YEAR_FILTER} data-analytics-template-zone="${ANALYTICS_TEMPLATE_ZONE_BODY}"
   data-analytics-link-type="${ANALYTICS_LINK_TYPE_FILTER}">${pYear}</div> ${options}`;
   const yearsDropdown = block.querySelector('.filter-year-dropdown');
   yearsDropdown.innerHTML = options;
@@ -415,7 +432,7 @@ export default async function decorate(block) {
         'articles',
         end,
         (article) => ifArticleBelongsToCategories(article, key, value)
-           && ifArticleBetweenDates(article, fromDate, toDate),
+          && ifArticleBetweenDates(article, fromDate, toDate),
       );
     } else if (year) {
       shortIndex = await ffetchArticles(
@@ -535,9 +552,9 @@ export default async function decorate(block) {
       annotateElWithAnalyticsTracking(
         link,
         link.textContent,
-        isSearch ? ANALYTICS_MODULE_SEARCH_LIST : ANALYTICS_MODULE_CONTENT_CARDS,
+        isSearch ? ANALYTICS_MODULE_SEARCH_LIST : ANALYTICS_MODULE_ARTICLE_LIST,
         ANALYTICS_TEMPLATE_ZONE_BODY,
-        isSearch ? ANALYTICS_LINK_TYPE_SEARCH_ACTIVITY : ANALYTICS_LINK_TYPE_ENGAGEMENT,
+        isSearch ? ANALYTICS_LINK_TYPE_INLINE_LINK : ANALYTICS_LINK_TYPE_CONTENT_MODULE,
       );
     });
     newsListContainer.append(item);

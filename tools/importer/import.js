@@ -1,5 +1,27 @@
+/* eslint-disable no-console */
 /* eslint-disable no-undef */
-const isCategoryPage = (url) => (url.includes('/industries/') || url.includes('/subjects/'));
+const isCategoryPage = (url) => (
+  url.includes('/industries/')
+  || url.includes('/subjects/')
+  || url.includes('/secteurs-dactivit/')
+  || url.includes('/sujet/')
+  || url.includes('/argomento/')
+);
+
+function createVideoBlock(main, document) {
+  const vidyardImgs = main.querySelectorAll('img[src*="play.vidyard.com"]');
+  vidyardImgs.forEach((vidyardImg) => {
+    const previewUrl = vidyardImg.src;
+    const videoUrl = previewUrl.replace('.jpg', '');
+    const videoCells = [
+      ['Video'],
+      ['url', videoUrl],
+      ['preview', previewUrl],
+    ];
+    const videoBlock = WebImporter.DOMUtils.createTable(videoCells, document);
+    vidyardImg.replaceWith(videoBlock);
+  });
+}
 
 const createMetadataBlock = (main, document, url) => {
   const meta = {};
@@ -81,9 +103,9 @@ const createNewsListBlock = (main, document, url) => {
   if (titleEl) {
     title = titleEl.textContent.trim();
   }
-  if (url.includes('/industries/')) {
+  if (url.includes('/industries/') || url.includes('/secteurs-dactivit/')) {
     cells.push(['Industries', title]);
-  } else if (url.includes('/subjects/')) {
+  } else if (url.includes('/subjects/') || url.includes('/sujet/') || url.includes('/argomento/')) {
     cells.push(['Subjects', title]);
   }
   const table = WebImporter.DOMUtils.createTable(cells, document);
@@ -92,7 +114,9 @@ const createNewsListBlock = (main, document, url) => {
   if (secHero) secHero.remove();
 };
 
-const makeProxySrcs = (main, host = 'https://newsroom.accenture.com') => {
+const makeProxySrcs = (main, url) => {
+  const newUrl = new URL(url);
+  const host = newUrl.searchParams.get('host');
   main.querySelectorAll('img').forEach((img) => {
     if (img.src.startsWith('/')) {
       // make absolute
@@ -102,7 +126,7 @@ const makeProxySrcs = (main, host = 'https://newsroom.accenture.com') => {
     try {
       const u = new URL(img.src);
       u.searchParams.append('host', u.origin);
-      img.src = `http://localhost:3001${u.pathname}${u.search}`;
+      img.src = `http://localhost:3001${u.pathname.replace(/\/\//g, '/')}${u.search}`;
     } catch (error) {
       // eslint-disable-next-line no-console
       console.warn(`Unable to make proxy src for ${img.src}: ${error.message}`);
@@ -122,7 +146,16 @@ const collectTextNodes = (node, list) => {
 };
 
 const findNextBrOrpNode = (node) => {
-  let currentNode = node.nextSibling;
+  let currentNode = node.parentElement.nextSibling;
+  if (node.parentElement.nodeName === 'DIV') currentNode = node.nextSibling;
+  if (node.parentElement.nodeName === 'H1') currentNode = node.parentElement.parentElement;
+  if (node.parentElement.nodeName === 'H1' && node.parentElement.parentElement.nodeName === 'DIV') currentNode = node.parentElement.nextSibling;
+  if (node.parentElement.nodeName === 'H1' && node.parentElement.parentElement.nodeName === 'SPAN' && node.parentElement.parentElement.parentElement.nodeName === 'P') currentNode = node.parentElement.parentElement.parentElement;
+  if (node.parentElement.nodeName === 'SPAN' && node.parentElement.parentElement.nodeName === 'STRONG') currentNode = node.parentElement.parentElement.parentElement;
+  if (node.parentElement.nodeName === 'SPAN' && node.parentElement.parentElement.nodeName === 'STRONG' && node.parentElement.parentElement.parentElement.nodeName === 'SPAN' && node.parentElement.parentElement.parentElement.parentElement.nodeName === 'P') currentNode = node.parentElement.parentElement.parentElement.parentElement;
+  if (node.parentElement.nodeName === 'SPAN' && node.parentElement.parentElement.nodeName === 'B' && node.parentElement.parentElement.parentElement.nodeName === 'P') currentNode = node.parentElement.parentElement.parentElement.nextSibling;
+  if (node.parentElement.nodeName === 'STRONG' && node.parentElement.parentElement.nodeName === 'SPAN') currentNode = node.parentElement.parentElement.parentElement;
+  if (node.parentElement.nodeName === 'I' && node.parentElement.parentElement.nodeName === 'DIV') currentNode = node.parentElement.parentElement.nextSibling;
 
   // Check siblings first
   while (currentNode !== null) {
@@ -164,6 +197,9 @@ export default {
     if (features) features.remove();
     const pageType = main.querySelector('#tek-wrap-centerwell .page-type');
     if (pageType) pageType.remove();
+    // remove filter form
+    const filterForm = main.querySelector('form.filterForm');
+    if (filterForm) filterForm.remove();
     // remove search modal
     const searchModal = main.querySelector('#myModal');
     if (searchModal) searchModal.remove();
@@ -177,10 +213,17 @@ export default {
         noscript.remove();
       });
     }
+    const oneTrust = main.querySelector('#onetrust-consent-sdk');
+    if (oneTrust) oneTrust.remove();
+    const coachMarks = main.querySelector('#coach-marks-screen');
+    if (coachMarks) coachMarks.remove();
 
     // Remove Footer
     const footer = main.querySelector('#block-footer');
     if (footer) footer.remove();
+
+    // Get right nav
+    const rightNav = main.querySelector('#tek-wrap-rightrail');
 
     // replace weird trailing backslash and ndash
     main.innerHTML = main.innerHTML.replace(/&ndash;/g, '-')
@@ -189,8 +232,11 @@ export default {
       .replace('</strong> <br>', '</strong>')
       .replaceAll(/&nbsp;<br>/g, '<br>');
 
+    // create video block
+    createVideoBlock(main, document);
+
     // make proxy srcs for images
-    makeProxySrcs(main);
+    makeProxySrcs(main, url);
 
     // convert title to h1 tag
     const title = main.querySelector('#tek-wrap-centerwell article strong');
@@ -198,25 +244,48 @@ export default {
       title.outerHTML = `<h1>${title.innerHTML}</h1>`;
     }
 
-    // add section after abstract
-    const contentDetails = main.querySelector('#tek-wrap-centerwell article #content-details');
-    const abstractRegex = /(.*?);.*?(\d{4})|(.*?)(\d{4})\s+–\s+\b|(.*?)(\d{4})\s+-\s+\b/;
-    const contentDetailsTextNodes = [];
-    collectTextNodes(contentDetails, contentDetailsTextNodes);
-    const matchingParagraph = contentDetailsTextNodes.find(
-      (p) => abstractRegex.test(p.textContent),
-    );
-    if (matchingParagraph) {
-      const nextBrNode = findNextBrOrpNode(matchingParagraph);
-      if (nextBrNode) {
-        nextBrNode.after('---');
+    // add section after abstract for news articles only
+    if (url.includes('/news/') && rightNav) {
+      const contentDetails = main.querySelector('#tek-wrap-centerwell article #content-details');
+      const primaryAbstractRegex = /(.*?);(.*?)(\d{4})/;
+      const secondaryAbstractRegex = /(.*?)(\d{4})\s+–\s+\b|(.*?)(\d{4})\s+-\s+\b|\b(\d+)\b(.*?)(\d{4})\b|(.*?),(.*?)(\d{4})\b/;
+      const contentDetailsTextNodes = [];
+      collectTextNodes(contentDetails, contentDetailsTextNodes);
+      const primaryMatchingParagraph = contentDetailsTextNodes.find(
+        (p) => primaryAbstractRegex.test(p.textContent),
+      );
+      if (primaryMatchingParagraph) {
+        console.log('found primary match!');
+        const nextBrNode = findNextBrOrpNode(primaryMatchingParagraph);
+        if (nextBrNode) {
+          const br1 = document.createElement('br');
+          const br2 = document.createElement('br');
+          nextBrNode.after(br1);
+          nextBrNode.after('---');
+          nextBrNode.after(br2);
+        } else {
+          console.log(`${new URL(url).pathname} - abstract not found`);
+        }
       } else {
-        const brNode = document.createElement('br');
-        const insertedBrNode = matchingParagraph.parentElement.insertAdjacentElement('afterend', brNode);
-        insertedBrNode.after('---');
+        const secondaryMatchingParagraph = contentDetailsTextNodes.find(
+          (p) => secondaryAbstractRegex.test(p.textContent),
+        );
+        if (secondaryMatchingParagraph) {
+          console.log('found secondary match!');
+          const nextBrNode = findNextBrOrpNode(secondaryMatchingParagraph);
+          if (nextBrNode) {
+            const br1 = document.createElement('br');
+            const br2 = document.createElement('br');
+            nextBrNode.after(br1);
+            nextBrNode.after('---');
+            nextBrNode.after(br2);
+          } else {
+            console.log(`${new URL(url).pathname} - abstract not found`);
+          }
+        } else {
+          console.log(`${new URL(url).pathname} - abstract not found`);
+        }
       }
-    } else {
-      throw new Error('abstract not found');
     }
 
     // If contact info in right rail, move it to the bottom of the content
@@ -227,11 +296,33 @@ export default {
       });
     }
 
+    // Handle Tables from the source content
+    const tables = main.querySelectorAll('table');
+    if (tables && tables.length > 0) {
+      tables.forEach((table) => {
+        const cells = [
+          ['Table'],
+          [table.outerHTML],
+        ];
+        const newTable = WebImporter.DOMUtils.createTable(cells, document);
+        table.after(newTable);
+        table.remove();
+      });
+    }
+
     const meta = createMetadataBlock(main, document, url);
 
+    // remove tek-pager arrows
+    const pagerArrows = main.querySelectorAll('.tek-pager.p-l-arrow, .tek-pager.p-r-arrow');
+    if (pagerArrows && pagerArrows.length > 0) {
+      pagerArrows.forEach((arrow) => {
+        arrow.remove();
+      });
+    }
+
     // remove right nav
-    const rightNav = main.querySelector('#tek-wrap-rightrail');
-    if (rightNav) rightNav.remove();
+    const rightNavStillExists = main.querySelector('#tek-wrap-rightrail');
+    if (rightNavStillExists) rightNavStillExists.remove();
 
     if (isCategoryPage(url)) {
       createNewsListBlock(main, document, url);
@@ -249,13 +340,57 @@ export default {
         element: main,
         path: newPath,
       });
-      return results;
+    } else {
+      // main page import - "element" is provided, i.e. a docx will be created
+      results.push({
+        element: main,
+        path: new URL(url).pathname.replace('.htm', ''),
+      });
     }
-    // main page import - "element" is provided, i.e. a docx will be created
-    results.push({
-      element: main,
-      path: new URL(url).pathname.replace('.htm', ''),
+
+    // find internal pdf links
+    main.querySelectorAll('a').forEach((a) => {
+      const href = a.getAttribute('href');
+      if (href && href.endsWith('.pdf') && href.includes('newsroom.accenture')) {
+        const newUrl = new URL(url);
+        const host = newUrl.searchParams.get('host');
+        if (href.startsWith('/')) {
+          // make absolute
+          const cu = new URL(host);
+          a.setAttribute('href', `${cu.origin}${a.href}`.replace(/\/\//g, '/'));
+        }
+        try {
+          const u = new URL(a.getAttribute('href'));
+          u.searchParams.append('host', u.origin);
+          // no "element", the "from" property is provided instead
+          // importer will download the "from" resource as "path"
+          const newPath = WebImporter.FileUtils.sanitizePath(u.pathname.replace(/\/\//g, '/'));
+          results.push({
+            path: newPath,
+            from: `http://localhost:3001${u.pathname.replace(/\/\//g, '/')}${u.search}`,
+          });
+
+          // update the link to new path on the target host
+          // this is required to be able to follow the links in Word
+          // you will need to replace "main--repo--owner" by your project setup
+          const newHref = new URL(newPath, 'https://main--accenture-newsroom--hlxsites.hlx.page').toString();
+          a.setAttribute('href', newHref);
+        } catch (error) {
+          console.warn(`Unable to create PDF link for ${href}: ${error.message}`);
+        }
+      }
     });
+
+    // remove section hero
+    const sectionHero = main.querySelector('#sec-hero');
+    if (sectionHero) sectionHero.remove();
+    // remove any elements that are display:none
+    main.querySelectorAll('[style]').forEach((el) => {
+      if (el.style.display === 'none') {
+        el.remove();
+      }
+    });
+
     return results;
   },
 };
