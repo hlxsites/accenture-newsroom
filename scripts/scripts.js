@@ -504,6 +504,7 @@ function annotateArticleSections() {
       return;
     }
     section.querySelectorAll('a').forEach((link) => {
+      link.removeAttribute('title');
       annotateElWithAnalyticsTracking(
         link,
         link.innerText,
