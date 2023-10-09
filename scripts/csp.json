@@ -9,7 +9,6 @@
       "rum.hlx.page",
       "assets.adobedtm.com",
       "cdn.cookielaw.org",
-      "https://*.cookielaw.org",
       "www.youtube.com",
       "dpm.demdex.net",
       "cdnjs.cloudflare.com"
@@ -31,12 +30,14 @@
     "*.accenture.com",
     "assets.adobedtm.com",
     "cdn.cookielaw.org",
-    "cm.everesttech.net"
+    "cm.everesttech.net",
+    "*.demdex.net"
   ],
   "frame-src": [
     "'self'",
     "*.accenture.com",
-    "www.youtube.com"
+    "www.youtube.com",
+    "*.demdex.net"
   ],
   "style-src": [
     "'self'",
