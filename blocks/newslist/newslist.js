@@ -42,7 +42,7 @@ function getHumanReadableDate(dateString) {
     year: 'numeric',
     month: 'long',
     day: '2-digit',
-  })
+  });
   return localedate.replace(/de/g, '');
 }
 
