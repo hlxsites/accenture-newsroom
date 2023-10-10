@@ -527,7 +527,6 @@
 @media (min-width: 1000px) {
   #newslist-search-form {
     display: flex;
-    width: 50%;
   }
 
   #newslist-filter-year {
