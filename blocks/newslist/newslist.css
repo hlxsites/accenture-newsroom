@@ -173,6 +173,7 @@
 
 .search-header-container .search-sub-header {
   display: flex;
+  flex-direction: column;
   width: 100%;
   justify-content: space-between;
   padding-bottom: 20px;
@@ -182,6 +183,7 @@
 .search-header-container .search-sub-header .search-sub-header-right {
   padding-right: 15px;
   padding-left: 15px;
+  align-self: flex-end;
 }
 
 .search-header-container .search-sub-header h3 {
@@ -191,7 +193,7 @@
   font-weight: bold;
   margin-top: 0;
   margin-bottom: 10px;
-  width: 30%;
+  width: 100%;
 }
 
 .newslist .search-results-container .search-results-item {
@@ -422,6 +424,12 @@
   .search-header-container .search-sub-header {
     width: 66.66%;
     height: auto;
+    flex-direction: row;
+  }
+
+  .search-header-container .search-sub-header h3 {
+    width: 30%;
+    margin-bottom: 0;
   }
 
   #filter-form {
