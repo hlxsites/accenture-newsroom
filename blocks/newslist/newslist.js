@@ -484,7 +484,7 @@ export default async function decorate(block) {
         <label for="newslist-filter-input">${pFilterNews}
           <span class="newslist-filter-arrow"></span>
         </label>
-        <input type="text" id="newslist-filter-input" title="${pDateRange}" name="date" value="${pDateRange}" size="40" maxlength="60" disabled>
+        <input type="text" id="newslist-filter-input" title="${pDateRange}" name="date" value="" size="40" placeholder="${pDateRange}" maxlength="60" disabled>
         <input type="submit" value="" disabled>
       </form>
     `;
@@ -519,7 +519,7 @@ export default async function decorate(block) {
         <label for="newslist-filter-input">${pFilterNews}
           <span class="newslist-filter-arrow"></span>
         </label>
-        <input type="text" id="newslist-filter-input" title="${pDateRange}" name="date" value="${pDateRange}" size="40" maxlength="60" disabled>
+        <input type="text" id="newslist-filter-input" title="${pDateRange}" name="date" value="" placeholder="${pDateRange}" size="40" maxlength="60" disabled>
         <input type="submit" value="" disabled>
       </form>
     `;

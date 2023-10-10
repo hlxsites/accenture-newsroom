@@ -281,6 +281,10 @@
   text-transform: uppercase;
 }
 
+#newslist-filter-input::placeholder {
+  color: var(--text-color);
+}
+
 .newslist .newslist-container .newslist-header-container label {
   font-family: var(--graphik-semibold);
   padding-left: 15px;
