@@ -37,12 +37,13 @@ function getHumanReadableDate(dateString) {
   const date = new Date(parseInt(dateString, 10));
   // display the date in GMT timezone
   const country = getCountry();
-  return date.toLocaleDateString(getDateLocales(country), {
+  const localedate = date.toLocaleDateString(getDateLocales(country), {
     timeZone: 'GMT',
     year: 'numeric',
     month: 'long',
     day: '2-digit',
-  });
+  })
+  return localedate.replace(/de/g, '');
 }
 
 /**

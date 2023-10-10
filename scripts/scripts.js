@@ -38,7 +38,7 @@ export const isMobile = () => window.innerWidth < 600;
 export function getSiteFromHostName(hostname = window.location.hostname) {
   const allowedSites = ['uk', 'de', 'fr', 'it', 'es', 'sg', 'pt', 'jp', 'br'];
   if (hostname === 'localhost') {
-    return 'us';
+    return 'br';
   }
   // handle franklin hostnames
   const franklinHostName = 'accenture-newsroom';
@@ -97,19 +97,19 @@ export function getLanguage(country) {
 }
 
 export function getDateLocales(country) {
-  const countryToLanguageMapping = {
+  const countryDateLocales = {
     us: 'en-US',
-    uk: 'en-US',
+    gb: 'en-US',
     de: 'de-DE',
     fr: 'fr-FR',
     it: 'it-IT',
-    es: 'es-ES',
+    sp: 'es-ES',
     sg: 'en-US',
     pt: 'pt-PT',
     jp: 'ja-JP',
     br: 'pt-BR',
   };
-  return countryToLanguageMapping[country] || 'en-US';
+  return countryDateLocales[country] || 'en-US';
 }
 
 export function getPlaceholder(key, placeholders) {
