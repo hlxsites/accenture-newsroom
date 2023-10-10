@@ -795,8 +795,7 @@ async function loadSemiDelayed() {
  * without impacting the user experience.
  */
 function loadDelayed() {
-  // article processing
-  window.setTimeout(() => loadSemiDelayed(), 2000);
+  // article processin
   // eslint-disable-next-line import/no-cycle
   window.setTimeout(() => import('./delayed.js'), 3000);
   // load anything that can be postponed to the latest here
@@ -805,6 +804,7 @@ function loadDelayed() {
 async function loadPage() {
   await loadEager(document);
   await loadLazy(document);
+  await loadSemiDelayed();
   loadDelayed();
 }
 
