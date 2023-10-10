@@ -38,7 +38,7 @@ export const isMobile = () => window.innerWidth < 600;
 export function getSiteFromHostName(hostname = window.location.hostname) {
   const allowedSites = ['uk', 'de', 'fr', 'it', 'es', 'sg', 'pt', 'jp', 'br'];
   if (hostname === 'localhost') {
-    return 'br';
+    return 'us';
   }
   // handle franklin hostnames
   const franklinHostName = 'accenture-newsroom';
