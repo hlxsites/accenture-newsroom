@@ -11,6 +11,16 @@ function getUUID(url) {
 export default async function decorate(block) {
   const config = readBlockConfig(block);
   if (config.url || config.uuid) {
+    await loadScript(VIDYARD_SCRIPT_URL, { async: 'false' });
+    const observer = new IntersectionObserver((entries) => {
+      if (entries.some((e) => e.isIntersecting)) {
+        if (window.vidyardEmbed) {
+          window.vidyardEmbed.api.renderDOMPlayers();
+        }
+        observer.disconnect();
+      }
+    });
+    observer.observe(block);
     block.textContent = '';
     const uuid = config.uuid || getUUID(config.url);
     const img = document.createElement('img');
@@ -20,10 +30,6 @@ export default async function decorate(block) {
     img.setAttribute('data-v', 4);
     img.setAttribute('data-type', 'inline');
     block.appendChild(img);
-    await loadScript(VIDYARD_SCRIPT_URL, { async: 'false' });
-    if (window.vidyardEmbed) {
-      window.vidyardEmbed.api.renderDOMPlayers();
-    }
   } else {
     block.remove();
   }
