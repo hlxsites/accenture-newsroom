@@ -407,7 +407,7 @@ export default async function decorate(block) {
           ${`Showing ${start + 1} - ${Math.min(end, shortIndex.length)} results`}
         </div>
       </div>
-      `;  
+      `;
       const heading = searchHeader.querySelector('h2');
       const searchInput = searchHeader.querySelector('#search-input');
       heading.textContent = `Results for "${query}"`;
