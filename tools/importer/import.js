@@ -70,7 +70,12 @@ const createMetadataBlock = (main, document, url) => {
   if (industryTagsContainer) {
     const industryTags = [];
     industryTagsContainer.querySelectorAll('li').forEach((li) => {
-      industryTags.push(li.textContent.trim());
+      let industryHref = li.querySelector('a').getAttribute('href');
+      if (industryHref.endsWith('/')) {
+        industryHref = industryHref.slice(0, -1);
+      }
+      const industryName = industryHref.split('/').pop();
+      industryTags.push(industryName);
     });
     meta.Industries = industryTags.join(', ');
   }
@@ -79,7 +84,12 @@ const createMetadataBlock = (main, document, url) => {
   if (subjectTagsContainer) {
     const subjectTags = [];
     subjectTagsContainer.querySelectorAll('li').forEach((li) => {
-      subjectTags.push(li.textContent.trim());
+      let subjectHref = li.querySelector('a').getAttribute('href');
+      if (subjectHref.endsWith('/')) {
+        subjectHref = subjectHref.slice(0, -1);
+      }
+      const subjectName = subjectHref.split('/').pop();
+      subjectTags.push(subjectName);
     });
     meta.Subjects = subjectTags.join(', ');
   }

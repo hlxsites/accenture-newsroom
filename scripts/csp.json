@@ -7,16 +7,19 @@
       "'unsafe-inline'",
       "'unsafe-eval'",
       "rum.hlx.page",
+      "*.accenture.com",
       "assets.adobedtm.com",
       "cdn.cookielaw.org",
       "www.youtube.com",
-      "dpm.demdex.net"
+      "dpm.demdex.net",
+      "cdnjs.cloudflare.com"
   ],
   "connect-src": [
       "'self'",
       "rum.hlx.page",
       "*.accenture.com",
       "*.onetrust.com",
+      "https://*.onetrust.com",
       "assets.adobedtm.com",
       "cdn.cookielaw.org",
       "dpm.demdex.net",
@@ -28,12 +31,14 @@
     "*.accenture.com",
     "assets.adobedtm.com",
     "cdn.cookielaw.org",
-    "cm.everesttech.net"
+    "cm.everesttech.net",
+    "*.demdex.net"
   ],
   "frame-src": [
     "'self'",
     "*.accenture.com",
-    "www.youtube.com"
+    "www.youtube.com",
+    "*.demdex.net"
   ],
   "style-src": [
     "'self'",

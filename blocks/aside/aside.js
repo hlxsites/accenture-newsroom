@@ -9,6 +9,7 @@ import {
   getMetadata,
   loadScript,
   fetchPlaceholders,
+  toCamelCase,
 } from '../../scripts/lib-franklin.js';
 import {
   ANALYTICS_LINK_TYPE_DOWNLOADABLE,
@@ -21,14 +22,13 @@ import {
   ANALYTICS_TEMPLATE_ZONE_RIGHT_RAIL,
 } from '../../scripts/constants.js';
 
-async function generatePDF(pageTitle) {
+async function generatePDF(pageName) {
   // Source HTMLElement or a string containing HTML.
   const main = document.querySelector('main').cloneNode(true);
   const heroContainer = main.querySelector('.section.hero-container');
   const asideContainer = main.querySelector('.aside-container');
   heroContainer.remove();
   asideContainer.remove();
-  const pageName = pageTitle.replace(/[^a-z0-9]/gi, '-');
 
   const { jsPDF } = window.jspdf;
   // eslint-disable-next-line new-cap
@@ -46,6 +46,23 @@ async function generatePDF(pageTitle) {
     width: 190, // target width in the PDF document
     windowWidth: 900, // window width in CSS pixels
   });
+}
+
+/**
+ * Converts the given tagName to camelCase and look up the value in the placeholders object.
+ * If the value is not found, the defaultValue is returned.
+ * @param {*} tagName
+ * @param {*} placeholders
+ * @param {*} defaultValue
+ * @returns
+ */
+function getTagTitle(tagName, placeholders, defaultValue) {
+  const camelCaseTagName = toCamelCase(tagName);
+  const tagTitle = getPlaceholder(camelCaseTagName, placeholders);
+  if (tagTitle === camelCaseTagName) {
+    return defaultValue;
+  }
+  return tagTitle;
 }
 
 export default async function decorate(block) {
@@ -120,7 +137,7 @@ export default async function decorate(block) {
     'print',
     ANALYTICS_MODULE_SHARE,
     ANALYTICS_TEMPLATE_ZONE_RIGHT_RAIL,
-    ANALYTICS_LINK_TYPE_SHARE_INTENT,
+    ANALYTICS_LINK_TYPE_ENGAGEMENT,
   );
   printShare.innerHTML = '<span class="icon icon-social-print" />';
   printShare.setAttribute('onclick', 'window.print()');
@@ -135,7 +152,8 @@ export default async function decorate(block) {
   // PDF Download button
   const addPDF = getMetadata('pdf');
   if (addPDF && (addPDF === 'true')) {
-    const pdfButton = createEl('a', { class: 'pdf-button button', title: ' Convert to PDF' }, pDownloadPressRelease, share);
+    const pageName = pageTitle.replace(/[^a-z0-9]/gi, '-');
+    const pdfButton = createEl('a', { class: 'pdf-button button', title: ' Convert to PDF', 'data-analytics-download-fileName': `${pageName}.tekpdf` }, pDownloadPressRelease, share);
     annotateElWithAnalyticsTracking(
       pdfButton,
       pdfButton.textContent,
@@ -143,12 +161,13 @@ export default async function decorate(block) {
       ANALYTICS_TEMPLATE_ZONE_RIGHT_RAIL,
       ANALYTICS_LINK_TYPE_DOWNLOADABLE,
     );
+
     pdfButton.addEventListener('click', async () => {
       // Add the js2pdf script
       await loadScript('https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js');
       await loadScript('/scripts/html2canvas.min.js');
       if (window.jspdf) {
-        await generatePDF(pageTitle);
+        await generatePDF(pageName);
       }
     });
   }
@@ -162,7 +181,7 @@ export default async function decorate(block) {
   const industryUl = industryEl ? createEl('ul', {}, '', industryEl) : null;
   industryTagValues.split(',').forEach((industryTag) => {
     const cleanedUpValue = industryTag.trim().toLowerCase().replace(/[\W_]+/g, '-');
-    const link = createEl('a', { href: `/industries/${cleanedUpValue}` }, industryTag);
+    const link = createEl('a', { href: `/industries/${cleanedUpValue}` }, getTagTitle(cleanedUpValue, placeholders, industryTag.trim()));
     annotateElWithAnalyticsTracking(
       link,
       link.textContent,
@@ -178,7 +197,7 @@ export default async function decorate(block) {
     const cleanedUpValue = subjectTag.trim().toLowerCase().replace(/&/g, 'and')
       .replace(/[/]/g, '')
       .replace(/[\W_]+/g, '-');
-    const link = createEl('a', { href: `/subjects/${cleanedUpValue}` }, subjectTag);
+    const link = createEl('a', { href: `/subjects/${cleanedUpValue}` }, getTagTitle(cleanedUpValue, placeholders, subjectTag.trim()));
     annotateElWithAnalyticsTracking(
       link,
       link.textContent,
