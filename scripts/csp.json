@@ -7,6 +7,7 @@
       "'unsafe-inline'",
       "'unsafe-eval'",
       "rum.hlx.page",
+      "*.accenture.com",
       "assets.adobedtm.com",
       "cdn.cookielaw.org",
       "www.youtube.com",
@@ -19,6 +20,7 @@
       "rum.hlx.page",
       "*.accenture.com",
       "*.onetrust.com",
+      "https://*.onetrust.com",
       "assets.adobedtm.com",
       "cdn.cookielaw.org",
       "dpm.demdex.net",
@@ -32,14 +34,16 @@
     "cdn.cookielaw.org",
     "cm.everesttech.net",
     "play.vidyard.com",
-    "cdn.vidyard.com"
+    "cdn.vidyard.com",
+    "*.demdex.net"
   ],
   "frame-src": [
     "'self'",
     "play.vidyard.com",
     "accenture.demdex.net",
     "*.accenture.com",
-    "www.youtube.com"
+    "www.youtube.com",
+    "*.demdex.net"
   ],
   "style-src": [
     "'self'",

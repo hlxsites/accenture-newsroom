@@ -26,6 +26,8 @@ import {
   ANALYTICS_MODULE_ARTICLE_LIST,
   ANALYTICS_LINK_TYPE_INLINE_LINK,
   ANALYTICS_LINK_TYPE_CONTENT_MODULE,
+  ANALYTICS_LINK_TYPE_ENGAGEMENT,
+  ANALYTICS_MODULE_CONTENT_CARDS,
 } from '../../scripts/constants.js';
 
 const MAX_CHARS_IN_CARD_DESCRIPTION = 800;
@@ -405,8 +407,25 @@ export default async function decorate(block) {
         </div>
       </div>
       `;
-    } else {
+    } else if (usp.get('q') === null) {
       searchHeader.innerHTML = form;
+    } else {
+      searchHeader.innerHTML = `
+      <div class="search-error">
+        <img class="search-error-icon" src="/icons/error.png" alt="Search Error">
+        <div class="search-error-content">
+          <h4>Errors Occurred</h4>
+          <ul>
+            <li>At least one keyword is required.</li>
+          </ul>
+        </div>
+      </div>
+      <a class="search-error-back" href="/search" title="Back" data-analytics-link-name="back" data-analytics-link-type="call to action"
+        data-analytics-content-type="call to action" data-analytics-template-zone="body"
+        data-analytics-module-name="nws-search">
+        Back
+      </a>
+      `;
     }
     const submitAction = searchHeader.querySelector('input[type="submit"]');
     annotateElWithAnalyticsTracking(
@@ -548,7 +567,16 @@ export default async function decorate(block) {
       `;
     }
     const item = range.createContextualFragment(itemHtml);
-    item.querySelectorAll('a').forEach((link) => {
+    item.querySelectorAll('a:not(.newslist-item-description a), a:not(.search-results-item-content a)').forEach((link) => {
+      annotateElWithAnalyticsTracking(
+        link,
+        link.textContent,
+        isSearch ? ANALYTICS_MODULE_SEARCH_LIST : ANALYTICS_MODULE_CONTENT_CARDS,
+        ANALYTICS_TEMPLATE_ZONE_BODY,
+        isSearch ? ANALYTICS_LINK_TYPE_SEARCH_ACTIVITY : ANALYTICS_LINK_TYPE_ENGAGEMENT,
+      );
+    });
+    item.querySelectorAll('.newslist-item-description a, .search-results-item-content a').forEach((link) => {
       annotateElWithAnalyticsTracking(
         link,
         link.textContent,

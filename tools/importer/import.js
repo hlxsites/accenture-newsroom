@@ -70,7 +70,12 @@ const createMetadataBlock = (main, document, url) => {
   if (industryTagsContainer) {
     const industryTags = [];
     industryTagsContainer.querySelectorAll('li').forEach((li) => {
-      industryTags.push(li.textContent.trim());
+      let industryHref = li.querySelector('a').getAttribute('href');
+      if (industryHref.endsWith('/')) {
+        industryHref = industryHref.slice(0, -1);
+      }
+      const industryName = industryHref.split('/').pop();
+      industryTags.push(industryName);
     });
     meta.Industries = industryTags.join(', ');
   }
@@ -79,7 +84,12 @@ const createMetadataBlock = (main, document, url) => {
   if (subjectTagsContainer) {
     const subjectTags = [];
     subjectTagsContainer.querySelectorAll('li').forEach((li) => {
-      subjectTags.push(li.textContent.trim());
+      let subjectHref = li.querySelector('a').getAttribute('href');
+      if (subjectHref.endsWith('/')) {
+        subjectHref = subjectHref.slice(0, -1);
+      }
+      const subjectName = subjectHref.split('/').pop();
+      subjectTags.push(subjectName);
     });
     meta.Subjects = subjectTags.join(', ');
   }
@@ -98,15 +108,15 @@ const createNewsListBlock = (main, document, url) => {
   const cells = [
     ['Newslist'],
   ];
-  const titleEl = main.querySelector('#sec-hero h1');
-  let title = '';
-  if (titleEl) {
-    title = titleEl.textContent.trim();
+  let { pathname } = new URL(url);
+  if (pathname.endsWith('/')) {
+    pathname = pathname.slice(0, -1);
   }
+  const tagName = pathname.split('/').pop();
   if (url.includes('/industries/') || url.includes('/secteurs-dactivit/')) {
-    cells.push(['Industries', title]);
+    cells.push(['Industries', tagName]);
   } else if (url.includes('/subjects/') || url.includes('/sujet/') || url.includes('/argomento/')) {
-    cells.push(['Subjects', title]);
+    cells.push(['Subjects', tagName]);
   }
   const table = WebImporter.DOMUtils.createTable(cells, document);
   categoryContainer.replaceWith(table);

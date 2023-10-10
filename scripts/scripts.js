@@ -467,9 +467,21 @@ const centerArticleDivider = (main) => {
   if (template !== 'Article') {
     return;
   }
-  const sectionDefaultArticles = main.querySelectorAll('main .section:not([class]), main .section.video-container .default-content-wrapper');
-  sectionDefaultArticles.forEach((article) => {
-    scanAllTextNodes(article);
+  const sectionArticles = main.querySelectorAll('.section');
+  sectionArticles.forEach((section) => {
+    if (!section.nextElementSibling) {
+      return;
+    }
+    if (!section.nextElementSibling.classList.contains('aside-container')) {
+      return;
+    }
+
+    const defaultWrappers = section.querySelectorAll('.default-content-wrapper');
+    const lastDefaultWrapper = defaultWrappers[defaultWrappers.length - 1];
+    if (!lastDefaultWrapper) {
+      return;
+    }
+    scanAllTextNodes(lastDefaultWrapper);
   });
 };
 

@@ -36,7 +36,6 @@ function collapseAllNavSections(sections) {
 function closeNav(e) {
   const escapePressed = e.code === 'Escape';
   const nav = document.querySelector('header nav');
-  nav.setAttribute('id', 'header-topnav');
   const navSections = nav.querySelector('.nav-sections');
   const navSectionExpanded = navSections.querySelector('[aria-expanded="true"]');
   const outSideNavClicked = !e.target.closest('header nav');
@@ -103,6 +102,7 @@ export default async function decorate(block) {
 
   // decorate nav DOM
   const nav = document.createElement('nav');
+  nav.setAttribute('id', 'header-topnav');
   nav.innerHTML = html;
   decorateIcons(nav);
 
