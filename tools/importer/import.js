@@ -1,12 +1,13 @@
 /* eslint-disable no-console */
 /* eslint-disable no-undef */
-const isCategoryPage = (url) => (
-  url.includes('/industries/')
-  || url.includes('/subjects/')
-  || url.includes('/secteurs-dactivit/')
-  || url.includes('/sujet/')
-  || url.includes('/argomento/')
-);
+const isCategoryPage = (url) => {
+  const { pathname } = new URL(url);
+  if (pathname.endsWith('.htm')) {
+    return false;
+  }
+  const validCategoryPages = ['/industries/', '/secteurs-dactivit/', '/subjects/', '/sujet/', '/argomento/'];
+  return validCategoryPages.some((category) => pathname.includes(category));
+};
 
 function createVideoBlock(main, document) {
   const vidyardImgs = main.querySelectorAll('img[src*="play.vidyard.com"]');
@@ -348,7 +349,7 @@ export default {
 
     if (meta.PublishedDate && url.includes('/news/')) {
       const publishedYear = new Date(meta.PublishedDate).getFullYear().toString().trim();
-      const newPath = new URL(url).pathname.replace('.htm', '').replace('/news/', `/news/${publishedYear}/`);
+      const newPath = decodeURIComponent(new URL(url).pathname).replace('.htm', '').replace('/news/', `/news/${publishedYear}/`);
       results.push({
         element: main,
         path: newPath,
@@ -360,7 +361,7 @@ export default {
       // main page import - "element" is provided, i.e. a docx will be created
       results.push({
         element: main,
-        path: new URL(url).pathname.replace('.htm', ''),
+        path: decodeURIComponent(new URL(url).pathname).replace('.htm', ''),
         report: {
           'Missing abstract': abstractNotFound,
         },
