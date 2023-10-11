@@ -2,6 +2,7 @@ import {
   annotateElWithAnalyticsTracking,
   createAnnotatedLinkEl,
   createEl,
+  getCountry,
   getPlaceholder,
 } from '../../scripts/scripts.js';
 import {
@@ -151,7 +152,8 @@ export default async function decorate(block) {
 
   // PDF Download button
   const addPDF = getMetadata('pdf');
-  if (addPDF && (addPDF === 'true')) {
+  const country = getCountry();
+  if (addPDF && (addPDF === 'true') && country !== 'jp') {
     const pageName = pageTitle.replace(/[^a-z0-9]/gi, '-');
     const pdfButton = createEl('a', { class: 'pdf-button button', title: ' Convert to PDF', 'data-analytics-download-fileName': `${pageName}.tekpdf` }, pDownloadPressRelease, share);
     annotateElWithAnalyticsTracking(
