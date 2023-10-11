@@ -11,9 +11,24 @@ function getUUID(url) {
 export default async function decorate(block) {
   const config = readBlockConfig(block);
   if (config.url || config.uuid) {
-    await loadScript(VIDYARD_SCRIPT_URL, { async: 'false' });
+    const isYoutubeEmbed = config.url && config.url.includes('youtube');
+    if (!isYoutubeEmbed) {
+      await loadScript(VIDYARD_SCRIPT_URL, { async: 'false' });
+    }
     const observer = new IntersectionObserver((entries) => {
       if (entries.some((e) => e.isIntersecting)) {
+        if (isYoutubeEmbed) {
+          const html = `
+            <div class="video-container">
+              <div>
+                <iframe allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowfullscreen="" frameborder="0" height="385" src="${config.url}" title="YouTube video player"></iframe></p>
+              </div>
+            </div>
+            `;
+          block.innerHTML = html;
+          return;
+        }
         if (window.vidyardEmbed) {
           window.vidyardEmbed.api.renderDOMPlayers();
         }
@@ -22,14 +37,16 @@ export default async function decorate(block) {
     });
     observer.observe(block);
     block.textContent = '';
-    const uuid = config.uuid || getUUID(config.url);
-    const img = document.createElement('img');
-    img.classList.add('vidyard-player-embed');
-    img.src = `${VIDYARD_URL}${uuid}.jpg`;
-    img.setAttribute('data-uuid', uuid);
-    img.setAttribute('data-v', 4);
-    img.setAttribute('data-type', 'inline');
-    block.appendChild(img);
+    if (!isYoutubeEmbed) {
+      const uuid = config.uuid || getUUID(config.url);
+      const img = document.createElement('img');
+      img.classList.add('vidyard-player-embed');
+      img.src = `${VIDYARD_URL}${uuid}.jpg`;
+      img.setAttribute('data-uuid', uuid);
+      img.setAttribute('data-v', 4);
+      img.setAttribute('data-type', 'inline');
+      block.appendChild(img);
+    }
   } else {
     block.remove();
   }

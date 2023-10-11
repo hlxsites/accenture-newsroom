@@ -35,6 +35,7 @@
     "cm.everesttech.net",
     "play.vidyard.com",
     "cdn.vidyard.com",
+    "*.ytimg.com/",
     "*.demdex.net"
   ],
   "frame-src": [
@@ -43,6 +44,7 @@
     "accenture.demdex.net",
     "*.accenture.com",
     "www.youtube.com",
+    "www.youtube-nocookie.com/",
     "*.demdex.net"
   ],
   "style-src": [

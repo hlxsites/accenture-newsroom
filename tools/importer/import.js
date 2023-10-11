@@ -22,6 +22,17 @@ function createVideoBlock(main, document) {
     const videoBlock = WebImporter.DOMUtils.createTable(videoCells, document);
     vidyardImg.replaceWith(videoBlock);
   });
+  // youtube videos
+  const youtubeEmbeds = main.querySelectorAll('iframe[src*="youtube"]');
+  youtubeEmbeds.forEach((youtubeEmbed) => {
+    const youtubeUrl = youtubeEmbed.src;
+    const videoCells = [
+      ['Video'],
+      ['url', youtubeUrl],
+    ];
+    const videoBlock = WebImporter.DOMUtils.createTable(videoCells, document);
+    youtubeEmbed.replaceWith(videoBlock);
+  });
 }
 
 const createMetadataBlock = (main, document, url) => {
@@ -314,7 +325,7 @@ export default {
     const tables = main.querySelectorAll('table');
     if (tables && tables.length > 0) {
       tables.forEach((table) => {
-        const videoRegex = /.*https:\/\/play.vidyard.com.*/;
+        const videoRegex = /.*https:\/\/play.vidyard.com.*|.*youtube.*/;
         const isVideo = videoRegex.test(table.outerHTML);
         if (isVideo) return;
         const cells = [
