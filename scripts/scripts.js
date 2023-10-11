@@ -385,6 +385,10 @@ async function addPrevNextLinksToArticles() {
   const placeholders = await fetchPlaceholders();
   const pPrevious = getPlaceholder('previous', placeholders);
   const pNext = getPlaceholder('next', placeholders);
+  const pNextTitle = getPlaceholder('nextTitle', placeholders);
+  const pNextTitleTooltip = pNextTitle === 'nextTitle' ? 'Next' : pNextTitle;
+  const pPreviousTitle = getPlaceholder('previousTitle', placeholders);
+  const pPreviousTitleTooltip = pPreviousTitle === 'previousTitle' ? 'Previous' : pPreviousTitle;
   const queryIndex = await ffetchArticles('/query-index.json', 'articles', 100);
   // iterate queryIndex to find current article and add prev/next links
   const currentArticlePath = window.location.pathname;
@@ -416,14 +420,14 @@ async function addPrevNextLinksToArticles() {
   let prevLink = '';
   let nextLink = '';
   if (prevArticle) {
-    prevLink = createEl('a', { href: prevArticle.path, class: 'prev', title: pPrevious }, pPrevious);
+    prevLink = createEl('a', { href: prevArticle.path, class: 'prev', title: pPreviousTitleTooltip }, pPrevious);
   } else {
-    prevLink = createEl('a', { href: '#', class: 'prev disabled', title: pPrevious }, pPrevious);
+    prevLink = createEl('a', { href: '#', class: 'prev disabled', title: pPreviousTitleTooltip }, pPrevious);
   }
   if (nextArticle) {
-    nextLink = createEl('a', { href: nextArticle.path, class: 'next', title: pNext }, pNext);
+    nextLink = createEl('a', { href: nextArticle.path, class: 'next', title: pNextTitleTooltip }, pNext);
   } else {
-    nextLink = createEl('a', { href: '#', class: 'next disabled', title: pNext }, pNext);
+    nextLink = createEl('a', { href: '#', class: 'next disabled', title: pNextTitleTooltip }, pNext);
   }
   annotateElWithAnalyticsTracking(
     prevLink,
