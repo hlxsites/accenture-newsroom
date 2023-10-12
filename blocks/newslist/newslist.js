@@ -573,9 +573,14 @@ export default async function decorate(block) {
     }
     const item = range.createContextualFragment(itemHtml);
     item.querySelectorAll('a:not(.newslist-item-description a), a:not(.search-results-item-content a)').forEach((link) => {
+      // special handling for read more links
+      let readMoreLinkName = '';
+      if (link.closest('.newslist-item-footer')) {
+        readMoreLinkName = `read more: ${e.title.toLowerCase()}`;
+      }
       annotateElWithAnalyticsTracking(
         link,
-        link.textContent,
+        readMoreLinkName || link.textContent,
         isSearch ? ANALYTICS_MODULE_SEARCH_LIST : ANALYTICS_MODULE_CONTENT_CARDS,
         ANALYTICS_TEMPLATE_ZONE_BODY,
         isSearch ? ANALYTICS_LINK_TYPE_SEARCH_ACTIVITY : ANALYTICS_LINK_TYPE_ENGAGEMENT,
