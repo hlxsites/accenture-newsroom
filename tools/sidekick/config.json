@@ -3,13 +3,6 @@
   "host": "main--accenture-newsroom--hlxsites.hlx.live",
   "plugins": [
     {
-      "id": "publish",
-      "excludePaths": [
-        "**/drafts/**",
-        "**%2Fdrafts**"
-      ]
-    },
-    {
       "id": "tagger",
       "title": "Tagger",
       "environments": [
