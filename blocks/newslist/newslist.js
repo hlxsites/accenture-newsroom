@@ -10,7 +10,6 @@ import {
   getCountry,
   getDateLocales,
   isMobile,
-  sanitizeName,
 } from '../../scripts/scripts.js';
 import {
   ANALYTICS_MODULE_SEARCH,
@@ -260,8 +259,7 @@ function addEventListenerToFilterForm(block) {
 
 function ifArticleBelongsToCategories(article, key, value) {
   const values = article[key.trim()].toLowerCase().split(',').map((v) => v.trim());
-  const sanitizedValue = sanitizeName(value);
-  if (values.includes(value.trim().toLowerCase()) || values.includes(sanitizedValue)) {
+  if (values.includes(value.trim().toLowerCase())) {
     return true;
   }
   return false;
