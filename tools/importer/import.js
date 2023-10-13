@@ -1,4 +1,5 @@
 /* eslint-disable no-console */
+
 /* eslint-disable no-undef */
 const isCategoryPage = (url) => {
   const { pathname } = new URL(url);
@@ -87,7 +88,11 @@ const createMetadataBlock = (main, document, url) => {
         industryHref = industryHref.slice(0, -1);
       }
       const industryName = industryHref.split('/').pop();
-      industryTags.push(industryName);
+      let sanitizedName = WebImporter.FileUtils.sanitizePath(industryName);
+      if (sanitizedName.startsWith('/')) {
+        sanitizedName = sanitizedName.slice(1);
+      }
+      industryTags.push(sanitizedName);
     });
     meta.Industries = industryTags.join(', ');
   }
@@ -101,7 +106,11 @@ const createMetadataBlock = (main, document, url) => {
         subjectHref = subjectHref.slice(0, -1);
       }
       const subjectName = subjectHref.split('/').pop();
-      subjectTags.push(subjectName);
+      let sanitizedName = WebImporter.FileUtils.sanitizePath(subjectName);
+      if (sanitizedName.startsWith('/')) {
+        sanitizedName = sanitizedName.slice(1);
+      }
+      subjectTags.push(sanitizedName);
     });
     meta.Subjects = subjectTags.join(', ');
   }

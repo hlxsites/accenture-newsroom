@@ -112,6 +112,18 @@ export function getDateLocales(country) {
   return countryDateLocales[country] || 'en-US';
 }
 
+/**
+ * Removes Diacritics (accented characters) from a string
+ * @param {*} name
+ * @returns
+ */
+export function sanitizeName(name) {
+  return name ? decodeURIComponent(name.trim()).toLowerCase().normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-|-$/g, '') : '';
+}
+
 export function getPlaceholder(key, placeholders) {
   if (placeholders && placeholders[key]) {
     return placeholders[key];
