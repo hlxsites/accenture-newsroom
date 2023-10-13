@@ -35,6 +35,7 @@ const MAX_CHARS_IN_CARD_DESCRIPTION = 800;
 function getHumanReadableDate(dateString) {
   if (!dateString) return dateString;
   const date = new Date(parseInt(dateString, 10));
+  const specialCountries = ['pt', 'br', 'sp'];
   // display the date in GMT timezone
   const country = getCountry();
   const localedate = date.toLocaleDateString(getDateLocales(country), {
@@ -43,7 +44,11 @@ function getHumanReadableDate(dateString) {
     month: 'long',
     day: '2-digit',
   });
-  return localedate.replace(/de/g, '');
+  if (specialCountries.includes(country)) {
+    // de means 'of' in pt/br/sp, replacing with empty string
+    return localedate.replace(/de /g, '');
+  }
+  return localedate;
 }
 
 /**
