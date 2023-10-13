@@ -3,6 +3,7 @@ import {
   createAnnotatedLinkEl,
   createEl,
   getPlaceholder,
+  getSiteFromHostName,
 } from '../../scripts/scripts.js';
 import {
   decorateIcons,
@@ -177,11 +178,15 @@ export default async function decorate(block) {
   const subjectTagValues = getMetadata('subjects');
   const industryEl = industryTagValues ? createEl('div', { class: 'industry' }, `<h4>${pIndustryTags}</h4>`) : null;
   const subjectEl = subjectTagValues ? createEl('div', { class: 'subject' }, `<h4>${pSubjectTags}</h4>`) : null;
+  let siteName = getSiteFromHostName(window.location.hostname);
+  if (siteName === 'us') {
+    siteName = '';
+  }
 
   const industryUl = industryEl ? createEl('ul', {}, '', industryEl) : null;
   industryTagValues.split(',').forEach((industryTag) => {
     const cleanedUpValue = industryTag.trim().toLowerCase().replace(/[\W_]+/g, '-');
-    const link = createEl('a', { href: `/industries/${cleanedUpValue}` }, getTagTitle(cleanedUpValue, placeholders, industryTag.trim()));
+    const link = createEl('a', { href: `${siteName}/industries/${cleanedUpValue}` }, getTagTitle(cleanedUpValue, placeholders, industryTag.trim()));
     annotateElWithAnalyticsTracking(
       link,
       link.textContent,
@@ -197,7 +202,7 @@ export default async function decorate(block) {
     const cleanedUpValue = subjectTag.trim().toLowerCase().replace(/&/g, 'and')
       .replace(/[/]/g, '')
       .replace(/[\W_]+/g, '-');
-    const link = createEl('a', { href: `/subjects/${cleanedUpValue}` }, getTagTitle(cleanedUpValue, placeholders, subjectTag.trim()));
+    const link = createEl('a', { href: `${siteName}/subjects/${cleanedUpValue}` }, getTagTitle(cleanedUpValue, placeholders, subjectTag.trim()));
     annotateElWithAnalyticsTracking(
       link,
       link.textContent,

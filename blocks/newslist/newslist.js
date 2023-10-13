@@ -435,7 +435,7 @@ export default async function decorate(block) {
     const submitAction = searchHeader.querySelector('input[type="submit"]');
     annotateElWithAnalyticsTracking(
       submitAction,
-      '',
+      'search',
       ANALYTICS_MODULE_SEARCH,
       ANALYTICS_TEMPLATE_ZONE_BODY,
       ANALYTICS_LINK_TYPE_SEARCH_ACTIVITY,
