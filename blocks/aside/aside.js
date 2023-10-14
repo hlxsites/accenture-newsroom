@@ -34,15 +34,15 @@ async function generatePDF(pageName) {
 
   const { html2pdf } = window;
   const opt = {
-    margin: [ 15, 30 ],
+    margin: [30, 30, 30, 30],
     filename: `${pageName}.pdf`,
-    image: { type: 'jpeg', quality: 0.98 },
-    html2canvas:  { scale: 2, letterRendering: true },
+    image: { type: 'jpeg', quality: 1 },
+    html2canvas: { scale: 2, letterRendering: true },
     jsPDF: { unit: 'pt', format: 'letter', orientation: 'portrait' },
-    pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
+    pagebreak: { mode: ['avoid-all', 'css', 'legacy'] },
   };
   html2pdf().set(opt).from(main).save();
-};
+}
 
 /**
  * Converts the given tagName to camelCase and look up the value in the placeholders object.
@@ -160,7 +160,7 @@ export default async function decorate(block) {
 
     pdfButton.addEventListener('click', async () => {
       // Add the html2pdf script
-      await loadScript('https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js',{
+      await loadScript('https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js', {
         integrity: 'sha512-GsLlZN/3F2ErC5ifS5QtgpiJtWd43JWSuIgh7mbzZ8zBps+dvLusV+eNQATqgA/HdeKFVgA5v3S/cIrLF7QnIg==',
         crossorigin: 'anonymous',
         referrerpolicy: 'no-referrer',
