@@ -1,10 +1,10 @@
 import {
-  ANALYTICS_LINK_TYPE_ENGAGEMENT,
   ANALYTICS_LINK_TYPE_NAV_PAGINATE,
   ANALYTICS_MODULE_MARQUEE,
   ANALYTICS_MODULE_MULTIPAGE_NAV,
   ANALYTICS_TEMPLATE_ZONE_HERO,
   ANALYTICS_TEMPLATE_ZONE_BODY,
+  ANALYTICS_LINK_TYPE_HERO_CONTENT,
 } from '../../scripts/constants.js';
 import { annotateElWithAnalyticsTracking } from '../../scripts/scripts.js';
 
@@ -35,18 +35,21 @@ export default async function decorate(block) {
       link.textContent,
       ANALYTICS_MODULE_MARQUEE,
       ANALYTICS_TEMPLATE_ZONE_HERO,
-      ANALYTICS_LINK_TYPE_ENGAGEMENT,
+      ANALYTICS_LINK_TYPE_HERO_CONTENT,
     );
   });
-  title.insertAdjacentElement('afterend', overlayContainer);
-  const stripe = document.createElement('div');
-  stripe.classList.add('home-hero-stripe');
-  title.insertAdjacentElement('afterend', stripe);
-  const picture = block.querySelector('picture');
-  const imgSrc = getBackgroundImage(picture);
-  picture.remove();
-  const content = block.querySelector('h1').parentNode;
-  content.classList.add('home-hero-content-container');
+  if (title) {
+    title.insertAdjacentElement('afterend', overlayContainer);
+    const stripe = document.createElement('div');
+    stripe.classList.add('home-hero-stripe');
+    title.insertAdjacentElement('afterend', stripe);
+    const picture = block.querySelector('picture');
+    const imgSrc = getBackgroundImage(picture);
+    picture.remove();
+    const content = block.querySelector('h1').parentNode;
+    content.classList.add('home-hero-content-container');
+    content.parentNode.style.backgroundImage = `url('${imgSrc}')`;
+  }
   const links = block.querySelector('ul');
   if (links) {
     const linksContainer = document.createElement('div');
@@ -63,5 +66,4 @@ export default async function decorate(block) {
     });
     block.append(linksContainer);
   }
-  content.parentNode.style.backgroundImage = `url('${imgSrc}')`;
 }

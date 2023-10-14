@@ -3,12 +3,15 @@ import {
   createAnnotatedLinkEl,
   createEl,
   getPlaceholder,
+  getSiteFromHostName,
+  sanitizeName,
 } from '../../scripts/scripts.js';
 import {
   decorateIcons,
   getMetadata,
   loadScript,
   fetchPlaceholders,
+  toCamelCase,
 } from '../../scripts/lib-franklin.js';
 import {
   ANALYTICS_LINK_TYPE_DOWNLOADABLE,
@@ -21,14 +24,13 @@ import {
   ANALYTICS_TEMPLATE_ZONE_RIGHT_RAIL,
 } from '../../scripts/constants.js';
 
-async function generatePDF(pageTitle) {
+async function generatePDF(pageName) {
   // Source HTMLElement or a string containing HTML.
   const main = document.querySelector('main').cloneNode(true);
   const heroContainer = main.querySelector('.section.hero-container');
   const asideContainer = main.querySelector('.aside-container');
   heroContainer.remove();
   asideContainer.remove();
-  const pageName = pageTitle.replace(/[^a-z0-9]/gi, '-');
 
   const { html2pdf } = window;
   const opt = {
@@ -41,6 +43,23 @@ async function generatePDF(pageTitle) {
   };
   html2pdf().set(opt).from(main).save();
 };
+
+/**
+ * Converts the given tagName to camelCase and look up the value in the placeholders object.
+ * If the value is not found, the defaultValue is returned.
+ * @param {*} tagName
+ * @param {*} placeholders
+ * @param {*} defaultValue
+ * @returns
+ */
+function getTagTitle(tagName, placeholders, defaultValue) {
+  const camelCaseTagName = toCamelCase(tagName);
+  const tagTitle = getPlaceholder(camelCaseTagName, placeholders);
+  if (tagTitle === camelCaseTagName) {
+    return defaultValue;
+  }
+  return tagTitle;
+}
 
 export default async function decorate(block) {
   block.innerText = '';
@@ -114,7 +133,7 @@ export default async function decorate(block) {
     'print',
     ANALYTICS_MODULE_SHARE,
     ANALYTICS_TEMPLATE_ZONE_RIGHT_RAIL,
-    ANALYTICS_LINK_TYPE_SHARE_INTENT,
+    ANALYTICS_LINK_TYPE_ENGAGEMENT,
   );
   printShare.innerHTML = '<span class="icon icon-social-print" />';
   printShare.setAttribute('onclick', 'window.print()');
@@ -129,7 +148,8 @@ export default async function decorate(block) {
   // PDF Download button
   const addPDF = getMetadata('pdf');
   if (addPDF && (addPDF === 'true')) {
-    const pdfButton = createEl('a', { class: 'pdf-button button', title: ' Convert to PDF' }, pDownloadPressRelease, share);
+    const pageName = pageTitle.replace(/[^a-z0-9]/gi, '-');
+    const pdfButton = createEl('a', { class: 'pdf-button button', title: ' Convert to PDF', 'data-analytics-download-fileName': `${pageName}.tekpdf` }, pDownloadPressRelease, share);
     annotateElWithAnalyticsTracking(
       pdfButton,
       pdfButton.textContent,
@@ -137,6 +157,7 @@ export default async function decorate(block) {
       ANALYTICS_TEMPLATE_ZONE_RIGHT_RAIL,
       ANALYTICS_LINK_TYPE_DOWNLOADABLE,
     );
+
     pdfButton.addEventListener('click', async () => {
       // Add the html2pdf script
       await loadScript('https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js',{
@@ -155,11 +176,18 @@ export default async function decorate(block) {
   const subjectTagValues = getMetadata('subjects');
   const industryEl = industryTagValues ? createEl('div', { class: 'industry' }, `<h4>${pIndustryTags}</h4>`) : null;
   const subjectEl = subjectTagValues ? createEl('div', { class: 'subject' }, `<h4>${pSubjectTags}</h4>`) : null;
+  const siteName = getSiteFromHostName(window.location.hostname);
+  let sitePrefix = '';
+  if (siteName === 'us') {
+    sitePrefix = '';
+  } else {
+    sitePrefix = `/${siteName}`;
+  }
 
   const industryUl = industryEl ? createEl('ul', {}, '', industryEl) : null;
   industryTagValues.split(',').forEach((industryTag) => {
-    const cleanedUpValue = industryTag.trim().toLowerCase().replace(/[\W_]+/g, '-');
-    const link = createEl('a', { href: `/industries/${cleanedUpValue}` }, industryTag);
+    const cleanedUpValue = sanitizeName(industryTag);
+    const link = createEl('a', { href: `${sitePrefix}/industries/${cleanedUpValue}` }, getTagTitle(cleanedUpValue, placeholders, industryTag.trim()));
     annotateElWithAnalyticsTracking(
       link,
       link.textContent,
@@ -172,10 +200,8 @@ export default async function decorate(block) {
 
   const subjectUl = subjectEl ? createEl('ul', {}, '', subjectEl) : null;
   subjectTagValues.split(',').forEach((subjectTag) => {
-    const cleanedUpValue = subjectTag.trim().toLowerCase().replace(/&/g, 'and')
-      .replace(/[/]/g, '')
-      .replace(/[\W_]+/g, '-');
-    const link = createEl('a', { href: `/subjects/${cleanedUpValue}` }, subjectTag);
+    const cleanedUpValue = sanitizeName(subjectTag);
+    const link = createEl('a', { href: `${sitePrefix}/subjects/${cleanedUpValue}` }, getTagTitle(cleanedUpValue, placeholders, subjectTag.trim()));
     annotateElWithAnalyticsTracking(
       link,
       link.textContent,

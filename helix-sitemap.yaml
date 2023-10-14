@@ -2,7 +2,7 @@ version: 1.1
 auto-generated: false
 sitemaps:
   default:
-    origin: https://main--accenture-newsroom--hlxsites.hlx.live
+    origin: https://tempnewsroom.accenture.com
     source: /query-index.json
     destination: /sitemap.xml
     lastmod: YYYY-MM-DD

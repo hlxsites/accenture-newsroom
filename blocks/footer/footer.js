@@ -8,9 +8,12 @@ import {
   ANALYTICS_TEMPLATE_ZONE_FOOTER,
 } from '../../scripts/constants.js';
 import {
-  readBlockConfig, decorateIcons, decorateSections, loadBlocks,
+  readBlockConfig, decorateIcons, decorateSections, loadBlocks, fetchPlaceholders,
 } from '../../scripts/lib-franklin.js';
-import { annotateElWithAnalyticsTracking } from '../../scripts/scripts.js';
+import {
+  annotateElWithAnalyticsTracking,
+  getPlaceholder,
+} from '../../scripts/scripts.js';
 
 /**
  * loads and decorates the footer
@@ -23,6 +26,14 @@ export default async function decorate(block) {
     facebook: 'Follow us on Facebook',
     youtube: 'See Accenture on YouTube',
   };
+
+  const getSocialIconTitle = async (iconName) => {
+    const placeholders = await fetchPlaceholders();
+    const placeHolderValue = await getPlaceholder(`${iconName}IconTitle`, placeholders);
+    const checkPlaceHolderValue = placeHolderValue === `${iconName}IconTitle` ? '' : placeHolderValue;
+    return checkPlaceHolderValue || socialTitlesMapping[iconName] || '';
+  };
+
   const cfg = readBlockConfig(block);
   block.textContent = '';
 
@@ -61,15 +72,17 @@ export default async function decorate(block) {
     });
 
     const footerBlack = footer.querySelector('.section.footer-black');
-    footerBlack.querySelectorAll('a').forEach((link) => {
+    footerBlack.querySelectorAll('a').forEach(async (link) => {
       const icon = link.querySelector('span[class*="icon-"]');
       let text = link.innerText;
       if (icon) {
         // find the class name with pattern icon- from the icon classList
         const iconClass = [...icon.classList].find((className) => className.startsWith('icon-'));
         // remove the icon class from the iconClass
-        text = socialTitlesMapping[iconClass.replace('icon-', '')] || '';
-        link.setAttribute('title', text);
+        const iconName = iconClass.replace('icon-', '');
+        const iconTitle = await getSocialIconTitle(iconName);
+        text = iconTitle;
+        link.setAttribute('title', iconTitle);
 
         const socialLink = icon.closest('a');
         socialLink.setAttribute('target', '_blank');

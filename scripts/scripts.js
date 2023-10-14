@@ -19,11 +19,13 @@ import {
   decorateBlocks,
   decorateTemplateAndTheme,
   waitForLCP,
+  loadBlock,
   loadBlocks,
   loadCSS,
   getMetadata,
   loadScript,
   fetchPlaceholders,
+  decorateBlock,
 } from './lib-franklin.js';
 
 const LCP_BLOCKS = []; // add your LCP blocks to the list
@@ -31,7 +33,7 @@ const LCP_BLOCKS = []; // add your LCP blocks to the list
 // regex to find abstract paragraph
 export const ABSTRACT_REGEX = /(.*?);.*?(\d{4})|(.*?)(\d{4})\s+–\s+\b|(.*?)(\d{4})\s+-\s+\b/;
 
-const isMobile = () => window.innerWidth < 600;
+export const isMobile = () => window.innerWidth < 600;
 
 export function getSiteFromHostName(hostname = window.location.hostname) {
   const allowedSites = ['uk', 'de', 'fr', 'it', 'es', 'sg', 'pt', 'jp', 'br'];
@@ -95,19 +97,31 @@ export function getLanguage(country) {
 }
 
 export function getDateLocales(country) {
-  const countryToLanguageMapping = {
+  const countryDateLocales = {
     us: 'en-US',
-    uk: 'en-US',
+    gb: 'en-US',
     de: 'de-DE',
     fr: 'fr-FR',
     it: 'it-IT',
-    es: 'es-ES',
+    sp: 'es-ES',
     sg: 'en-US',
     pt: 'pt-PT',
     jp: 'ja-JP',
     br: 'pt-BR',
   };
-  return countryToLanguageMapping[country] || 'en-US';
+  return countryDateLocales[country] || 'en-US';
+}
+
+/**
+ * Removes Diacritics (accented characters) from a string
+ * @param {*} name
+ * @returns
+ */
+export function sanitizeName(name) {
+  return name ? decodeURIComponent(name.trim()).toLowerCase().normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-|-$/g, '') : '';
 }
 
 export function getPlaceholder(key, placeholders) {
@@ -115,6 +129,42 @@ export function getPlaceholder(key, placeholders) {
     return placeholders[key];
   }
   return key;
+}
+
+export function createTag(tag, attributes, html) {
+  const el = document.createElement(tag);
+  if (html) {
+    if (html instanceof HTMLElement
+      || html instanceof SVGElement
+      || html instanceof DocumentFragment) {
+      el.append(html);
+    } else if (Array.isArray(html)) {
+      el.append(...html);
+    } else {
+      el.insertAdjacentHTML('beforeend', html);
+    }
+  }
+  if (attributes) {
+    Object.entries(attributes).forEach(([key, val]) => {
+      el.setAttribute(key, val);
+    });
+  }
+  return el;
+}
+
+/**
+ * Sets the Content-Security-Policy meta tag to the document based on JSON file
+ */
+async function setCSP() {
+  const resp = await fetch(`${window.hlx.codeBasePath}/scripts/csp.json`);
+  const json = await resp.json();
+  const directives = Object.keys(json);
+  const policy = directives.map((directive) => `${directive} ${json[directive].join(' ')}`).join('; ');
+  const meta = document.createElement('meta');
+  meta.setAttribute('http-equiv', 'Content-Security-Policy');
+  meta.setAttribute('content', policy);
+  document.addEventListener('securitypolicyviolation', (e) => sampleRUM('csperror', { source: `${e.documentURI}:${e.lineNumber}:${e.columnNumber}`, target: e.blockedURI }));
+  document.head.appendChild(meta);
 }
 
 /**
@@ -199,12 +249,12 @@ export async function createFilterYear(years, currentYear, url) {
   filterYear.name = 'year';
   let options = years.map((y) => (`
     <div class="filter-year-item" value="${y}" data-analytics-link-name="${y}"
-    data-analytics-module-name=${ANALYTICS_MODULE_YEAR_FILTER} data-analytics-template-zone=""
+    data-analytics-module-name=${ANALYTICS_MODULE_YEAR_FILTER} data-analytics-template-zone="${ANALYTICS_TEMPLATE_ZONE_BODY}"
     data-analytics-link-type="${ANALYTICS_LINK_TYPE_FILTER}">${y}</div>
     `)).join('');
   options = `<div class="filter-year-item" value=""
     data-analytics-link-name="year"
-    data-analytics-module-name=${ANALYTICS_MODULE_YEAR_FILTER} data-analytics-template-zone=""
+    data-analytics-module-name=${ANALYTICS_MODULE_YEAR_FILTER} data-analytics-template-zone="${ANALYTICS_TEMPLATE_ZONE_BODY}"
     data-analytics-link-type="${ANALYTICS_LINK_TYPE_FILTER}">${pYear}</div> ${options}`;
   filterYear.innerHTML = `
   ${currentYear || pYear}
@@ -347,6 +397,10 @@ async function addPrevNextLinksToArticles() {
   const placeholders = await fetchPlaceholders();
   const pPrevious = getPlaceholder('previous', placeholders);
   const pNext = getPlaceholder('next', placeholders);
+  const pNextTitle = getPlaceholder('nextTitle', placeholders);
+  const pNextTitleTooltip = pNextTitle === 'nextTitle' ? 'Next' : pNextTitle;
+  const pPreviousTitle = getPlaceholder('previousTitle', placeholders);
+  const pPreviousTitleTooltip = pPreviousTitle === 'previousTitle' ? 'Previous' : pPreviousTitle;
   const queryIndex = await ffetchArticles('/query-index.json', 'articles', 100);
   // iterate queryIndex to find current article and add prev/next links
   const currentArticlePath = window.location.pathname;
@@ -378,14 +432,14 @@ async function addPrevNextLinksToArticles() {
   let prevLink = '';
   let nextLink = '';
   if (prevArticle) {
-    prevLink = createEl('a', { href: prevArticle.path, class: 'prev', title: pPrevious }, pPrevious);
+    prevLink = createEl('a', { href: prevArticle.path, class: 'prev', title: pPreviousTitleTooltip }, pPrevious);
   } else {
-    prevLink = createEl('a', { href: '#', class: 'prev disabled', title: pPrevious }, pPrevious);
+    prevLink = createEl('a', { href: '#', class: 'prev disabled', title: pPreviousTitleTooltip }, pPrevious);
   }
   if (nextArticle) {
-    nextLink = createEl('a', { href: nextArticle.path, class: 'next', title: pNext }, pNext);
+    nextLink = createEl('a', { href: nextArticle.path, class: 'next', title: pNextTitleTooltip }, pNext);
   } else {
-    nextLink = createEl('a', { href: '#', class: 'next disabled', title: pNext }, pNext);
+    nextLink = createEl('a', { href: '#', class: 'next disabled', title: pNextTitleTooltip }, pNext);
   }
   annotateElWithAnalyticsTracking(
     prevLink,
@@ -430,9 +484,21 @@ const centerArticleDivider = (main) => {
   if (template !== 'Article') {
     return;
   }
-  const sectionDefaultArticles = main.querySelectorAll('main .section:not([class*=" "]) .default-content-wrapper');
-  sectionDefaultArticles.forEach((article) => {
-    scanAllTextNodes(article);
+  const sectionArticles = main.querySelectorAll('.section');
+  sectionArticles.forEach((section) => {
+    if (!section.nextElementSibling) {
+      return;
+    }
+    if (!section.nextElementSibling.classList.contains('aside-container')) {
+      return;
+    }
+
+    const defaultWrappers = section.querySelectorAll('.default-content-wrapper');
+    const lastDefaultWrapper = defaultWrappers[defaultWrappers.length - 1];
+    if (!lastDefaultWrapper) {
+      return;
+    }
+    scanAllTextNodes(lastDefaultWrapper);
   });
 };
 
@@ -666,11 +732,27 @@ async function loadJQueryDateRangePicker() {
   }
 }
 
+const preflightListener = async () => {
+  const section = createTag('div');
+  const wrapper = createTag('div');
+  section.appendChild(wrapper);
+  const preflightBlock = buildBlock('preflight', '');
+  wrapper.appendChild(preflightBlock);
+  decorateBlock(preflightBlock);
+  await loadBlock(preflightBlock);
+  const { default: getModal } = await import('../blocks/modal/modal.js');
+  const customModal = await getModal('dialog-modal', () => section.innerHTML, (modal) => {
+    modal.querySelector('button[name="close"]')?.addEventListener('click', () => modal.close());
+  });
+  customModal.showModal();
+};
+
 /**
  * Loads everything that doesn't need to be delayed.
  * @param {Element} doc The container element
  */
 async function loadLazy(doc) {
+  await setCSP();
   const main = doc.querySelector('main');
   await loadBlocks(main);
 
@@ -686,10 +768,17 @@ async function loadLazy(doc) {
 
   loadJQueryDateRangePicker();
 
+  centerArticleDivider(main);
+
+  // Add plugin listeners here
+  const sk = document.querySelector('helix-sidekick');
+  if (sk) {
+    sk.addEventListener('custom:preflight', preflightListener);
+  }
+
   sampleRUM('lazy');
   sampleRUM.observe(main.querySelectorAll('div[data-block-name]'));
   sampleRUM.observe(main.querySelectorAll('picture > img'));
-  centerArticleDivider(main);
 }
 
 async function completeFFetchIteration() {

@@ -26,7 +26,7 @@
   color: #000;
   font-size: 36px;
   font-weight: 900;
-  width: 200px;
+  width: auto;
   margin-top: 11px;
   margin-bottom: 10px;
   line-height: 1.1;
@@ -36,7 +36,7 @@
 
 .home-hero.block .home-hero-stripe {
   background-color: #004DFF;
-  height: 21.5%;
+  height: 110px;
   width: 100%;
   top: 37%;
   left: 0;
@@ -97,6 +97,10 @@
 
 .home-hero.block .home-hero-content-container .overlay-container h2 a::after{
   display: none;
+}
+
+.home-hero .overlay-container .button-container a.button.secondary {
+  text-transform: none;
 }
 
 @media (min-width: 1000px) {
