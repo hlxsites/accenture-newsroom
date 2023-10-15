@@ -65,6 +65,7 @@ export default async function decorate(block) {
   block.innerText = '';
   const pageUrl = window.location.href;
   const pageTitle = getMetadata('og:title');
+  const pageName = pageUrl.split('/').pop();
   const placeholders = await fetchPlaceholders();
   const pShare = getPlaceholder('share', placeholders);
   const pDownloadPressRelease = getPlaceholder('downloadPressRelease', placeholders);
@@ -148,8 +149,7 @@ export default async function decorate(block) {
   // PDF Download button
   const addPDF = getMetadata('pdf');
   if (addPDF && (addPDF === 'true')) {
-    const pageName = pageTitle.replace(/[^a-z0-9]/gi, '-');
-    const pdfButton = createEl('a', { class: 'pdf-button button', title: ' Convert to PDF', 'data-analytics-download-fileName': `${pageName}.tekpdf` }, pDownloadPressRelease, share);
+    const pdfButton = createEl('a', { class: 'pdf-button button', title: ' Convert to PDF', 'data-analytics-download-fileName': `${pageName}` }, pDownloadPressRelease, share);
     annotateElWithAnalyticsTracking(
       pdfButton,
       pdfButton.textContent,
@@ -166,7 +166,7 @@ export default async function decorate(block) {
         referrerpolicy: 'no-referrer',
       });
       if (window.html2pdf) {
-        await generatePDF(pageTitle);
+        await generatePDF(pageName);
       }
     });
   }
