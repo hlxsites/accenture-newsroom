@@ -67,6 +67,26 @@ function getTagTitle(tagName, placeholders, defaultValue) {
   return tagTitle;
 }
 
+function getPrefixForTags(siteName, category) {
+  const siteNamePrefixMapping = {
+    us: '',
+    uk: '/english-uk',
+    de: '/de',
+    fr: '/fr',
+    it: '/it',
+    es: '/es',
+    sg: '/asia-pacific',
+    pt: '/pt',
+    jp: '/jp',
+    br: '/br',
+  };
+  let categoryMapping = category;
+  if (siteName === 'fr') {
+    categoryMapping = category === 'industries' ? 'secteurs-dactivit' : 'sujet';
+  }
+  return `${siteNamePrefixMapping[siteName] || ''}/${categoryMapping}`;
+}
+
 export default async function decorate(block) {
   block.innerText = '';
   const pageUrl = window.location.href;
@@ -180,17 +200,13 @@ export default async function decorate(block) {
   const industryEl = industryTagValues ? createEl('div', { class: 'industry' }, `<h4>${pIndustryTags}</h4>`) : null;
   const subjectEl = subjectTagValues ? createEl('div', { class: 'subject' }, `<h4>${pSubjectTags}</h4>`) : null;
   const siteName = getSiteFromHostName(window.location.hostname);
-  let sitePrefix = '';
-  if (siteName === 'us') {
-    sitePrefix = '';
-  } else {
-    sitePrefix = `/${siteName}`;
-  }
+  const industriesPrefix = getPrefixForTags(siteName, 'industries');
+  const subjectsPrefix = getPrefixForTags(siteName, 'subjects');
 
   const industryUl = industryEl ? createEl('ul', {}, '', industryEl) : null;
   industryTagValues.split(',').forEach((industryTag) => {
     const cleanedUpValue = sanitizeName(industryTag);
-    const link = createEl('a', { href: `${sitePrefix}/industries/${cleanedUpValue}` }, getTagTitle(cleanedUpValue, placeholders, industryTag.trim()));
+    const link = createEl('a', { href: `${industriesPrefix}/${cleanedUpValue}` }, getTagTitle(cleanedUpValue, placeholders, industryTag.trim()));
     annotateElWithAnalyticsTracking(
       link,
       link.textContent,
@@ -204,7 +220,7 @@ export default async function decorate(block) {
   const subjectUl = subjectEl ? createEl('ul', {}, '', subjectEl) : null;
   subjectTagValues.split(',').forEach((subjectTag) => {
     const cleanedUpValue = sanitizeName(subjectTag);
-    const link = createEl('a', { href: `${sitePrefix}/subjects/${cleanedUpValue}` }, getTagTitle(cleanedUpValue, placeholders, subjectTag.trim()));
+    const link = createEl('a', { href: `${subjectsPrefix}/${cleanedUpValue}` }, getTagTitle(cleanedUpValue, placeholders, subjectTag.trim()));
     annotateElWithAnalyticsTracking(
       link,
       link.textContent,
