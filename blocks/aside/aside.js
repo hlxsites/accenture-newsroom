@@ -84,6 +84,9 @@ function getPrefixForTags(siteName, category) {
   if (siteName === 'fr') {
     categoryMapping = category === 'industries' ? 'secteurs-dactivit' : 'sujet';
   }
+  if (siteName === 'it') {
+    categoryMapping = category === 'subjects' ? 'argomento' : 'industries';
+  }
   return `${siteNamePrefixMapping[siteName] || ''}/${categoryMapping}`;
 }
 
