@@ -12,6 +12,14 @@ function getCookie(name) {
   return '';
 }
 
+function isProd() {
+  const { host } = window.location;
+  if (host.startsWith('newsroom.accenture')) {
+    return true;
+  }
+  return false;
+}
+
 function addOneTrustCookieButton(text) {
   const OPTANON_BUTTON_ID = 'optanon-minimize-button';
   if (!document.getElementById(OPTANON_BUTTON_ID)) {
@@ -68,7 +76,11 @@ function addCookieOneTrust() {
   cookieScript.src = ONETRUST_SDK;
   cookieScript.type = 'text/javascript';
   cookieScript.charset = 'UTF-8';
-  cookieScript.setAttribute('data-domain-script', 'b6b6947b-e233-46b5-9b4e-ccc2cd860869');
+  if (isProd()) {
+    cookieScript.setAttribute('data-domain-script', 'b6b6947b-e233-46b5-9b4e-ccc2cd860869');
+  } else {
+    cookieScript.setAttribute('data-domain-script', 'b6b6947b-e233-46b5-9b4e-ccc2cd860869-test');
+  }
   document.head.appendChild(cookieScript);
   attachOneTrustCookieListeners();
 }
@@ -77,7 +89,11 @@ async function addMartechStack() {
   // load jquery
   await loadScript('/scripts/jquery-3.5.1.min.js', { async: 'false' });
   // Add Adobe Analytics
-  await loadScript('https://assets.adobedtm.com/55621ea95d50/e22056dd1d90/launch-EN379c80f941604b408953a2df1776d1c6-staging.min.js');
+  if (isProd()) {
+    await loadScript('https://assets.adobedtm.com/55621ea95d50/e22056dd1d90/launch-EN379c80f941604b408953a2df1776d1c6.min.js');
+  } else {
+    await loadScript('https://assets.adobedtm.com/55621ea95d50/e22056dd1d90/launch-EN379c80f941604b408953a2df1776d1c6-staging.min.js');
+  }
 }
 
 function getPageInstanceId(template, path, countryLanguage = '') {
