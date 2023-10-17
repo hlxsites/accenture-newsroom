@@ -90,7 +90,7 @@ async function addMartechStack() {
   await loadScript('/scripts/jquery-3.5.1.min.js', { async: 'false' });
   // Add Adobe Analytics
   if (isProd()) {
-    await loadScript('https://assets.adobedtm.com/55621ea95d50/e22056dd1d90/launch-EN379c80f941604b408953a2df1776d1c6.min.js');
+    await loadScript('https://assets.adobedtm.com/55621ea95d50/e22056dd1d90/launch-EN664f8f34ad5946f8a0f7914005f717cf.min.js');
   } else {
     await loadScript('https://assets.adobedtm.com/55621ea95d50/e22056dd1d90/launch-EN379c80f941604b408953a2df1776d1c6-staging.min.js');
   }
