@@ -508,25 +508,18 @@ function annotateArticleSections() {
   if (template !== 'Article') {
     return;
   }
-  const articleSections = document.querySelectorAll('main > .section');
-
-  // eslint-disable-next-line no-restricted-syntax
-  for (const section of articleSections) {
-    const sectionText = section.innerText;
-    const isAbstract = ABSTRACT_REGEX.test(sectionText);
-    if (isAbstract) {
-      section.classList.add('abstract');
-      const h1 = section.querySelector('h1');
-      if (h1) {
-        const date = h1.previousSibling;
-        if (date) {
-          date.classList.add('date');
-        }
-      }
-      break;
+  // add abstract and date classes
+  const abstractSection = document.querySelector('main > .section:not(.hero-container)');
+  abstractSection.classList.add('abstract');
+  const h1 = abstractSection.querySelector('h1');
+  if (h1) {
+    const date = h1.previousSibling;
+    if (date) {
+      date.classList.add('date');
     }
   }
   // annotate links
+  const articleSections = document.querySelectorAll('main > .section');
   const excludeSections = ['hero-container', 'aside-container'];
   articleSections.forEach((section) => {
     const sectionClassList = Array.from(section.classList);
