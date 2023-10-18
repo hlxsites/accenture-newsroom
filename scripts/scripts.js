@@ -3,6 +3,7 @@ import {
   ANALYTICS_TEMPLATE_ZONE_BODY,
   ANALYTICS_MODULE_SEARCH_PAGINATION,
   ANALYTICS_MODULE_CONTENT,
+  ANALYTICS_MODULE_FACT,
   ANALYTICS_LINK_TYPE_CONTENT_MODULE,
   ANALYTICS_MODULE_YEAR_FILTER,
   ANALYTICS_LINK_TYPE_FILTER,
@@ -532,15 +533,27 @@ function annotateArticleSections() {
     if (sectionClassList.some((c) => excludeSections.includes(c))) {
       return;
     }
-    section.querySelectorAll('a').forEach((link) => {
-      annotateElWithAnalyticsTracking(
-        link,
-        link.innerText,
-        ANALYTICS_MODULE_CONTENT,
-        ANALYTICS_TEMPLATE_ZONE_BODY,
-        ANALYTICS_LINK_TYPE_CONTENT_MODULE,
-      );
-    });
+    if (window.location.pathname.startsWith('/help-faq')) {
+      section.querySelectorAll('a').forEach((link) => {
+        annotateElWithAnalyticsTracking(
+          link,
+          link.innerText,
+          ANALYTICS_MODULE_FACT,
+          ANALYTICS_TEMPLATE_ZONE_BODY,
+          ANALYTICS_LINK_TYPE_CONTENT_MODULE,
+        );
+      });
+    } else {
+      section.querySelectorAll('a').forEach((link) => {
+        annotateElWithAnalyticsTracking(
+          link,
+          link.innerText,
+          ANALYTICS_MODULE_CONTENT,
+          ANALYTICS_TEMPLATE_ZONE_BODY,
+          ANALYTICS_LINK_TYPE_CONTENT_MODULE,
+        );
+      });
+    }
   });
 }
 
