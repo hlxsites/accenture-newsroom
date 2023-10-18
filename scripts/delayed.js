@@ -2,6 +2,7 @@
 import { sampleRUM, loadScript, getMetadata } from './lib-franklin.js';
 // eslint-disable-next-line import/no-cycle
 import { getCountry, getLanguage } from './scripts.js';
+import { ANALYTICS_LINK_TYPE_CTA, ANALYTICS_TEMPLATE_ZONE_CONSENT_MANAGER } from './constants.js';
 
 const ONETRUST_SDK = 'https://cdn.cookielaw.org/scripttemplates/otSDKStub.js';
 
@@ -42,6 +43,27 @@ function addOneTrustCookieButton(text) {
   }
 }
 
+function addOneTrustDataAttrs() {
+  const oneTrustSDK = document.querySelector('div#onetrust-consent-sdk');
+  if (oneTrustSDK) {
+    const buttons = oneTrustSDK.querySelectorAll('button');
+    const tabs = oneTrustSDK.querySelectorAll('ul.ot-cat-grp li');
+    buttons.forEach((button) => {
+      button.setAttribute('data-analytics-link-name', button.textContent || '');
+      button.setAttribute('data-analytics-link-type', ANALYTICS_LINK_TYPE_CTA);
+      button.setAttribute('data-analytics-module-name', ANALYTICS_TEMPLATE_ZONE_CONSENT_MANAGER);
+      button.setAttribute('data-analytics-template-zone', ANALYTICS_TEMPLATE_ZONE_CONSENT_MANAGER);
+    });
+    tabs.forEach((tab) => {
+      const linkName = tab.querySelector('h3')?.textContent || '';
+      tab.setAttribute('data-analytics-link-name', linkName);
+      tab.setAttribute('data-analytics-link-type', ANALYTICS_LINK_TYPE_CTA);
+      tab.setAttribute('data-analytics-module-name', ANALYTICS_TEMPLATE_ZONE_CONSENT_MANAGER);
+      tab.setAttribute('data-analytics-template-zone', ANALYTICS_TEMPLATE_ZONE_CONSENT_MANAGER);
+    });
+  }
+}
+
 function attachOneTrustCookieListeners() {
   const minimizeBanner = getCookie('OptanonAlertBoxClosed');
   let localStorageName = ONETRUST_SDK;
@@ -71,18 +93,23 @@ function attachOneTrustCookieListeners() {
   }
 }
 
-function addCookieOneTrust() {
-  const cookieScript = document.createElement('script');
-  cookieScript.src = ONETRUST_SDK;
-  cookieScript.type = 'text/javascript';
-  cookieScript.charset = 'UTF-8';
+async function addCookieOneTrust() {
+  let otId;
   if (isProd()) {
-    cookieScript.setAttribute('data-domain-script', 'b6b6947b-e233-46b5-9b4e-ccc2cd860869');
+    otId = 'b6b6947b-e233-46b5-9b4e-ccc2cd860869';
   } else {
-    cookieScript.setAttribute('data-domain-script', 'b6b6947b-e233-46b5-9b4e-ccc2cd860869-test');
+    otId = 'b6b6947b-e233-46b5-9b4e-ccc2cd860869-test';
   }
-  document.head.appendChild(cookieScript);
+
+  await loadScript(ONETRUST_SDK, {
+    type: 'text/javascript',
+    charset: 'UTF-8',
+    'data-domain-script': `${otId}`,
+  });
   attachOneTrustCookieListeners();
+  window.OptanonWrapper = () => {
+    addOneTrustDataAttrs();
+  };
 }
 
 async function addMartechStack() {
