@@ -45,7 +45,8 @@
     "*.accenture.com",
     "www.youtube.com",
     "www.youtube-nocookie.com/",
-    "*.demdex.net"
+    "*.demdex.net",
+    "blocks.glass"
   ],
   "style-src": [
     "'self'",
