@@ -34,6 +34,17 @@ function createVideoBlock(main, document) {
     const videoBlock = WebImporter.DOMUtils.createTable(videoCells, document);
     youtubeEmbed.replaceWith(videoBlock);
   });
+  // looking glass 3d rendering
+  const glassEmbeds = main.querySelectorAll('iframe[src*="blocks.glass"]');
+  glassEmbeds.forEach((glassEmbed) => {
+    const glassUrl = glassEmbed.src;
+    const blockCells = [
+      ['Embed'],
+      [glassUrl],
+    ];
+    const embedBlock = WebImporter.DOMUtils.createTable(blockCells, document);
+    glassEmbed.replaceWith(embedBlock);
+  });
 }
 
 const createMetadataBlock = (main, document, url) => {
@@ -253,6 +264,23 @@ export default {
     const footer = main.querySelector('#block-footer');
     if (footer) footer.remove();
 
+    // Handle Tables from the source content
+    const tables = main.querySelectorAll('table');
+    if (tables && tables.length > 0) {
+      tables.forEach((table) => {
+        const videoRegex = /.*https:\/\/play.vidyard.com.*|.*youtube.*|.*blocks.glass.*/;
+        const isVideo = videoRegex.test(table.outerHTML);
+        if (isVideo) return;
+        const cells = [
+          ['Table'],
+          [table.outerHTML],
+        ];
+        const newTable = WebImporter.DOMUtils.createTable(cells, document);
+        table.after(newTable);
+        table.remove();
+      });
+    }
+
     // Get right nav
     const rightNav = main.querySelector('#tek-wrap-rightrail');
 
@@ -319,23 +347,6 @@ export default {
     if (authors && authors.length > 0) {
       authors.forEach((author) => {
         main.append(author);
-      });
-    }
-
-    // Handle Tables from the source content
-    const tables = main.querySelectorAll('table');
-    if (tables && tables.length > 0) {
-      tables.forEach((table) => {
-        const videoRegex = /.*https:\/\/play.vidyard.com.*|.*youtube.*/;
-        const isVideo = videoRegex.test(table.outerHTML);
-        if (isVideo) return;
-        const cells = [
-          ['Table'],
-          [table.outerHTML],
-        ];
-        const newTable = WebImporter.DOMUtils.createTable(cells, document);
-        table.after(newTable);
-        table.remove();
       });
     }
 
