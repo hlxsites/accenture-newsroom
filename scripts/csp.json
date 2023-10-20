@@ -13,7 +13,8 @@
       "www.youtube.com",
       "dpm.demdex.net",
       "cdnjs.cloudflare.com",
-      "play.vidyard.com"
+      "play.vidyard.com",
+      "api.demandbase.com"
   ],
   "connect-src": [
       "'self'",

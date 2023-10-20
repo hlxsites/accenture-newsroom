@@ -121,6 +121,8 @@ async function addMartechStack() {
   } else {
     await loadScript('https://assets.adobedtm.com/55621ea95d50/e22056dd1d90/launch-EN379c80f941604b408953a2df1776d1c6-staging.min.js');
   }
+  // Add Demandbase tag
+  loadScript('//api.demandbase.com/api/v2/ip.json?key=126cd7070cfc0c3ab3e70e653cde6887&callback=Dmdbase_CDC.callback', { async: 'true' });
 }
 
 function getPageInstanceId(template, path, countryLanguage = '') {
