@@ -103,6 +103,7 @@
 
   .hero.block h1 {
     font-size: 58px;
+    padding: 25px 0 10px;
   }
 
   .hero.block h2 {
@@ -113,10 +114,6 @@
   .hero.block .hero-link-container {
     gap: 6em;
   }
-  .hero.block h1 {
-    padding: 25px 0 10px;
-  }
-
 }
 
 @media (min-width: 900px) {
