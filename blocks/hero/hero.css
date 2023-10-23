@@ -18,12 +18,11 @@
   font-weight: 900;
   line-height: 1;
   color: #000;
-  margin: 0 10px;
+  margin: 8px 0 10px;
   padding: 0 0 10px;
 }
 
 .hero.block h2 {
-  width: 50%;
   font-family: var(--graphik-semibold);
   font-size: 22px;
   font-weight: bold;
@@ -114,6 +113,10 @@
   .hero.block .hero-link-container {
     gap: 6em;
   }
+  .hero.block h1 {
+    padding: 25px 0 10px;
+  }
+
 }
 
 @media (min-width: 900px) {
