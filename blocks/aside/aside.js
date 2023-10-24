@@ -41,7 +41,11 @@ async function generatePDF(pageName) {
     jsPDF: { unit: 'pt', format: 'letter', orientation: 'portrait' },
     pagebreak: { mode: ['avoid-all', 'css', 'legacy'] },
   };
-  html2pdf().set(opt).from(main).save();
+  html2pdf().set(opt).from(main).toPdf()
+    .get('pdf')
+    .then((pdf) => {
+      window.open(pdf.output('bloburl'), '_blank');
+    });
 }
 
 /**
