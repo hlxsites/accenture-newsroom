@@ -35,7 +35,6 @@ const LCP_BLOCKS = []; // add your LCP blocks to the list
 export const ABSTRACT_REGEX = /(.*?);.*?(\d{4})|(.*?)(\d{4})\s+–\s+\b|(.*?)(\d{4})\s+-\s+\b/;
 
 export const isMobile = () => window.innerWidth < 600;
-export const isDesktop = () => window.innerWidth >= 900;
 
 export function getSiteFromHostName(hostname = window.location.hostname) {
   const allowedSites = ['uk', 'de', 'fr', 'it', 'es', 'sg', 'pt', 'jp', 'br'];
@@ -762,28 +761,6 @@ const preflightListener = async () => {
 };
 
 /**
- * set the height of the last section to completely show the aside
- */
-function handleAsideSectionHeight() {
-  const excludeSections = ['hero-container', 'aside-container'];
-  const aside = document.querySelector('.aside-container');
-  const asideHeight = aside ? aside.offsetHeight : 0;
-  let totalSectionHeght = 0;
-  const sections = document.querySelectorAll('main .section');
-  sections.forEach((section) => {
-    const sectionClass = section.className.replace('section ', '').trim();
-    if (!excludeSections.includes(sectionClass)) {
-      totalSectionHeght += section.offsetHeight;
-    }
-  });
-  if (totalSectionHeght < asideHeight) {
-    const lastSection = sections[sections.length - 2];
-    const minHeight = asideHeight - totalSectionHeght + lastSection.offsetHeight;
-    lastSection.style.minHeight = `${minHeight}px`;
-  }
-}
-
-/**
  * Loads everything that doesn't need to be delayed.
  * @param {Element} doc The container element
  */
@@ -791,9 +768,6 @@ async function loadLazy(doc) {
   await setCSP();
   const main = doc.querySelector('main');
   await loadBlocks(main);
-  if (isDesktop()) {
-    handleAsideSectionHeight();
-  }
 
   const { hash } = window.location;
   const element = hash ? doc.getElementById(hash.substring(1)) : false;
