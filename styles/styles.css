@@ -338,6 +338,9 @@ body.article main .section .article-end-divider {
 
   body.article main {
     max-width: 1200px;
+
+    /* height of aside 450px and hero container height 160px, so setting the min height to 610px */
+    min-height: 610px;
     margin: auto;
     position: relative;
   }
