@@ -202,6 +202,20 @@ const findNextBrOrpNode = (node) => {
   if (node.parentElement.nodeName === 'SPAN' && node.parentElement.parentElement.nodeName === 'P') currentNode = node.parentElement.parentElement;
   if (node.parentElement.nodeName === 'I' && node.parentElement.parentElement.nodeName === 'DIV') currentNode = node.parentElement.parentElement.nextSibling;
 
+  // if the currentNode is text node, find the next sibling that's not text node
+  // If not found, set the currentNode to parent's next sibling
+  while (currentNode && (currentNode.nodeType === Node.TEXT_NODE || currentNode.nodeName === 'A' || currentNode.nodeName === 'SPAN')) {
+    currentNode = currentNode.nextSibling;
+  }
+
+  if (currentNode === null && node.parentElement.nodeName === 'DIV') {
+    return node.parentElement;
+  }
+
+  if (currentNode === null && node.parentElement.parentElement.nodeName === 'DIV') {
+    return node.parentElement.parentElement;
+  }
+
   // Check siblings first
   while (currentNode !== null) {
     if (currentNode.nodeName === 'BR' || currentNode.nodeName === 'P') {
