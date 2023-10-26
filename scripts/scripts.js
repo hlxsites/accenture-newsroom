@@ -503,6 +503,17 @@ const centerArticleDivider = (main) => {
   });
 };
 
+const pdfLinkHandler = (link) => {
+  const href = link.getAttribute('href');
+  if (!href) {
+    return;
+  }
+  if (!href.includes('.pdf')) {
+    return;
+  }
+  link.setAttribute('target', '_blank');
+};
+
 function annotateArticleSections() {
   const template = getMetadata('template');
   if (template !== 'Article') {
@@ -535,6 +546,7 @@ function annotateArticleSections() {
           ANALYTICS_TEMPLATE_ZONE_BODY,
           ANALYTICS_LINK_TYPE_CONTENT_MODULE,
         );
+        pdfLinkHandler(link);
       });
     } else {
       section.querySelectorAll('a').forEach((link) => {
@@ -545,6 +557,7 @@ function annotateArticleSections() {
           ANALYTICS_TEMPLATE_ZONE_BODY,
           ANALYTICS_LINK_TYPE_CONTENT_MODULE,
         );
+        pdfLinkHandler(link);
       });
     }
   });
