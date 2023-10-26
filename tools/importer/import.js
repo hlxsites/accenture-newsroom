@@ -188,6 +188,11 @@ const collectTextNodes = (node, list) => {
 };
 
 const findNextBrOrpNode = (node) => {
+  // if the node's parent is div or p, just reutn the parent
+  if (node.parentElement.nodeName === 'P' || node.parentElement.nodeName === 'DIV') {
+    return node.parentElement;
+  }
+
   let currentNode = node.parentElement.nextSibling;
   if (node.parentElement.nodeName === 'DIV') currentNode = node.nextSibling;
   if (node.parentElement.nodeName === 'H1') currentNode = node.parentElement.parentElement;
