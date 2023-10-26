@@ -9,7 +9,6 @@ import {
   getPlaceholder,
   getCountry,
   getDateLocales,
-  isMobile,
 } from '../../scripts/scripts.js';
 import {
   ANALYTICS_MODULE_SEARCH,
@@ -220,7 +219,7 @@ function filterByYear(article, year) {
 }
 
 function addEventListenerToFilterForm(block) {
-  if (!isMobile()) {
+  if (window.innerWidth > 768) {
     return;
   }
   const filterForm = block.querySelector('#filter-form');
