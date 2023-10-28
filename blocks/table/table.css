@@ -1,0 +1,90 @@
+.table {
+  width: 100%;
+  overflow-x: auto;
+}
+
+.table table {
+  width: 100%;
+  max-width: 100%;
+  border-collapse: collapse;
+}
+
+.table table thead tr {
+  border-top: 1px solid;
+  border-bottom: 1px solid;
+}
+
+.table table tbody tr {
+  border-bottom: 1px solid;
+}
+
+
+.table table th, .table table td {
+  padding: 8px 16px;
+  text-align: left;
+}
+
+.table a.button {
+  font-family: var(--body-font-family);
+  text-transform: none;
+  font-size: var(--body-font-size-xs);
+  font-weight: 600;
+}
+
+.table p {
+  margin: 0;
+}
+
+.table-wrapper+.table-wrapper {
+  margin-top: 10px;
+}
+
+/* striped variant */
+.table.striped tbody tr:nth-child(odd) {
+  background-color: var(--overlay-background-color);
+}
+
+/* bordered variant */
+.table.bordered table th, .table.bordered table td {
+  border: 1px solid;
+}
+
+/* noborder variant */
+.table.nobordered table th, .table.nobordered table td, .table.nobordered table tbody tr {
+  border: none;
+}
+
+/* industry variant */
+.table.industry {
+  font-family: Arial, sans-serif;
+  font-size: 12px;
+  line-height: 9.2pt;
+}
+
+.table.industry th, .table.industry td {
+  vertical-align: baseline;
+  padding: 3px;
+}
+
+.table.industry td {
+  line-height: 1.6rem;
+}
+
+.table.industry td p {
+  line-height: 9.2pt;
+  min-height: 13px;
+}
+
+.table.industry tbody tr:nth-child(even) p {
+  min-height: 69px;
+  color: #333;
+}
+
+.table.industry thead tr, .table.industry tbody tr {
+  border: none;
+  border-bottom: #e8e8e8 1pt solid;
+}
+
+.table.industry tbody tr:nth-child(odd) {
+  background-color: var(--overlay-background-color);
+}
