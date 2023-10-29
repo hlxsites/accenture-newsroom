@@ -51,8 +51,8 @@
   border: 1px solid;
 }
 
-/* noborder variant */
-.table.nobordered table th, .table.nobordered table td, .table.nobordered table tbody tr {
+/* nobordered variant */
+.table.nobordered table th, .table.nobordered table td, .table.nobordered table thead tr, .table.nobordered table tbody tr {
   border: none;
 }
 
