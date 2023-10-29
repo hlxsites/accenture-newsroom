@@ -5,6 +5,7 @@
  */
 
 const VARIANT_INDUSTRY = 'industry';
+const VARIANT_REVENUE = 'revenue';
 
 function buildCell(rowIndex) {
   const cell = rowIndex ? document.createElement('td') : document.createElement('th');
@@ -35,6 +36,17 @@ export default async function decorate(block) {
   if (block.classList.contains(VARIANT_INDUSTRY)) {
     table.querySelectorAll('tbody td').forEach((cell) => {
       cell.innerHTML = `<p>${cell.innerHTML}</p>`;
+    });
+  }
+  if (block.classList.contains(VARIANT_REVENUE)) {
+    table.querySelectorAll('tr').forEach((row) => {
+      if (row.children.length === 1) {
+        row.children[0].setAttribute('colspan', 4);
+        const cell = row.children[0];
+        if (cell.textContent === '') {
+          row.classList.add('empty');
+        }
+      }
     });
   }
 }
