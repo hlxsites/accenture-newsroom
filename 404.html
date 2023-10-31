@@ -58,6 +58,13 @@
       const pYear = getPlaceholder('year', placeholders);
       const pMessage = getPlaceholder('pageNotFoundMessage', placeholders);
       const pReturnButtonText = getPlaceholder('returnButtonText', placeholders);
+      const pFilterNews = getPlaceholder('filterNews', placeholders);
+      const pDateRange = getPlaceholder('dateRange', placeholders);
+      const label = document.querySelector('#filter-form label');
+      label.prepend(pFilterNews);
+      const filterInput = document.querySelector('#newslist-filter-input');
+      filterInput.placeholder = pDateRange;
+      filterInput.title = pDateRange;
       const filterYear = await createFilterYear(years, pYear, '/');
       filterForm.appendChild(filterYear);
       const message = `<p>${pMessage}</p>`;
@@ -74,9 +81,6 @@
   </script>
   <link rel="stylesheet" href="/styles/styles.css">
   <style>
-    main.error {
-    }
-
     main.error #filter-form {
       border: 0.5px solid #ccc;
       margin-bottom: 10px;
@@ -90,8 +94,9 @@
       margin-bottom: 5px;
       font-size: 18px;
       font-weight: 700;
-      line-height: 50px;
+      line-height: 24px;
       text-transform: uppercase;
+      text-align: right;
       color: #000;
       width: auto;
     }
@@ -147,10 +152,10 @@
   <main class="error">
     <div class="section content">
       <form action="/" method="get" id="filter-form" data-year="2005">
-        <label for="newslist-filter-input">Filter News
+        <label for="newslist-filter-input">
           <span class="newslist-filter-arrow"></span>
         </label>
-        <input type="text" id="newslist-filter-input" title="Date Range" name="date" value="DATE RANGE" size="40" maxlength="60" disabled>
+        <input type="text" id="newslist-filter-input" name="date" size="40" maxlength="60" disabled>
         <input type="submit" value="" disabled>
       </form>
       <p class="button-container">
