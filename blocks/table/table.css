@@ -51,6 +51,9 @@
   border: 1px solid;
   vertical-align: baseline;
 }
+.table.bordered table tr th[colspan] {
+  text-align: center;
+}
 
 /* nobordered variant */
 .table.nobordered table th, .table.nobordered table td, .table.nobordered table thead tr, .table.nobordered table tbody tr {
