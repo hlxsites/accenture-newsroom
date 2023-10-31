@@ -6,11 +6,20 @@
 
 const VARIANT_INDUSTRY = 'industry';
 const VARIANT_REVENUE = 'revenue';
+const VARIANT_BORDERED = 'bordered';
 
 function buildCell(rowIndex) {
   const cell = rowIndex ? document.createElement('td') : document.createElement('th');
   if (!rowIndex) cell.setAttribute('scope', 'col');
   return cell;
+}
+
+function getColumnCount(table) {
+  let columns = 0;
+  table.querySelectorAll('tr').forEach((row) => {
+    if (row.children.length > columns) columns = row.children.length;
+  });
+  return columns;
 }
 
 export default async function decorate(block) {
@@ -33,15 +42,16 @@ export default async function decorate(block) {
     block.innerHTML = '';
     block.append(table);
   }
+  const columns = getColumnCount(table);
   if (block.classList.contains(VARIANT_INDUSTRY)) {
     table.querySelectorAll('tbody td').forEach((cell) => {
       cell.innerHTML = `<p>${cell.innerHTML}</p>`;
     });
   }
-  if (block.classList.contains(VARIANT_REVENUE)) {
+  if (block.classList.contains(VARIANT_REVENUE) || block.classList.contains(VARIANT_BORDERED)) {
     table.querySelectorAll('tr').forEach((row) => {
       if (row.children.length === 1) {
-        row.children[0].setAttribute('colspan', 4);
+        row.children[0].setAttribute('colspan', columns);
         const cell = row.children[0];
         if (cell.textContent === '') {
           row.classList.add('empty');

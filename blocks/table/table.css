@@ -38,7 +38,7 @@
 }
 
 .table-wrapper+.table-wrapper {
-  margin-top: 10px;
+  margin-top: 40px;
 }
 
 /* striped variant */
@@ -49,6 +49,7 @@
 /* bordered variant */
 .table.bordered table th, .table.bordered table td {
   border: 1px solid;
+  vertical-align: baseline;
 }
 
 /* nobordered variant */
