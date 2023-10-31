@@ -417,6 +417,7 @@ async function addPrevNextLinksToArticles() {
         nextArticle = window.articles[currentArticleIndex - 1];
         const a = await window.ffetchIterator.next();
         if (!a.done) {
+          window.articles.push(a.value);
           prevArticle = a.value;
         } else {
           prevArticle = '';
@@ -424,6 +425,15 @@ async function addPrevNextLinksToArticles() {
         break;
       }
     }
+  } else if (currentArticleIndex === queryIndex.length - 1) {
+    const a = await window.ffetchIterator.next();
+    if (!a.done) {
+      window.articles.push(a.value);
+      prevArticle = a.value;
+    } else {
+      prevArticle = '';
+    }
+    nextArticle = queryIndex[currentArticleIndex - 1];
   } else {
     prevArticle = queryIndex[currentArticleIndex + 1];
     nextArticle = queryIndex[currentArticleIndex - 1];

@@ -232,7 +232,7 @@ button.secondary {
   color: var(--secondary-link-color);
 }
 
-body.article p.button-container a.primary {
+body.article p.button-container strong a.primary {
   display: inline-block;
   color: #fff;
   background-color: #000;
@@ -252,14 +252,14 @@ body.article p.button-container a.primary {
   background-repeat: repeat-x;
 }
 
-body.article p.button-container a.primary:hover,
-body.article p.button-container a.primary:focus {
+body.article p.button-container strong a.primary:hover,
+body.article p.button-container strong a.primary:focus {
     background-color: #4a4a4a;
     color: #fff;
     background-position: 0 -15px;
 }
 
-body.article p.button-container a.primary:active {
+body.article p.button-container strong a.primary:active {
     outline: 0;
     background-image: none;
     /* stylelint-disable-next-line property-no-vendor-prefix */
