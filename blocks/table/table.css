@@ -51,6 +51,7 @@
   border: 1px solid;
   vertical-align: baseline;
 }
+
 .table.bordered table tr th[colspan] {
   text-align: center;
 }
