@@ -232,6 +232,16 @@ button.secondary {
   color: var(--secondary-link-color);
 }
 
+/* style mailto links as normal links rather than buttons */
+
+a.primary.button[href^="mailto"] {
+  color: var(--link-color);
+  font-family: var(--body-font-family);
+  text-transform: none;
+  font-size: var(--body-font-size-default);
+  font-weight: 100;
+}
+
 body.article p.button-container strong a.primary {
   display: inline-block;
   color: #fff;
