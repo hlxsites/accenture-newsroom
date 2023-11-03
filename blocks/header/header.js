@@ -245,7 +245,7 @@ export default async function decorate(block) {
   // hamburger for mobile
   const hamburger = document.createElement('div');
   hamburger.classList.add('nav-hamburger');
-  hamburger.innerHTML = `<button type="button" aria-controls="nav" aria-label="Open navigation"
+  hamburger.innerHTML = `<button type="button" aria-controls="header-topnav" aria-label="Open navigation"
       data-analytics-link-name="menu" data-analytics-module-name=${ANALYTICS_MODULE_TOP_NAV}
       data-analytics-template-zone="${ANALYTICS_TEMPLATE_ZONE_GLOBAL_HEADER}"
       data-analytics-link-type="${ANALYTICS_LINK_TYPE_NAV_PAGINATE}">

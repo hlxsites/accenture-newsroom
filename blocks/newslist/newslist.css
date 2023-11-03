@@ -14,7 +14,7 @@
   margin-bottom: 50px;
 }
 
-.newslist .newslist-container .newslist-item h4 {
+.newslist .newslist-container .newslist-item h3 {
   font-family: var(--graphik-semibold);
   font-size: 20px;
   font-weight: 600;
@@ -24,7 +24,7 @@
   line-height: 1.2;
 }
 
-.newslist .newslist-container .newslist-item h4 a {
+.newslist .newslist-container .newslist-item h3 a {
   font-family: var(--graphik-semibold);
   font-size: var(--body-font-size-s);
   font-weight: 600;
@@ -186,7 +186,7 @@
   align-self: flex-end;
 }
 
-.search-header-container .search-sub-header h3 {
+.newslist .search-header-container .search-sub-header h3 {
   font-family: var(--header-font-family-regular);
   font-size: var(--body-font-size-s);
   text-transform: uppercase;
@@ -551,7 +551,7 @@
     width: 370px;
   }
 
-  .newslist .newslist-container .newslist-item h4 a {
+  .newslist .newslist-container .newslist-item h3 a {
     font-size: 20px;
   }
   

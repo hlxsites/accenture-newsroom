@@ -584,9 +584,9 @@ export default async function decorate(block) {
       itemHtml = `
         <div class="newslist-item">
           <div class="newslist-item-title">
-            <h4>
+            <h3>
               <a href="${e.path}" title="${e.title}">${e.title}</a>
-            </h4>
+            </h3>
           </div>
           <div class="newslist-item-description">
             ${getDescription(e)}
