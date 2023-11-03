@@ -296,7 +296,6 @@
   font-weight: 700;
   line-height: 50px;
   text-transform: uppercase;
-  text-align: right;
   color: #000;
 }
 
@@ -385,6 +384,10 @@
     display: flex;
     flex-wrap: wrap;
     align-items: center;
+  }
+
+  .newslist .newslist-container .newslist-header-container label {
+    text-align: right;
   }
 
   body.category .newslist .newslist-container .newslist-header-container {
