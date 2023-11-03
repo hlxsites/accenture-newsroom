@@ -795,8 +795,6 @@ async function loadLazy(doc) {
   loadCSS(`${window.hlx.codeBasePath}/styles/lazy-styles.css`);
   loadFonts();
 
-  loadJQueryDateRangePicker();
-
   centerArticleDivider(main);
 
   // Add plugin listeners here
@@ -833,6 +831,7 @@ async function loadSemiDelayed() {
     document.dispatchEvent(event);
   }
   addPrevNextLinksToArticles();
+  loadJQueryDateRangePicker();
 }
 
 /**
