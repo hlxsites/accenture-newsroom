@@ -82,6 +82,15 @@
   display: none;
 }
 
+.home-hero.block .overlay-container a::after {
+  content: '';
+  display: inline-block;
+  height: 20px;
+  width: 40px;
+  line-height: 20px;
+  background: transparent url('/icons/arrow-icon.svg') no-repeat 0 -8px;
+}
+
 .home-hero.block .home-hero-content-container .overlay-container h2 a{
   color: #000;
 }
