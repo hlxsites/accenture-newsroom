@@ -357,8 +357,8 @@ body.article main .section.abstract p.date {
 }
 
 body.article main .section h1,
-body.article main .section h2,
-body.article main .section h3 {
+body.article main .section.abstract h2,
+body.article main .section.abstract h3 {
   text-align: center;
   font-family: var(--header-font-family-regular);
   font-weight: 700;
