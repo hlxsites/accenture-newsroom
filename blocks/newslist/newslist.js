@@ -490,7 +490,7 @@ export default async function decorate(block) {
           <span class="newslist-filter-arrow"></span>
         </label>
         <input type="text" id="newslist-filter-input" title="${pDateRange}" name="date" value="" size="40" placeholder="${pDateRange}" maxlength="60" disabled>
-        <input type="submit" value="" disabled>
+        <input type="submit" value="" aria-label="calendar" disabled>
       </form>
     `;
     newsListHeader.querySelector('#filter-form').append(filterYear);
@@ -525,7 +525,7 @@ export default async function decorate(block) {
           <span class="newslist-filter-arrow"></span>
         </label>
         <input type="text" id="newslist-filter-input" title="${pDateRange}" name="date" value="" placeholder="${pDateRange}" size="40" maxlength="60" disabled>
-        <input type="submit" value="" disabled>
+        <input type="submit" value="" aria-label="calendar" disabled>
       </form>
     `;
     const searchSubmitAction = newsListHeader.querySelector('#newslist-search-form input[type="submit"]');
