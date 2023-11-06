@@ -51,10 +51,10 @@
       });
     }
 
-    // Add home page "search functionality" link to the error message
+    // Add search page "search functionality" link to the error message
     const addLinkToErrorMessage = (sErrorMessage = '', sLinkText) => {
       const sRegex = new RegExp('{searchFunctionality}', 'gi');
-      const sReplacedText = sErrorMessage.replace(sRegex, `<a href="/">${sLinkText}</a>`);
+      const sReplacedText = sErrorMessage.replace(sRegex, `<a href="/search">${sLinkText}</a>`);
       return sReplacedText;
     };
 
