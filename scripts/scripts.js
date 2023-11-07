@@ -536,7 +536,12 @@ function annotateArticleSections() {
   if (h1) {
     const date = h1.previousSibling;
     if (date) {
-      date.classList.add('date');
+      const h1ParentElement = h1.parentNode;
+      const divDate = document.createElement('div');
+      divDate.innerHTML = date.innerHTML;
+      divDate.classList.add('date');
+      h1ParentElement.insertAdjacentHTML('afterbegin', divDate.outerHTML);
+      date.remove();
     }
   }
   // annotate links
