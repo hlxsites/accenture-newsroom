@@ -592,7 +592,10 @@ export default async function decorate(block) {
             ${getDescription(e)}
           </div>
           <div class="newslist-item-footer">
-            <a href="${e.path}" title="${pReadMore}">${pReadMore} <span class="read-more-arrow"></span></a>
+            <a href="${e.path}" title="${pReadMore}">${pReadMore}
+              <span class="read-more-arrow"></span>
+              <span class="sr-only"> Read more about ${e.title}</span>
+            </a>
             <div class="newslist-item-publisheddate">
               ${getHumanReadableDate(e.publisheddateinseconds * 1000)}
             </div>
