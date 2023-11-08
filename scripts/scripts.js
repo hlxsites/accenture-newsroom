@@ -514,7 +514,7 @@ const centerArticleDivider = (main) => {
 };
 
 const pdfLinkHandler = () => {
-  const sections = document.querySelectorAll('main > .section');
+  const sectionLinks = document.querySelectorAll('main > .section a');
 
   const addTargetAttribute = (link) => {
     const href = link.getAttribute('href');
@@ -527,10 +527,8 @@ const pdfLinkHandler = () => {
     link.setAttribute('target', '_blank');
   };
 
-  sections.forEach((oElem) => {
-    oElem.querySelectorAll('a').forEach((link) => {
-      addTargetAttribute(link);
-    });
+  sectionLinks.forEach((link) => {
+    addTargetAttribute(link);
   });
 };
 
