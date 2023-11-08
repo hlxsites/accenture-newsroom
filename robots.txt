@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://newsroom.accenture.com/sitemap.xml
