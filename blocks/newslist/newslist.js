@@ -319,6 +319,7 @@ function updatePagination(paginationContainer, totalResults, pageOffset) {
     const prev = document.createElement('a');
     if (pageOffset === 1) {
       prev.setAttribute('aria-disabled', 'true');
+      prev.setAttribute('href', '#');
     } else {
       prev.setAttribute('href', addParam('page', pageOffset - 1));
     }
@@ -329,6 +330,7 @@ function updatePagination(paginationContainer, totalResults, pageOffset) {
     const next = document.createElement('a');
     if (pageOffset === totalPages) {
       next.setAttribute('aria-disabled', 'true');
+      next.setAttribute('href', '#');
     } else {
       next.setAttribute('href', addParam('page', pageOffset + 1));
     }
