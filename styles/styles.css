@@ -414,10 +414,11 @@ body.article main picture+em {
   text-align: center;
 }
 
-body.article main .section.abstract h5 em{
+body.article main .section.abstract h5 em ~ h5 {
   font-size: var(--body-font-size-default);
   font-family: var(--body-font-family);
   font-weight: 400;
+  line-height: 25.6px;
 }
 
 body.article main .section .article-end-divider {
