@@ -56,7 +56,7 @@ function getHumanReadableDate(dateString) {
  * @param {*} element
  */
 function cleanDescription(element) {
-  const elementsToRemove = ['h1', 'h2', 'h3', 'h6', 'ul'];
+  const elementsToRemove = ['h1', 'h2', 'h3', 'h5', 'h6', 'ul'];
   elementsToRemove.forEach((e) => {
     const el = element.querySelector(e);
     if (el) {

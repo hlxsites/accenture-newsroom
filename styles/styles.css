@@ -414,6 +414,12 @@ body.article main picture+em {
   text-align: center;
 }
 
+body.article main .section.abstract h5 em{
+  font-size: var(--body-font-size-default);
+  font-family: var(--body-font-family);
+  font-weight: 400;
+}
+
 body.article main .section .article-end-divider {
   display: inline-block;
   width: 100%;
