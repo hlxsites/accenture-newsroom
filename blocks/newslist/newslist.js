@@ -74,6 +74,11 @@ function cleanDescription(element) {
  * @returns
  */
 function getDescription(queryIndexEntry) {
+  if (queryIndexEntry.abstract) {
+    const wrapper = document.createElement('div');
+    wrapper.innerHTML = queryIndexEntry.abstract;
+    return wrapper.innerHTML;
+  }
   const { longdescriptionextracted } = queryIndexEntry;
   const div = document.createElement('div');
   div.innerHTML = longdescriptionextracted;
