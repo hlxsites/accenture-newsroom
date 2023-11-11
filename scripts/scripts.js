@@ -32,7 +32,7 @@ import {
 const LCP_BLOCKS = []; // add your LCP blocks to the list
 
 // regex to find abstract paragraph
-export const ABSTRACT_REGEX = /(.*?);.*?(\d{4})|(.*?)(\d{4})\s+–\s+|(.*?)(\d{4})\s+-\s+/;
+export const ABSTRACT_REGEX = /(.*?);.*?(\d{4})|(.*?)(\d{4})\s+(–|-|‒)\s+/;
 
 export const isMobile = () => window.innerWidth < 600;
 
