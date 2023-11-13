@@ -1,3 +1,13 @@
+function sanitizeName(name) {
+  if (!name) {
+    return '';
+  }
+
+  const decodedText = decodeURIComponent(name.trim()).toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+  const sanitizedText = decodedText.split(',').map((text) => text.trim().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '')).join(', ');
+  return sanitizedText.trim();
+}
+
 function renderItems(cat, catId, taxonomy) {
   let html = '';
   const items = taxonomy.map((item) => item[cat]);
@@ -52,6 +62,9 @@ function toggleTag(target) {
   target.classList.toggle('selected');
   // eslint-disable-next-line no-use-before-define
   displaySelected();
+  const selEl = document.getElementById('selected');
+  const copyButton = selEl.querySelector('button.copy');
+  copyButton.disabled = false;
 }
 
 function displaySelected() {
@@ -92,7 +105,8 @@ async function init() {
   const copyButton = selEl.querySelector('button.copy');
   copyButton.addEventListener('click', () => {
     const copyText = document.getElementById('copybuffer');
-    navigator.clipboard.writeText(copyText.value);
+    const sanitizedText = sanitizeName(copyText.value);
+    navigator.clipboard.writeText(sanitizedText);
 
     copyButton.disabled = true;
   });
