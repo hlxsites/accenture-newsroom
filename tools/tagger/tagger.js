@@ -21,15 +21,16 @@ function getPlaceholder(key, placeholders) {
 
 function toCamelCaseTag(tag) {
   return tag.replace(/[^a-zA-Z0-9]/g, ' ').split(' ')
-      .map((word, index) => index === 0 ? word.toLowerCase() : word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
-      .join('');
+    .map((word, index) => (index === 0 ? word.toLowerCase()
+      : word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()))
+    .join('');
 }
 
 function renderItems(cat, catId, taxonomy, placeholders) {
   let html = '';
   const items = taxonomy.map((item) => item[cat]);
   items.forEach((tag) => {
-    const replaceAndTag =  tag === "Strategy & Consulting" ?  tag.replace('&','and') : tag;
+    const replaceAndTag = tag === 'Strategy & Consulting' ? tag.replace('&', 'and') : tag;
     const sToCamelCaseTag = toCamelCaseTag(replaceAndTag.replace(/(?<=\w)\/(?=\w)/g, '')); // 'Win/News' --> 'WinNews' ....... "Win / News" --> "Win / News"
     const tagNamePlaceHolder = getPlaceholder(sToCamelCaseTag, placeholders);
     if (tag.trim() !== '') {
