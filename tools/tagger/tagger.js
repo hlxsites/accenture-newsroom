@@ -1,21 +1,41 @@
+import {
+  fetchPlaceholders,
+} from '../../scripts/lib-franklin.js';
+
 function sanitizeName(name) {
   if (!name) {
     return '';
   }
 
   const decodedText = decodeURIComponent(name.trim()).toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
-  const sanitizedText = decodedText.split(',').map((text) => text.trim().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '')).join(', ');
+  const sanitizedText = decodedText.split(',').map((text) => text.trim().replace(/(?<=[^\s/])\s*\/\s*(?=[^\s/])/g, '').replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '')).join(', ');
   return sanitizedText.trim();
 }
 
-function renderItems(cat, catId, taxonomy) {
+function getPlaceholder(key, placeholders) {
+  if (placeholders && placeholders[key]) {
+    return placeholders[key];
+  }
+  return key;
+}
+
+function toCamelCaseTag(tag) {
+  return tag.replace(/[^a-zA-Z0-9]/g, ' ').split(' ')
+      .map((word, index) => index === 0 ? word.toLowerCase() : word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+      .join('');
+}
+
+function renderItems(cat, catId, taxonomy, placeholders) {
   let html = '';
   const items = taxonomy.map((item) => item[cat]);
   items.forEach((tag) => {
+    const replaceAndTag =  tag === "Strategy & Consulting" ?  tag.replace('&','and') : tag;
+    const sToCamelCaseTag = toCamelCaseTag(replaceAndTag.replace(/(?<=\w)\/(?=\w)/g, '')); // 'Win/News' --> 'WinNews' ....... "Win / News" --> "Win / News"
+    const tagNamePlaceHolder = getPlaceholder(sToCamelCaseTag, placeholders);
     if (tag.trim() !== '') {
       html += `
       <span class="path">
-        <span data-title="${tag}" class="tag cat-${catId % 8}">${tag}</span>
+        <span data-title="${replaceAndTag}" class="tag cat-${catId % 8}">${tagNamePlaceHolder}</span>
       </span>
     `;
     }
@@ -23,12 +43,12 @@ function renderItems(cat, catId, taxonomy) {
   return html;
 }
 
-function initTaxonomy(taxonomy) {
+function initTaxonomy(taxonomy, placeholders) {
   let html = '';
   Object.keys(taxonomy[0]).forEach((cat, idx) => {
     html += '<div class="category">';
     html += `<h2>${cat}</h2>`;
-    html += renderItems(cat, idx, taxonomy);
+    html += renderItems(cat, idx, taxonomy, placeholders);
     html += '</div>';
   });
   const results = document.getElementById('results');
@@ -98,8 +118,9 @@ function displaySelected() {
 
 async function init() {
   const tax = await getTaxonomy();
+  const placeholders = await fetchPlaceholders();
 
-  initTaxonomy(tax);
+  initTaxonomy(tax, placeholders);
 
   const selEl = document.getElementById('selected');
   const copyButton = selEl.querySelector('button.copy');
