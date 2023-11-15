@@ -9,6 +9,7 @@
 
 .columns.pr-contact img {
   width: unset;
+  max-width: 225px;
 }
 
 .columns > div > div {
