@@ -11,3 +11,8 @@
   width: 100%;
   height: 100%;
 }
+
+.video.block .vidyard-player-container iframe {
+  width: 80%;
+  height: 100%;
+}
