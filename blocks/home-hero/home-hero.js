@@ -21,6 +21,7 @@ function getBackgroundImage(picture) {
 }
 
 export default async function decorate(block) {
+  const genericText = ['read more'];
   const title = block.querySelector('h1');
   const overlayContainer = document.createElement('div');
   overlayContainer.classList.add('overlay-container');
@@ -30,6 +31,13 @@ export default async function decorate(block) {
     overlayContainer.append(parent);
   });
   overlayContainer.querySelectorAll('a').forEach((link) => {
+    const linkText = (link.textContent && link.textContent.toLowerCase()) || '';
+    if (genericText.includes(linkText)) {
+      const textSpan = document.createElement('span');
+      textSpan.classList.add('sr-only');
+      textSpan.textContent = link.href.split('/').pop();
+      link.append(textSpan);
+    }
     annotateElWithAnalyticsTracking(
       link,
       link.textContent,

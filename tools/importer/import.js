@@ -188,9 +188,9 @@ const collectTextNodes = (node, list) => {
 };
 
 const findNextBrOrpNode = (node) => {
-  // if the node's parent is div or p, just reutn the parent
-  if (node.parentElement.nodeName === 'P' || node.parentElement.nodeName === 'DIV') {
-    return node.parentElement;
+  // if the next sibling is br or p, return it
+  if (node.nextSibling && (node.nextSibling.nodeName === 'BR' || node.nextSibling.nodeName === 'P')) {
+    return node.nextSibling;
   }
 
   let currentNode = node.parentElement.nextSibling;
@@ -229,6 +229,10 @@ const findNextBrOrpNode = (node) => {
       return currentNode;
     }
     currentNode = currentNode.nextSibling;
+  }
+  // if the node's parent is div or p, just reutn the parent
+  if (node.parentElement.nodeName === 'P' || node.parentElement.nodeName === 'DIV') {
+    return node.parentElement;
   }
   return null; // No next <br> node found
 };
@@ -295,10 +299,15 @@ export default {
         const videoRegex = /.*https:\/\/play.vidyard.com.*|.*youtube.*|.*blocks.glass.*/;
         const isVideo = videoRegex.test(table.outerHTML);
         if (isVideo) return;
-        const cells = [
-          ['Table'],
-          [table.outerHTML],
-        ];
+        const cells = [];
+        cells.push(['Table']);
+        table.querySelectorAll('tr').forEach((tr) => {
+          const rowCells = [];
+          tr.querySelectorAll('td,th').forEach((td) => {
+            rowCells.push(td.outerHTML);
+          });
+          cells.push(rowCells);
+        });
         const newTable = WebImporter.DOMUtils.createTable(cells, document);
         table.after(newTable);
         table.remove();

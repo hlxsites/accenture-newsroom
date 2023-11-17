@@ -1,6 +1,5 @@
 {
   "project": "Accenture Newsroom",
-  "host": "main--accenture-newsroom--hlxsites.hlx.live",
   "plugins": [
     {
       "id": "tagger",
