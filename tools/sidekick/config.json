@@ -23,6 +23,15 @@
       "environments": [ "edit" ],
       "url": "/tools/sidekick/library.html",
       "includePaths": [ "**.docx**" ]
+    },
+    {
+      "id": "logs",
+      "title": "Log Viewer",
+      "environments": [
+        "dev", "preview", "live"
+      ],
+      "url": "/tools/log-viewer/index.html",
+      "event": "log-viewer"
     }
   ]
 }
