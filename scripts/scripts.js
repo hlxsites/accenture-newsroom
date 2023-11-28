@@ -783,18 +783,6 @@ const preflightListener = async () => {
   customModal.showModal();
 };
 
-// eslint-disable-next-line consistent-return
-const publishListener = () => {
-  // eslint-disable-next-line no-restricted-globals, no-alert
-  if (confirm('Are you sure you want to publish this content live?')) {
-    // let the sidekick continue publishing
-    // eslint-disable-next-line no-console
-    console.debug('publish clicked');
-  } else {
-    // avoid publishing
-    return false;
-  }
-};
 /**
  * Loads everything that doesn't need to be delayed.
  * @param {Element} doc The container element
@@ -820,11 +808,20 @@ async function loadLazy(doc) {
   const sk = document.querySelector('helix-sidekick');
   if (sk) {
     sk.addEventListener('custom:preflight', preflightListener);
-    sk.addEventListener('publish', publishListener);
-    const publishButtons = sk.querySelectorAll('button[title="Publish"]');
+    const publishButtons = sk.shadowRoot.querySelectorAll('button[title="Publish"]');
     publishButtons.forEach((publishButton) => {
-      // eslint-disable-next-line consistent-return
-      publishButton.addEventListener('mousedown', publishListener);
+      // eslint-disable-next-line func-names, consistent-return
+      publishButton.addEventListener('mousedown', function (e) {
+        // eslint-disable-next-line no-restricted-globals, no-alert
+        if (confirm('Are you sure you want to publish this content live?')) {
+          // continue publishing
+          this.click();
+        } else {
+          // avoid publishing
+          e.stopImmediatePropagation();
+          return false;
+        }
+      });
     });
   }
 
