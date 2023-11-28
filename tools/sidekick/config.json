@@ -30,7 +30,6 @@
       "environments": [
         "dev", "preview", "live"
       ],
-      "url": "/tools/log-viewer/index.html",
       "event": "log-viewer"
     }
   ]
