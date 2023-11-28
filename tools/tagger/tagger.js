@@ -17,11 +17,12 @@ const getReduceTags = (oTaxonomy, sCategory) => {
   const sCategoryCapital = sCategory.charAt(0).toUpperCase() + sCategory.slice(1);
 
   return oTaxonomy.reduce((oAccumulated, oObject) => {
-    oAccumulated[sCategory] || (oAccumulated[sCategory] = []); 
+    // eslint-disable-next-line no-unused-expressions
+    oAccumulated[sCategory] || (oAccumulated[sCategory] = []);
     oAccumulated[sCategory].push({
-       key: oObject[`${sCategoryCapital} Key`],
-       text: oObject[`${sCategoryCapital} Text`]
-     });
+      key: oObject[`${sCategoryCapital} Key`],
+      text: oObject[`${sCategoryCapital} Text`],
+    });
     return oAccumulated;
   }, {});
 };
@@ -30,7 +31,7 @@ function initTaxonomy(taxonomy) {
   let html = '';
   const subjectsTags = getReduceTags(taxonomy, 'subjects');
   const industriesTags = getReduceTags(taxonomy, 'industries');
-  const tagsJson = {...subjectsTags, ...industriesTags};
+  const tagsJson = { ...subjectsTags, ...industriesTags };
 
   Object.keys(tagsJson).forEach((cat, idx) => {
     const sCategory = cat.charAt(0).toUpperCase() + cat.slice(1);
@@ -83,7 +84,6 @@ function displaySelected() {
 
   selTagsEl.innerHTML = '';
   const selectedTags = document.querySelectorAll('#results .path.selected');
- 
   if (selectedTags.length > 0) {
     selectedTags.forEach((path) => {
       const clone = path.cloneNode(true);
