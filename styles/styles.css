@@ -357,7 +357,7 @@ body.article main .section.abstract+.section {
   margin-left: 10px;
 }
 
-body.article main .section.abstract div.date {
+body.article main .section.abstract p.date {
   font-family: var(--graphik-semibold);
   font-size: 12px;
   font-weight: 600;

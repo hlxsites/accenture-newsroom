@@ -32,7 +32,7 @@ import {
 const LCP_BLOCKS = []; // add your LCP blocks to the list
 
 // regex to find abstract paragraph
-export const ABSTRACT_REGEX = /(.*?);.*?(\d{4})|(.*?)(\d{4})\s+–\s+\b|(.*?)(\d{4})\s+-\s+\b/;
+export const ABSTRACT_REGEX = /(.*?);.*?(\d{4})|(.*?)(\d{4})\s*(–|-|‒|:)\s*/;
 
 export const isMobile = () => window.innerWidth < 600;
 
@@ -531,25 +531,6 @@ const pdfLinkHandler = () => {
     addTargetAttribute(link);
   });
 };
-const convertPublishedDate = (dateString) => {
-  const dateObject = new Date(dateString);
-  const options = { year: 'numeric', month: 'long', day: 'numeric' };
-  const formattedDate = dateObject.toLocaleDateString('en-US', options);
-  return formattedDate;
-};
-
-const createHiddenPublishedDate = (parentElement) => {
-  const publishedDate = getMetadata('publisheddate');
-  if (!publishedDate) {
-    return;
-  }
-  const divDate = document.createElement('div');
-
-  divDate.innerHTML = convertPublishedDate(publishedDate);
-  divDate.classList.add('date');
-  divDate.style.display = 'none';
-  parentElement.insertAdjacentHTML('afterbegin', divDate.outerHTML);
-};
 
 function annotateArticleSections() {
   const template = getMetadata('template');
@@ -562,16 +543,9 @@ function annotateArticleSections() {
   const h1 = abstractSection.querySelector('h1');
   if (h1) {
     const date = h1.previousSibling;
-    const h1ParentElement = h1.parentNode;
-    if (!date) {
-      createHiddenPublishedDate(h1ParentElement);
-      return;
+    if (date) {
+      date.classList.add('date');
     }
-    const divDate = document.createElement('div');
-    divDate.innerHTML = date.innerHTML;
-    divDate.classList.add('date');
-    h1ParentElement.insertAdjacentHTML('afterbegin', divDate.outerHTML);
-    date.remove();
   }
   // annotate links
   const articleSections = document.querySelectorAll('main > .section');
