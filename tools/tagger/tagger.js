@@ -2,10 +2,10 @@ function renderItems(cat, catId, taxonomy) {
   let html = '';
   const oCategoryTags = taxonomy[cat];
   oCategoryTags.forEach((tag) => {
-    if (tag.key.trim() !== '' && tag.text.trim() !== '') {
+    if (tag.value.trim() !== '' && tag.text.trim() !== '') {
       html += `
       <span class="path">
-        <span data-title="${tag.key}" class="tag cat-${catId % 8}">${tag.text}</span>
+        <span data-title="${tag.value}" class="tag cat-${catId % 8}">${tag.text}</span>
       </span>
     `;
     }
@@ -20,7 +20,7 @@ const getReduceTags = (oTaxonomy, sCategory) => {
     // eslint-disable-next-line no-unused-expressions
     oAccumulated[sCategory] || (oAccumulated[sCategory] = []);
     oAccumulated[sCategory].push({
-      key: oObject[`${sCategoryCapital} Key`],
+      value: oObject[`${sCategoryCapital} Value`],
       text: oObject[`${sCategoryCapital} Text`],
     });
     return oAccumulated;
@@ -46,7 +46,7 @@ function initTaxonomy(taxonomy) {
 }
 
 async function getTaxonomy() {
-  const resp = await fetch('/tags-placeholders.json');
+  const resp = await fetch('/new-tags.json');
   const tagsJson = await resp.json();
   return tagsJson.data;
 }
