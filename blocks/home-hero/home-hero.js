@@ -21,7 +21,6 @@ function getBackgroundImage(picture) {
 }
 
 export default async function decorate(block) {
-  const genericText = ['read more'];
   const title = block.querySelector('h1');
   const overlayContainer = document.createElement('div');
   overlayContainer.classList.add('overlay-container');
@@ -30,22 +29,22 @@ export default async function decorate(block) {
     parent.innerHTML = element.innerHTML;
     overlayContainer.append(parent);
   });
-  overlayContainer.querySelectorAll('a').forEach((link) => {
+  overlayContainer.querySelectorAll('a').forEach((link, index) => {
     const linkText = (link.textContent && link.textContent.toLowerCase()) || '';
-    if (genericText.includes(linkText)) {
-      const textSpan = document.createElement('span');
-      textSpan.classList.add('sr-only');
-      textSpan.textContent = link.href.split('/').pop();
-      link.append(textSpan);
+    const ctaAriaLabel = `${linkText}: ${link.href.split('/').pop()}`;
+
+    if (index === 1) {
+      link.setAttribute('aria-label', ctaAriaLabel);
     }
     annotateElWithAnalyticsTracking(
       link,
-      link.textContent,
+      index === 1 ? `${ctaAriaLabel}` : link.textContent,
       ANALYTICS_MODULE_MARQUEE,
       ANALYTICS_TEMPLATE_ZONE_HERO,
       ANALYTICS_LINK_TYPE_HERO_CONTENT,
     );
   });
+
   if (title) {
     title.insertAdjacentElement('afterend', overlayContainer);
     const stripe = document.createElement('div');
