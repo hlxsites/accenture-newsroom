@@ -20,6 +20,7 @@ import {
  * @param {Element} block The footer block element
  */
 export default async function decorate(block) {
+  const placeholders = await fetchPlaceholders();
   const socialTitlesMapping = {
     linkedin: 'Follow us on Linkedin',
     twitter: 'Follow us on Twitter',
@@ -28,7 +29,6 @@ export default async function decorate(block) {
   };
 
   const getSocialIconTitle = async (iconName) => {
-    const placeholders = await fetchPlaceholders();
     const placeHolderValue = await getPlaceholder(`${iconName}IconTitle`, placeholders);
     const checkPlaceHolderValue = placeHolderValue === `${iconName}IconTitle` ? '' : placeHolderValue;
     return checkPlaceHolderValue || socialTitlesMapping[iconName] || '';
@@ -60,8 +60,10 @@ export default async function decorate(block) {
     }
 
     const preFooter = footer.querySelector('.section.pre-footer');
+    const contactHrefText = getPlaceholder('contact', placeholders);
     preFooter.querySelectorAll('a').forEach((link) => {
-      const moduleName = link.innerText === 'Contact Us' ? ANALYTICS_MODULE_CONTACT_US : ANALYTICS_MODULE_CORPORATE_INFORMATION_LINKS;
+      const moduleName = link.href.includes(contactHrefText)
+        ? ANALYTICS_MODULE_CONTACT_US : ANALYTICS_MODULE_CORPORATE_INFORMATION_LINKS;
       annotateElWithAnalyticsTracking(
         link,
         link.innerText,
