@@ -112,7 +112,7 @@ export default async function decorate(block) {
   createEl('div', { class: 'linkedin-share' }, linkedinShare, social);
 
   // Twitter
-  const twitterUrl = `https://twitter.com/intent/tweet?text=${pageTitle}&url=${pageUrl}`;
+  const twitterUrl = `https://twitter.com/intent/tweet?text=${encodeURI(pageTitle)}&url=${pageUrl}`;
   const twitterShare = createAnnotatedLinkEl(
     twitterUrl,
     'twitter',
