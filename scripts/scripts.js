@@ -809,21 +809,6 @@ const preflightListener = async () => {
   customModal.showModal();
 };
 
-const logViewerListener = async () => {
-  const section = createTag('div');
-  const wrapper = createTag('div');
-  section.appendChild(wrapper);
-  const logsBlock = buildBlock('log-viewer', '');
-  wrapper.appendChild(logsBlock);
-  decorateBlock(logsBlock);
-  await loadBlock(logsBlock);
-  const { default: getModal } = await import('../blocks/modal/modal.js');
-  const customModal = await getModal('dialog-modal', () => section.innerHTML, (modal) => {
-    modal.querySelector('button[name="close"]')?.addEventListener('click', () => modal.close());
-  });
-  customModal.showModal();
-};
-
 /**
  * Loads everything that doesn't need to be delayed.
  * @param {Element} doc The container element
@@ -849,7 +834,6 @@ async function loadLazy(doc) {
   const sk = document.querySelector('helix-sidekick');
   if (sk) {
     sk.addEventListener('custom:preflight', preflightListener);
-    sk.addEventListener('custom:log-viewer', logViewerListener);
   }
 
   sampleRUM('lazy');
