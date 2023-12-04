@@ -23,6 +23,14 @@
       "environments": [ "edit" ],
       "url": "/tools/sidekick/library.html",
       "includePaths": [ "**.docx**" ]
+    },
+    {
+      "id": "publishlater",
+      "title": "Publish Later",
+      "environments": [
+        "preview"
+      ],
+      "event": "publishlater"
     }
   ]
 }
