@@ -783,6 +783,87 @@ const preflightListener = async () => {
   customModal.showModal();
 };
 
+// Set event for the publish button for confirmation message
+const publishConfirmationPopUp = (oSidekick, oPublishButtons) => {
+  // Add plugin listeners here
+  if (!oSidekick) {
+    return;
+  }
+  oSidekick.addEventListener('custom:preflight', preflightListener);
+  oPublishButtons.forEach((oPublishBtn) => {
+    // eslint-disable-next-line func-names, consistent-return
+    oPublishBtn.addEventListener('mousedown', function (e) {
+      // eslint-disable-next-line no-restricted-globals, no-alert
+      if (confirm('Are you sure you want to publish this content live?')) {
+        // continue publishing
+        this.click();
+      } else {
+        // avoid publishing
+        e.stopImmediatePropagation();
+        return false;
+      }
+    });
+  });
+};
+
+// Handler for publish button to set observer-
+// if the publish button is already loaded on the shadowroot
+const publishConfirmationHandler = (oSidekick) => {
+  if (!oSidekick) {
+    return;
+  }
+  const oShadowRoot = oSidekick.shadowRoot;
+  if (!oShadowRoot) {
+    return;
+  }
+
+  // Options for the observer (which mutations to observe)
+  const config = { childList: true, subtree: true };
+
+  // Callback function to execute when mutations are observed
+  const callback = (_mutationList, observer) => {
+    const oPublishButtons = oSidekick.shadowRoot.querySelectorAll('button[title="Publish"]');
+    if (oPublishButtons.length !== 0) {
+      publishConfirmationPopUp(oSidekick, oPublishButtons);
+      observer.disconnect();
+    }
+  };
+
+  // Create an observer instance linked to the callback function
+  const observer = new MutationObserver(callback);
+
+  // Start observing the target node for configured mutations
+  observer.observe(oShadowRoot, config);
+};
+
+// Observe helix-sidekick element if already loaded on the html body
+const helixSideKickObserver = () => {
+  const oSidekick = document.querySelector('helix-sidekick');
+  if (oSidekick) {
+    publishConfirmationHandler(oSidekick);
+    return;
+  }
+  const oBody = document.querySelector('body');
+
+  // Options for the observer (which mutations to observe)
+  const config = { childList: true };
+
+  // Callback function to execute when mutations are observed
+  const callback = (_mutationList, observer) => {
+    const oAddedSidekick = document.querySelector('helix-sidekick');
+    if (oAddedSidekick) {
+      publishConfirmationHandler(oAddedSidekick);
+      observer.disconnect();
+    }
+  };
+
+  // Create an observer instance linked to the callback function
+  const observer = new MutationObserver(callback);
+
+  // Start observing the target node for configured mutations
+  observer.observe(oBody, config);
+};
+
 /**
  * Loads everything that doesn't need to be delayed.
  * @param {Element} doc The container element
@@ -803,27 +884,7 @@ async function loadLazy(doc) {
   loadFonts();
 
   centerArticleDivider(main);
-
-  // Add plugin listeners here
-  const sk = document.querySelector('helix-sidekick');
-  if (sk) {
-    sk.addEventListener('custom:preflight', preflightListener);
-    const publishButtons = sk.shadowRoot.querySelectorAll('button[title="Publish"]');
-    publishButtons.forEach((publishButton) => {
-      // eslint-disable-next-line func-names, consistent-return
-      publishButton.addEventListener('mousedown', function (e) {
-        // eslint-disable-next-line no-restricted-globals, no-alert
-        if (confirm('Are you sure you want to publish this content live?')) {
-          // continue publishing
-          this.click();
-        } else {
-          // avoid publishing
-          e.stopImmediatePropagation();
-          return false;
-        }
-      });
-    });
-  }
+  helixSideKickObserver();
 
   sampleRUM('lazy');
   sampleRUM.observe(main.querySelectorAll('div[data-block-name]'));
