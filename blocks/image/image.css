@@ -1,0 +1,35 @@
+.image.block  {
+  display: grid;
+  justify-content: center;
+}
+
+.image.block picture {
+  display: flex;
+  justify-content: center;
+}
+
+.image.block img {
+  width: auto;
+}
+
+.image .caption {
+  font-size: 12px;
+  display: flex;
+  justify-content: center;
+  font-style: italic;
+  text-align: center;
+}
+
+/* variations */
+
+.image.block.left {
+  justify-content: left;
+}
+
+.image.block.right {
+  justify-content: right;
+}
+
+.image-wrapper + .default-content-wrapper > p {
+  margin-top: 0;
+}
