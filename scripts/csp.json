@@ -14,7 +14,9 @@
       "dpm.demdex.net",
       "cdnjs.cloudflare.com",
       "play.vidyard.com",
-      "api.demandbase.com"
+      "api.demandbase.com",
+      "img.en25.com",
+      "adobedc.demdex.net"
   ],
   "connect-src": [
       "'self'",
