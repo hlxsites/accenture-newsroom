@@ -9,7 +9,7 @@ export default async function decorate(block) {
   }
   if (config.url) {
     const alt = config.url.split('/').pop().split('.')[0];
-    picture = createOptimizedPicture(config.url, alt, false);
+    picture = createOptimizedPicture(config.url, alt, false, [{ media: '(min-width: 600px)', width: config.width || '2000' }, { width: '750' }]);
   }
   const img = picture.querySelector('img');
   if (config.width) {
