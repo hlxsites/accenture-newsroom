@@ -1,11 +1,15 @@
-import { readBlockConfig } from '../../scripts/lib-franklin.js';
+import { readBlockConfig, createOptimizedPicture } from '../../scripts/lib-franklin.js';
 
 export default async function decorate(block) {
   const config = readBlockConfig(block);
-  const picture = block.querySelector('picture');
-  if (!picture) {
+  let picture = block.querySelector('picture');
+  if (!picture && !config.url) {
     block.remove();
     return;
+  }
+  if (config.url) {
+    const alt = config.url.split('/').pop().split('.')[0];
+    picture = createOptimizedPicture(config.url, alt, false);
   }
   const img = picture.querySelector('img');
   if (config.width) {

@@ -1,3 +1,7 @@
+.section .image-wrapper {
+  margin-top: 1rem;
+}
+
 .image.block  {
   display: grid;
   justify-content: center;
