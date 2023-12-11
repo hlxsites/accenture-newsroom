@@ -22,7 +22,8 @@
   justify-content: center;
   font-style: italic;
   text-align: center;
-  margin-top: unset;
+  margin-top: 6px;
+  line-height: 1.2;
 }
 
 /* variations */
