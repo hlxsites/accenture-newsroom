@@ -784,12 +784,12 @@ const preflightListener = async () => {
 };
 
 // Set event for the publish button for confirmation message
-const publishConfirmationPopUp = (oSidekick, oPublishButtons) => {
+const publishConfirmationPopUp = (oPublishButtons) => {
+  const oSidekick = document.querySelector('helix-sidekick');
   // Add plugin listeners here
   if (!oSidekick) {
     return;
   }
-  oSidekick.addEventListener('custom:preflight', preflightListener);
   oPublishButtons.forEach((oPublishBtn) => {
     // eslint-disable-next-line func-names, consistent-return
     oPublishBtn.addEventListener('mousedown', function (e) {
@@ -819,12 +819,11 @@ const publishConfirmationHandler = (oSidekick) => {
 
   // Options for the observer (which mutations to observe)
   const config = { childList: true, subtree: true };
-
   // Callback function to execute when mutations are observed
   const callback = (_mutationList, observer) => {
     const oPublishButtons = oSidekick.shadowRoot.querySelectorAll('button[title="Publish"]');
     if (oPublishButtons.length !== 0) {
-      publishConfirmationPopUp(oSidekick, oPublishButtons);
+      publishConfirmationPopUp(oPublishButtons);
       observer.disconnect();
     }
   };
@@ -838,30 +837,20 @@ const publishConfirmationHandler = (oSidekick) => {
 
 // Observe helix-sidekick element if already loaded on the html body
 const helixSideKickObserver = () => {
-  const oSidekick = document.querySelector('helix-sidekick');
-  if (oSidekick) {
-    publishConfirmationHandler(oSidekick);
-    return;
-  }
-  const oBody = document.querySelector('body');
-
-  // Options for the observer (which mutations to observe)
-  const config = { childList: true };
-
-  // Callback function to execute when mutations are observed
-  const callback = (_mutationList, observer) => {
-    const oAddedSidekick = document.querySelector('helix-sidekick');
-    if (oAddedSidekick) {
+  // const oSidekick = document.querySelector('helix-sidekick');
+  const sk = document.querySelector('helix-sidekick');
+  if (sk) {
+    // sidekick already loaded
+    sk.addEventListener('custom:preflight', preflightListener);
+    publishConfirmationHandler(sk);
+  } else {
+    // wait for sidekick to be loaded
+    document.addEventListener('sidekick-ready', () => {
+      const oAddedSidekick = document.querySelector('helix-sidekick');
+      oAddedSidekick.addEventListener('custom:preflight', preflightListener);
       publishConfirmationHandler(oAddedSidekick);
-      observer.disconnect();
-    }
-  };
-
-  // Create an observer instance linked to the callback function
-  const observer = new MutationObserver(callback);
-
-  // Start observing the target node for configured mutations
-  observer.observe(oBody, config);
+    }, { once: true });
+  }
 };
 
 /**
