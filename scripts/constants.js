@@ -37,7 +37,7 @@ export const ANALYTICS_TEMPLATE_ZONE_GLOBAL_HEADER = 'global header';
 export const ANALYTICS_TEMPLATE_ZONE_BODY = 'body';
 export const ANALYTICS_TEMPLATE_ZONE_RIGHT_RAIL = 'right-rail';
 export const ANALYTICS_TEMPLATE_ZONE_FOOTER = 'footer';
-export const ANALYTICS_TEMPLATE_ZONE_CONSENT_MANAGER = 'consent-manager';
+export const ANALYTICS_TEMPLATE_ZONE_CONSENT_MANAGER = 'consent manager';
 
 // ANALYTICS LINK TYPES
 export const ANALYTICS_LINK_TYPE_NAV_PAGINATE = 'nav/paginate';

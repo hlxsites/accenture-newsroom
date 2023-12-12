@@ -62,7 +62,9 @@ export default async function decorate(block) {
     const linksContainer = document.createElement('div');
     linksContainer.classList.add('home-hero-links-container');
     linksContainer.append(links);
-    links.querySelectorAll('a').forEach((link) => {
+    const oDivider = document.createElement('li');
+    oDivider.classList.add('home-hero-divider');
+    links.querySelectorAll('a').forEach((link, iIndex, oLinks) => {
       annotateElWithAnalyticsTracking(
         link,
         link.textContent,
@@ -70,6 +72,11 @@ export default async function decorate(block) {
         ANALYTICS_TEMPLATE_ZONE_BODY,
         ANALYTICS_LINK_TYPE_NAV_PAGINATE,
       );
+      if (iIndex !== oLinks.length - 1) {
+        const oClonedDivider = oDivider.cloneNode(true);
+        const oLi = link.parentNode;
+        oLi.insertAdjacentElement('afterend', oClonedDivider);
+      }
     });
     block.append(linksContainer);
   }
