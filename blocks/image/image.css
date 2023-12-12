@@ -2,11 +2,6 @@
   margin-top: 1rem;
 }
 
-.image.block  {
-  display: grid;
-  justify-content: center;
-}
-
 .image.block picture {
   display: flex;
   justify-content: center;
@@ -18,8 +13,6 @@
 
 .image .caption {
   font-size: 12px;
-  display: flex;
-  justify-content: center;
   font-style: italic;
   text-align: center;
   margin-top: 6px;
