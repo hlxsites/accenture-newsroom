@@ -129,6 +129,10 @@ h6 {
   font-size: var(--heading-font-size-xs)
 }
 
+strong {
+  -webkit-font-smoothing: antialiased
+}
+
 p,
 dl,
 ol,
