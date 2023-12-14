@@ -783,6 +783,43 @@ const preflightListener = async () => {
   customModal.showModal();
 };
 
+const hasInvalidTags = () => {
+  const oAsideComponent = document.querySelector('.aside-container');
+  const sInvalidText = '(INVALID. Use the tagger to input a tag)';
+  let bHasInvalidTags = false;
+  if (!oAsideComponent) {
+    return false;
+  }
+  const oIndustry = oAsideComponent.querySelector('.tags .industry');
+  const oSubject = oAsideComponent.querySelector('.tags .subject');
+  const aAllTagsText = [];
+  if (oIndustry) {
+    const oIndustryTags = oIndustry.querySelectorAll('.industry-tag a');
+    oIndustryTags.forEach((oLink) => aAllTagsText.push(oLink.innerText));
+  }
+  if (oSubject) {
+    const oSubjectTags = oSubject.querySelectorAll('.subject-tag a');
+    oSubjectTags.forEach((oLink) => aAllTagsText.push(oLink.innerText));
+  }
+
+  aAllTagsText.forEach((sTags) => {
+    if (sTags.includes(sInvalidText)) {
+      bHasInvalidTags = true;
+    }
+  });
+  return bHasInvalidTags;
+};
+
+const getContentDate = () => {
+  const sPublishDate = document.querySelector('meta[name=publisheddate]').content || '';
+  const oDateObject = new Date(sPublishDate);
+  if (oDateObject.toDateString() === 'Invalid Date') {
+    return 'Invalid Date';
+  }
+  const extractedDate = sPublishDate.split(' ')[0];
+  return extractedDate;
+};
+
 // Set event for the publish button for confirmation message
 const publishConfirmationPopUp = (oPublishButtons) => {
   const oSidekick = document.querySelector('helix-sidekick');
@@ -793,8 +830,9 @@ const publishConfirmationPopUp = (oPublishButtons) => {
   oPublishButtons.forEach((oPublishBtn) => {
     // eslint-disable-next-line func-names, consistent-return
     oPublishBtn.addEventListener('mousedown', function (e) {
+      const sTagRemarks = hasInvalidTags() ? 'With Invalid Tags' : '';
       // eslint-disable-next-line no-restricted-globals, no-alert
-      if (confirm('Are you sure you want to publish this content live?')) {
+      if (confirm(` Are you sure you want to publish this content live?\n Content Date is ${getContentDate()}\n ${sTagRemarks}\n`)) {
         // continue publishing
         this.click();
       } else {

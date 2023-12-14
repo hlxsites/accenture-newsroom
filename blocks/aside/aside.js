@@ -11,7 +11,6 @@ import {
   getMetadata,
   loadScript,
   fetchPlaceholders,
-  toCamelCase,
 } from '../../scripts/lib-franklin.js';
 import {
   ANALYTICS_LINK_TYPE_DOWNLOADABLE,
@@ -52,14 +51,35 @@ async function generatePDF(pageName) {
  * @param {*} defaultValue
  * @returns
  */
-function getTagTitle(tagName, placeholders, defaultValue) {
-  const camelCaseTagName = toCamelCase(tagName);
-  const tagTitle = getPlaceholder(camelCaseTagName, placeholders);
-  if (tagTitle === camelCaseTagName) {
-    return defaultValue;
+
+const getTaxonomy = async () => {
+  const resp = await fetch('/new-tags.json');
+  const tagsJson = await resp.json();
+  return tagsJson.data;
+};
+
+const getTagTitleHandler = (sTag, oTaxonomy) => {
+  for (let i = 0; i < oTaxonomy.length; i += 1) {
+    if (oTaxonomy[i].value === sTag) {
+      return oTaxonomy[i].text;
+    }
   }
-  return tagTitle;
-}
+
+  return `${sTag}(INVALID. Use the tagger to input a tag)`;
+};
+
+const getReduceTags = (oTaxonomy, sCategory) => {
+  const sCategoryCapital = sCategory.charAt(0).toUpperCase() + sCategory.slice(1);
+  return oTaxonomy.reduce((oAccumulated, oObject) => {
+    // eslint-disable-next-line no-unused-expressions
+    oAccumulated[sCategory] || (oAccumulated[sCategory] = []);
+    oAccumulated[sCategory].push({
+      value: oObject[`${sCategoryCapital} Value`],
+      text: oObject[`${sCategoryCapital} Text`],
+    });
+    return oAccumulated;
+  }, {});
+};
 
 function getPrefixForTags(siteName, category) {
   const siteNamePrefixMapping = {
@@ -195,6 +215,9 @@ export default async function decorate(block) {
   }
 
   // Tags
+  const oTaxonomy = await getTaxonomy();
+  const aSubjectsTagsCollection = getReduceTags(oTaxonomy, 'subjects').subjects || [];
+  const aIndustriesTagsCollection = getReduceTags(oTaxonomy, 'industries').industries || [];
   const industryTagValues = getMetadata('industries');
   const subjectTagValues = getMetadata('subjects');
   const industryEl = industryTagValues ? createEl('div', { class: 'industry' }, `<h4>${pIndustryTags}</h4>`) : null;
@@ -205,8 +228,9 @@ export default async function decorate(block) {
 
   const industryUl = industryEl ? createEl('ul', {}, '', industryEl) : null;
   industryTagValues.split(',').forEach((industryTag) => {
+    const sTagTile = getTagTitleHandler(industryTag, aIndustriesTagsCollection);
     const cleanedUpValue = sanitizeName(industryTag);
-    const link = createEl('a', { href: `${industriesPrefix}/${cleanedUpValue}` }, getTagTitle(cleanedUpValue, placeholders, industryTag.trim()));
+    const link = createEl('a', { href: `${industriesPrefix}/${cleanedUpValue}` }, sTagTile);
     annotateElWithAnalyticsTracking(
       link,
       link.textContent,
@@ -219,8 +243,9 @@ export default async function decorate(block) {
 
   const subjectUl = subjectEl ? createEl('ul', {}, '', subjectEl) : null;
   subjectTagValues.split(',').forEach((subjectTag) => {
+    const sTagTile = getTagTitleHandler(subjectTag.trim(), aSubjectsTagsCollection);
     const cleanedUpValue = sanitizeName(subjectTag);
-    const link = createEl('a', { href: `${subjectsPrefix}/${cleanedUpValue}` }, getTagTitle(cleanedUpValue, placeholders, subjectTag.trim()));
+    const link = createEl('a', { href: `${subjectsPrefix}/${cleanedUpValue}` }, sTagTile.trim());
     annotateElWithAnalyticsTracking(
       link,
       link.textContent,
