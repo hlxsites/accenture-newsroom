@@ -9,8 +9,8 @@ const createSatTrack = () => {
   const script = document.createElement('script');
   script.type = 'text/javascript';
   script.innerHTML = `const getCookie = (sName) => {
-    const value = "; " + document.cookie;
-    const aParts = value.split("; " + sName + "=");
+    const sValue = "; " + document.cookie;
+    const aParts = sValue.split("; " + sName + "=");
     if (aParts.length === 2) return aParts.pop().split(";").shift();
   };
 
