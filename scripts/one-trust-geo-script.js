@@ -18,16 +18,16 @@ const createSatTrack = () => {
     const sSatTrackCookie = getCookie('sat_track');
 
     if (typeof sSatTrackCookie !== 'undefined') {
-        return;
+      return;
     }
 
     // list of geos where only strictly necessary cookies are allowed
     const aSNGeos = ["GB", "BE", "IE", "FR", "RU", "ES", "IT", "DE", "AT", "CH"];
     if (aSNGeos.indexOf(window.otUserLocation) !== -1) {
-        document.cookie = "sat_track=false;path=/;secure;max-age=31536000";
+      document.cookie = "sat_track=false;path=/;secure;max-age=31536000";
     }
     else {
-        document.cookie = "sat_track=true;path=/;secure;max-age=31536000";
+      document.cookie = "sat_track=true;path=/;secure;max-age=31536000";
     }
     console.log("creating sat_track");
   };
