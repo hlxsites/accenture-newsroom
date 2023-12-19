@@ -584,3 +584,13 @@ main .section.highlight {
     width: 370px;
   }
 }
+
+.metadata.sidekick-library.block div  {
+  width: 100%;
+  display: flex;
+}
+
+.metadata.sidekick-library.block div div {
+  border-bottom: 1px solid;
+  padding: 5px;
+}
