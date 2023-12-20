@@ -127,7 +127,7 @@ async function addMartechStack() {
   loadScript('//api.demandbase.com/api/v2/ip.json?key=4RB1W8tybpJRLdkTK0TRQcWfhYutivBKD5dyciDa', { async: 'true' });
 
   if (typeof jQuery === 'undefined') {
-    document.addEventListener('jQueryReady', async ()  => {
+    document.addEventListener('jQueryReady', async () => {
       // Add adobe analytics
       await loadAdobeDTM();
     });
@@ -344,15 +344,15 @@ function addDataLayer() {
   };
 }
 
-const addGeoScript = () => {
-  loadScript('/scripts/one-trust-geo-script.js');
+const loadAnalyticsFunctions = async () => {
+  await addCookieOneTrust();
+  await loadScript('/scripts/one-trust-geo-script.js');
+  await addMartechStack();
 };
 
 // add more delayed functionality here
 addDataLayer();
-addCookieOneTrust();
-addMartechStack();
-addGeoScript();
+loadAnalyticsFunctions();
 
 // Core Web Vitals RUM collection
 sampleRUM('cwv');
