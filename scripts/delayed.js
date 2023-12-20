@@ -112,17 +112,29 @@ async function addCookieOneTrust() {
   };
 }
 
-async function addMartechStack() {
-  // load jquery
-  await loadScript('/scripts/jquery-3.5.1.min.js', { async: 'false' });
-  // Add Adobe Analytics
+const loadAdobeDTM = async () => {
   if (isProd()) {
     await loadScript('https://assets.adobedtm.com/55621ea95d50/e22056dd1d90/launch-EN664f8f34ad5946f8a0f7914005f717cf.min.js');
   } else {
     await loadScript('https://assets.adobedtm.com/55621ea95d50/e22056dd1d90/launch-EN379c80f941604b408953a2df1776d1c6-staging.min.js');
   }
+};
+
+async function addMartechStack() {
+  // load jquery
+  await loadScript('/scripts/jquery-3.5.1.min.js', { async: 'false' });
   // Add Demandbase tag
   loadScript('//api.demandbase.com/api/v2/ip.json?key=4RB1W8tybpJRLdkTK0TRQcWfhYutivBKD5dyciDa', { async: 'true' });
+
+  if (typeof jQuery === 'undefined') {
+    document.addEventListener('jQueryReady', async ()  => {
+      // Add adobe analytics
+      await loadAdobeDTM();
+    });
+    return;
+  }
+
+  await loadAdobeDTM();
 }
 
 function getPageInstanceId(template, path, countryLanguage = '') {
