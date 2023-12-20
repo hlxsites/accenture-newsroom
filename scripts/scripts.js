@@ -831,6 +831,11 @@ const publishConfirmationPopUp = (oPublishButtons) => {
     // eslint-disable-next-line func-names, consistent-return
     oPublishBtn.addEventListener('mousedown', function (e) {
       const sTagRemarks = hasInvalidTags() ? 'With Invalid Tags' : '';
+      if (hasInvalidTags()) {
+        alert(` Page will not publish\n Content Date is ${getContentDate()}\n ${sTagRemarks}\n`)
+        e.stopImmediatePropagation();
+        return false;
+      }
       // eslint-disable-next-line no-restricted-globals, no-alert
       if (confirm(` Are you sure you want to publish this content live?\n Content Date is ${getContentDate()}\n ${sTagRemarks}\n`)) {
         // continue publishing
