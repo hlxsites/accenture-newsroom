@@ -1,3 +1,6 @@
+// eslint-disable-next-line import/no-cycle
+import { loadScript } from './lib-franklin.js';
+
 const createOptanonWrapper = () => {
   const script = document.createElement('script');
   script.type = 'text/javascript';
@@ -36,12 +39,33 @@ const createSatTrack = () => {
   document.head.append(script);
 };
 
+const loadAdobeDTM = async () => {
+  if (isProd()) {
+    await loadScript('https://assets.adobedtm.com/55621ea95d50/e22056dd1d90/launch-EN664f8f34ad5946f8a0f7914005f717cf.min.js');
+  } else {
+    await loadScript('https://assets.adobedtm.com/55621ea95d50/e22056dd1d90/launch-EN379c80f941604b408953a2df1776d1c6-staging.min.js');
+  }
+};
+
+const loadLaunchScript = async () => {
+  if (typeof jQuery === 'undefined') {
+    document.addEventListener('jQueryReady', async () => {
+      // Add adobe analytics
+      await loadAdobeDTM();
+    });
+    return;
+  }
+
+  await loadAdobeDTM();
+};
+
 const loadGeoScript = () => {
   createOptanonWrapper();
   createSatTrack();
 
   const jsonFeed = (locationJson) => {
     window.otUserLocation = locationJson.country;
+    loadLaunchScript();
   };
 
   const origin = window.location.origin.toLowerCase();
