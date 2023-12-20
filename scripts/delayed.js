@@ -13,13 +13,13 @@ function getCookie(name) {
   return '';
 }
 
-function isProd() {
+export const isProd = () => {
   const { host } = window.location;
   if (host.startsWith('newsroom.accenture')) {
     return true;
   }
   return false;
-}
+};
 
 function addOneTrustCookieButton(text) {
   const OPTANON_BUTTON_ID = 'optanon-minimize-button';

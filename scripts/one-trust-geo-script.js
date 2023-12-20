@@ -1,5 +1,6 @@
 // eslint-disable-next-line import/no-cycle
 import { loadScript } from './lib-franklin.js';
+import { isProd } from './delayed.js';
 
 const createOptanonWrapper = () => {
   const script = document.createElement('script');
