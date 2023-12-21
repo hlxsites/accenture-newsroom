@@ -700,9 +700,7 @@ async function loadJQueryDateRangePicker() {
   if (!filterInput) {
     return;
   }
-  // await import('./moment.min.js');
   await loadScript('/scripts/moment.min.js');
-  // await loadScript('/scripts/jquery-3.5.1.min.js'); // old
   await loadjQueryScript();
   await loadScript('/scripts/jquery.daterangepicker-20190409.js');
   await loadCSS('/styles/daterangepicker.css');
