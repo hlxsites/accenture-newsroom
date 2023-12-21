@@ -346,8 +346,7 @@ function addDataLayer() {
 
 const loadAnalyticsFunctions = async () => {
   await addCookieOneTrust();
-  await loadScript('/scripts/one-trust-geo-script.js', { type: 'module',});
-  // await addMartechStack();
+  await loadScript('/scripts/one-trust-geo-script.js', { type: 'module' });
 };
 
 // add more delayed functionality here

@@ -673,29 +673,6 @@ async function loadEager(doc) {
   }
 }
 
-// START
-// Launch script changes
-// const launchScript = () => {
-//   // code here
-// };
-
-// Launchscript will check if the jQuery is undefined
-// if yes then it will use the custom event "jQueryReady"
-// if jQuery is not undefined then lunchScript will invoke
-// const launchScriptHandler = () => {
-//   if (typeof jQuery !== 'undefined') {
-//     launchScript();
-//     return;
-//   }
-
-//   document.addEventListener('jQueryReady', () => {
-//     launchScript();
-//   });
-// };
-
-// launchScriptHandler();
-// END
-
 // Add custom event that will trigger if the jQuery is loaded
 export async function loadjQueryScript() {
   const jqueryReadyEvent = new Event('jQueryReady');
