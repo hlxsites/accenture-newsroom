@@ -1,21 +1,11 @@
-function sanitizeName(name) {
-  if (!name) {
-    return '';
-  }
-
-  const decodedText = decodeURIComponent(name.trim()).toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
-  const sanitizedText = decodedText.split(',').map((text) => text.trim().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '')).join(', ');
-  return sanitizedText.trim();
-}
-
 function renderItems(cat, catId, taxonomy) {
   let html = '';
-  const items = taxonomy.map((item) => item[cat]);
-  items.forEach((tag) => {
-    if (tag.trim() !== '') {
+  const oCategoryTags = taxonomy[cat];
+  oCategoryTags.forEach((tag) => {
+    if (tag.value.trim() !== '' && tag.text.trim() !== '') {
       html += `
       <span class="path">
-        <span data-title="${tag}" class="tag cat-${catId % 8}">${tag}</span>
+        <span data-title="${tag.value}" class="tag cat-${catId % 8}">${tag.text}</span>
       </span>
     `;
     }
@@ -23,20 +13,40 @@ function renderItems(cat, catId, taxonomy) {
   return html;
 }
 
+const getReduceTags = (oTaxonomy, sCategory) => {
+  const sCategoryCapital = sCategory.charAt(0).toUpperCase() + sCategory.slice(1);
+
+  return oTaxonomy.reduce((oAccumulated, oObject) => {
+    // eslint-disable-next-line no-unused-expressions
+    oAccumulated[sCategory] || (oAccumulated[sCategory] = []);
+    oAccumulated[sCategory].push({
+      value: oObject[`${sCategoryCapital} Value`],
+      text: oObject[`${sCategoryCapital} Text`],
+    });
+    return oAccumulated;
+  }, {});
+};
+
 function initTaxonomy(taxonomy) {
   let html = '';
-  Object.keys(taxonomy[0]).forEach((cat, idx) => {
+  const subjectsTags = getReduceTags(taxonomy, 'subjects');
+  const industriesTags = getReduceTags(taxonomy, 'industries');
+  const tagsJson = { ...subjectsTags, ...industriesTags };
+
+  Object.keys(tagsJson).forEach((cat, idx) => {
+    const sCategory = cat.charAt(0).toUpperCase() + cat.slice(1);
     html += '<div class="category">';
-    html += `<h2>${cat}</h2>`;
-    html += renderItems(cat, idx, taxonomy);
+    html += `<h2>${sCategory}</h2>`;
+    html += renderItems(cat, idx, tagsJson);
     html += '</div>';
   });
+
   const results = document.getElementById('results');
   results.innerHTML = html;
 }
 
 async function getTaxonomy() {
-  const resp = await fetch('/tags.json');
+  const resp = await fetch('/new-tags.json');
   const tagsJson = await resp.json();
   return tagsJson.data;
 }
@@ -44,12 +54,12 @@ async function getTaxonomy() {
 function filter() {
   const searchTerm = document.getElementById('search').value.toLowerCase();
   document.querySelectorAll('#results .tag').forEach((tag) => {
-    const { title } = tag.dataset;
-    const offset = title.toLowerCase().indexOf(searchTerm);
+    const tagText = tag.innerText;
+    const offset = tagText.toLowerCase().indexOf(searchTerm);
     if (offset >= 0) {
-      const before = title.substring(0, offset);
-      const term = title.substring(offset, offset + searchTerm.length);
-      const after = title.substring(offset + searchTerm.length);
+      const before = tagText.substring(0, offset);
+      const term = tagText.substring(offset, offset + searchTerm.length);
+      const after = tagText.substring(offset + searchTerm.length);
       tag.innerHTML = `${before}<span class="highlight">${term}</span>${after}`;
       tag.closest('.path').classList.remove('filtered');
     } else {
@@ -79,7 +89,6 @@ function displaySelected() {
       const clone = path.cloneNode(true);
       clone.classList.remove('filtered', 'selected');
       const tag = clone.querySelector('.tag');
-      tag.innerHTML = tag.dataset.title;
       clone.addEventListener('click', () => {
         toggleTag(path);
       });
@@ -105,8 +114,7 @@ async function init() {
   const copyButton = selEl.querySelector('button.copy');
   copyButton.addEventListener('click', () => {
     const copyText = document.getElementById('copybuffer');
-    const sanitizedText = sanitizeName(copyText.value);
-    navigator.clipboard.writeText(sanitizedText);
+    navigator.clipboard.writeText(copyText.value);
 
     copyButton.disabled = true;
   });

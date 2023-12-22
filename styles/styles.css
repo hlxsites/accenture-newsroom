@@ -129,6 +129,10 @@ h6 {
   font-size: var(--heading-font-size-xs)
 }
 
+strong {
+  -webkit-font-smoothing: antialiased
+}
+
 p,
 dl,
 ol,
@@ -357,7 +361,7 @@ body.article main .section.abstract+.section {
   margin-left: 10px;
 }
 
-body.article main .section.abstract div.date {
+body.article main .section.abstract p.date {
   font-family: var(--graphik-semibold);
   font-size: 12px;
   font-weight: 600;
@@ -372,11 +376,15 @@ body.article main .section h1,
 body.article main .section.abstract h2,
 body.article main .section.abstract h3 {
   text-align: center;
-  font-family: var(--header-font-family-regular);
+  font-family: var(--graphik-semibold);
   font-weight: 700;
   font-size: 1rem;
   line-height: 1.6em;
   margin: 0;
+}
+
+body.article main p strong {
+  font-family: var(--graphik-semibold);
 }
 
 body.article main h6 {
@@ -575,4 +583,14 @@ main .section.highlight {
   #filter-year {
     width: 370px;
   }
+}
+
+.metadata.sidekick-library.block div  {
+  width: 100%;
+  display: flex;
+}
+
+.metadata.sidekick-library.block div div {
+  border-bottom: 1px solid;
+  padding: 5px;
 }

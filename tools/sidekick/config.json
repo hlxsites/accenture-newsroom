@@ -7,7 +7,7 @@
       "environments": [
         "edit"
       ],
-      "url": "/tools/tagger/index.html"
+      "url": "/tools/tagger"
     },
     {
       "id": "preflight",
@@ -21,7 +21,7 @@
       "id": "library",
       "title": "Library",
       "environments": [ "edit" ],
-      "url": "/tools/sidekick/library.html",
+      "url": "/tools/sidekick/library",
       "includePaths": [ "**.docx**" ]
     }
   ]

@@ -32,7 +32,7 @@ import {
 const LCP_BLOCKS = []; // add your LCP blocks to the list
 
 // regex to find abstract paragraph
-export const ABSTRACT_REGEX = /(.*?);.*?(\d{4})|(.*?)(\d{4})\s+–\s+\b|(.*?)(\d{4})\s+-\s+\b/;
+export const ABSTRACT_REGEX = /(.*?);.*?(\d{4})|(.*?)(\d{4})\s*(–|-|‒|:)\s*/;
 
 export const isMobile = () => window.innerWidth < 600;
 
@@ -531,25 +531,6 @@ const pdfLinkHandler = () => {
     addTargetAttribute(link);
   });
 };
-const convertPublishedDate = (dateString) => {
-  const dateObject = new Date(dateString);
-  const options = { year: 'numeric', month: 'long', day: 'numeric' };
-  const formattedDate = dateObject.toLocaleDateString('en-US', options);
-  return formattedDate;
-};
-
-const createHiddenPublishedDate = (parentElement) => {
-  const publishedDate = getMetadata('publisheddate');
-  if (!publishedDate) {
-    return;
-  }
-  const divDate = document.createElement('div');
-
-  divDate.innerHTML = convertPublishedDate(publishedDate);
-  divDate.classList.add('date');
-  divDate.style.display = 'none';
-  parentElement.insertAdjacentHTML('afterbegin', divDate.outerHTML);
-};
 
 function annotateArticleSections() {
   const template = getMetadata('template');
@@ -562,16 +543,9 @@ function annotateArticleSections() {
   const h1 = abstractSection.querySelector('h1');
   if (h1) {
     const date = h1.previousSibling;
-    const h1ParentElement = h1.parentNode;
-    if (!date) {
-      createHiddenPublishedDate(h1ParentElement);
-      return;
+    if (date) {
+      date.classList.add('date');
     }
-    const divDate = document.createElement('div');
-    divDate.innerHTML = date.innerHTML;
-    divDate.classList.add('date');
-    h1ParentElement.insertAdjacentHTML('afterbegin', divDate.outerHTML);
-    date.remove();
   }
   // annotate links
   const articleSections = document.querySelectorAll('main > .section');
@@ -699,14 +673,35 @@ async function loadEager(doc) {
   }
 }
 
+// Add custom event that will trigger if the jQuery is loaded
+export async function loadjQueryScript() {
+  const jqueryReadyEvent = new Event('jQueryReady');
+  const sJquerySrc = '/scripts/jquery-3.5.1.min.js';
+
+  return new Promise((resolve, reject) => {
+    if (!document.querySelector(`head > script[src="${sJquerySrc}"]`)) {
+      const script = document.createElement('script');
+      script.src = sJquerySrc;
+      const loaded = () => {
+        document.dispatchEvent(jqueryReadyEvent);
+        resolve();
+      };
+      script.onload = loaded;
+      script.onerror = reject;
+      document.head.append(script);
+    } else {
+      resolve();
+    }
+  });
+}
+
 async function loadJQueryDateRangePicker() {
   const filterInput = document.querySelector('#newslist-filter-input');
   if (!filterInput) {
     return;
   }
-  // await import('./moment.min.js');
   await loadScript('/scripts/moment.min.js');
-  await loadScript('/scripts/jquery-3.5.1.min.js');
+  await loadjQueryScript();
   await loadScript('/scripts/jquery.daterangepicker-20190409.js');
   await loadCSS('/styles/daterangepicker.css');
 
@@ -809,6 +804,76 @@ const preflightListener = async () => {
   customModal.showModal();
 };
 
+// Set event for the publish button for confirmation message
+const publishConfirmationPopUp = (oPublishButtons) => {
+  const oSidekick = document.querySelector('helix-sidekick');
+  // Add plugin listeners here
+  if (!oSidekick) {
+    return;
+  }
+  oPublishButtons.forEach((oPublishBtn) => {
+    // eslint-disable-next-line func-names, consistent-return
+    oPublishBtn.addEventListener('mousedown', function (e) {
+      // eslint-disable-next-line no-restricted-globals, no-alert
+      if (confirm('Are you sure you want to publish this content live?')) {
+        // continue publishing
+        this.click();
+      } else {
+        // avoid publishing
+        e.stopImmediatePropagation();
+        return false;
+      }
+    });
+  });
+};
+
+// Handler for publish button to set observer-
+// if the publish button is already loaded on the shadowroot
+const publishConfirmationHandler = (oSidekick) => {
+  if (!oSidekick) {
+    return;
+  }
+  const oShadowRoot = oSidekick.shadowRoot;
+  if (!oShadowRoot) {
+    return;
+  }
+
+  // Options for the observer (which mutations to observe)
+  const config = { childList: true, subtree: true };
+  // Callback function to execute when mutations are observed
+  const callback = (_mutationList, observer) => {
+    const oPublishButtons = oSidekick.shadowRoot.querySelectorAll('button[title="Publish"]');
+    if (oPublishButtons.length !== 0) {
+      publishConfirmationPopUp(oPublishButtons);
+      observer.disconnect();
+    }
+  };
+
+  // Create an observer instance linked to the callback function
+  const observer = new MutationObserver(callback);
+
+  // Start observing the target node for configured mutations
+  observer.observe(oShadowRoot, config);
+};
+
+// Observe helix-sidekick element if already loaded on the html body
+const helixSideKickObserver = () => {
+  // const oSidekick = document.querySelector('helix-sidekick');
+  const sk = document.querySelector('helix-sidekick');
+  if (sk) {
+    // sidekick already loaded
+    sk.addEventListener('custom:preflight', preflightListener);
+    publishConfirmationHandler(sk);
+  } else {
+    // wait for sidekick to be loaded
+    document.addEventListener('sidekick-ready', () => {
+      const oAddedSidekick = document.querySelector('helix-sidekick');
+      oAddedSidekick.addEventListener('custom:preflight', preflightListener);
+      publishConfirmationHandler(oAddedSidekick);
+    }, { once: true });
+  }
+};
+
 /**
  * Loads everything that doesn't need to be delayed.
  * @param {Element} doc The container element
@@ -829,12 +894,7 @@ async function loadLazy(doc) {
   loadFonts();
 
   centerArticleDivider(main);
-
-  // Add plugin listeners here
-  const sk = document.querySelector('helix-sidekick');
-  if (sk) {
-    sk.addEventListener('custom:preflight', preflightListener);
-  }
+  helixSideKickObserver();
 
   sampleRUM('lazy');
   sampleRUM.observe(main.querySelectorAll('div[data-block-name]'));

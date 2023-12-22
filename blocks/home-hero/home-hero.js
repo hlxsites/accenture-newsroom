@@ -21,7 +21,6 @@ function getBackgroundImage(picture) {
 }
 
 export default async function decorate(block) {
-  const genericText = ['read more'];
   const title = block.querySelector('h1');
   const overlayContainer = document.createElement('div');
   overlayContainer.classList.add('overlay-container');
@@ -30,22 +29,22 @@ export default async function decorate(block) {
     parent.innerHTML = element.innerHTML;
     overlayContainer.append(parent);
   });
-  overlayContainer.querySelectorAll('a').forEach((link) => {
+  overlayContainer.querySelectorAll('a').forEach((link, index) => {
     const linkText = (link.textContent && link.textContent.toLowerCase()) || '';
-    if (genericText.includes(linkText)) {
-      const textSpan = document.createElement('span');
-      textSpan.classList.add('sr-only');
-      textSpan.textContent = link.href.split('/').pop();
-      link.append(textSpan);
+    const ctaAriaLabel = `${linkText}: ${link.href.split('/').pop()}`;
+
+    if (index === 1) {
+      link.setAttribute('aria-label', ctaAriaLabel);
     }
     annotateElWithAnalyticsTracking(
       link,
-      link.textContent,
+      index === 1 ? `${ctaAriaLabel}` : link.textContent,
       ANALYTICS_MODULE_MARQUEE,
       ANALYTICS_TEMPLATE_ZONE_HERO,
       ANALYTICS_LINK_TYPE_HERO_CONTENT,
     );
   });
+
   if (title) {
     title.insertAdjacentElement('afterend', overlayContainer);
     const stripe = document.createElement('div');
@@ -63,7 +62,9 @@ export default async function decorate(block) {
     const linksContainer = document.createElement('div');
     linksContainer.classList.add('home-hero-links-container');
     linksContainer.append(links);
-    links.querySelectorAll('a').forEach((link) => {
+    const oDivider = document.createElement('li');
+    oDivider.classList.add('home-hero-divider');
+    links.querySelectorAll('a').forEach((link, iIndex, oLinks) => {
       annotateElWithAnalyticsTracking(
         link,
         link.textContent,
@@ -71,6 +72,11 @@ export default async function decorate(block) {
         ANALYTICS_TEMPLATE_ZONE_BODY,
         ANALYTICS_LINK_TYPE_NAV_PAGINATE,
       );
+      if (iIndex !== oLinks.length - 1) {
+        const oClonedDivider = oDivider.cloneNode(true);
+        const oLi = link.parentNode;
+        oLi.insertAdjacentElement('afterend', oClonedDivider);
+      }
     });
     block.append(linksContainer);
   }

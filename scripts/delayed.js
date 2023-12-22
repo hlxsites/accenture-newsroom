@@ -13,13 +13,13 @@ function getCookie(name) {
   return '';
 }
 
-function isProd() {
+export const isProd = () => {
   const { host } = window.location;
   if (host.startsWith('newsroom.accenture')) {
     return true;
   }
   return false;
-}
+};
 
 function addOneTrustCookieButton(text) {
   const OPTANON_BUTTON_ID = 'optanon-minimize-button';
@@ -112,17 +112,29 @@ async function addCookieOneTrust() {
   };
 }
 
-async function addMartechStack() {
-  // load jquery
-  await loadScript('/scripts/jquery-3.5.1.min.js', { async: 'false' });
-  // Add Adobe Analytics
+const loadAdobeDTM = async () => {
   if (isProd()) {
     await loadScript('https://assets.adobedtm.com/55621ea95d50/e22056dd1d90/launch-EN664f8f34ad5946f8a0f7914005f717cf.min.js');
   } else {
     await loadScript('https://assets.adobedtm.com/55621ea95d50/15ee9f97ba5a/launch-492e907d7db4-staging.min.js');
   }
+};
+
+export async function addMartechStack() {
+  // load jquery
+  await loadScript('/scripts/jquery-3.5.1.min.js', { async: 'false' });
   // Add Demandbase tag
   loadScript('//api.demandbase.com/api/v2/ip.json?key=4RB1W8tybpJRLdkTK0TRQcWfhYutivBKD5dyciDa', { async: 'true' });
+
+  if (typeof jQuery === 'undefined') {
+    document.addEventListener('jQueryReady', async () => {
+      // Add adobe analytics
+      await loadAdobeDTM();
+    });
+    return;
+  }
+
+  await loadAdobeDTM();
 }
 
 function getPageInstanceId(template, path, countryLanguage = '') {
@@ -332,15 +344,14 @@ function addDataLayer() {
   };
 }
 
-const addGeoScript = () => {
-  loadScript('/scripts/one-trust-geo-script.js');
+const loadAnalyticsFunctions = async () => {
+  await addCookieOneTrust();
+  await loadScript('/scripts/one-trust-geo-script.js', { type: 'module' });
 };
 
 // add more delayed functionality here
 addDataLayer();
-addCookieOneTrust();
-addMartechStack();
-addGeoScript();
+loadAnalyticsFunctions();
 
 // Core Web Vitals RUM collection
 sampleRUM('cwv');
