@@ -66,18 +66,24 @@ function cleanDescription(element) {
   return element.innerHTML;
 }
 
-/**
- * In the longdescrptionextracted field, iterate over all the child nodes and
- * check if the content matches with the regex, then return it as description.
- * Oterwise return the description field.
- * @param {*} queryIndexEntry
- * @returns
- */
-function getDescription(queryIndexEntry) {
-  const { longdescriptionextracted } = queryIndexEntry;
-  const div = document.createElement('div');
-  div.innerHTML = longdescriptionextracted;
-  const longdescriptionElements = Array.from(div.querySelectorAll('p'));
+const fetchArticleFragmentDescription = (sPath) => (
+  fetch(`${sPath}.plain.html`)
+    .then((response) => response.text())
+    .then((res) => {
+      const range = document.createRange();
+      const documentFragment = range.createContextualFragment(res);
+      return documentFragment.firstElementChild;
+    }).catch((err) => {
+      // eslint-disable-next-line no-console
+      console.log(`error while fetching ${sPath} `, err);
+      return document.createElement('div');
+    })
+);
+
+// Render the Fragment description based on the description ID
+const renderDescription = (oDivDesc, queryIndexEntry, sDescID) => {
+  const oAllParagraph = oDivDesc.querySelectorAll('p') || [];
+  const longdescriptionElements = Array.from(oAllParagraph);
   const matchingParagraph = longdescriptionElements.find((p) => ABSTRACT_REGEX.test(p.innerText));
   const oBr = matchingParagraph?.querySelector('br');
   if (oBr) {
@@ -86,7 +92,7 @@ function getDescription(queryIndexEntry) {
   let longdescription = matchingParagraph ? matchingParagraph.outerHTML : '';
   if (longdescription === '') {
     // obtain the description with out regex matching
-    longdescription = cleanDescription(div);
+    longdescription = cleanDescription(oDivDesc);
   }
   if (queryIndexEntry.description.length > longdescription.length) {
     longdescription = `<p>${queryIndexEntry.description}</p>`;
@@ -99,7 +105,27 @@ function getDescription(queryIndexEntry) {
   }
   const wrapper = document.createElement('div');
   wrapper.innerHTML = longdescription;
-  return wrapper.innerHTML;
+  const oDescWrapper = document.querySelector(`#${sDescID}`);
+
+  if (!oDescWrapper) {
+    return;
+  }
+  oDescWrapper.insertAdjacentHTML('beforeBegin', wrapper.innerHTML);
+};
+
+/**
+ * In the longdescrptionextracted field, iterate over all the child nodes and
+ * check if the content matches with the regex, then return it as description.
+ * Oterwise return the description field.
+ * @param {*} queryIndexEntry
+ * @returns
+ */
+function getDescription(queryIndexEntry, sDescID) {
+  const { path } = queryIndexEntry;
+  fetchArticleFragmentDescription(path)
+    .then((oDivDesc) => {
+      renderDescription(oDivDesc, queryIndexEntry, sDescID);
+    });
 }
 
 function filterByQuery(article, query) {
@@ -570,6 +596,7 @@ export default async function decorate(block) {
     const e = shortIndex[i];
     let itemHtml;
     if (isSearch) {
+      const sSearchContentID = `search-results-item-content-${i}`;
       itemHtml = `
       <div class="search-results-item">
         <div class="search-results-item-published-date">
@@ -578,11 +605,12 @@ export default async function decorate(block) {
         <div class="search-results-item-title">
           <a href="${e.path}" title="${e.title}" target="_blank">${e.title}</a>
         </div>
-        <div class="search-results-item-content">${getDescription(e)}</div>
+        <div id="${sSearchContentID}" class="search-results-item-content"></div>
       </div>
-
       `;
+      getDescription(e, sSearchContentID);
     } else {
+      const sDescID = `newslist-item-description-${i}`;
       itemHtml = `
         <div class="newslist-item">
           <div class="newslist-item-title">
@@ -590,9 +618,7 @@ export default async function decorate(block) {
               <a href="${e.path}" title="${e.title}">${e.title}</a>
             </h3>
           </div>
-          <div class="newslist-item-description">
-            ${getDescription(e)}
-          </div>
+          <div id="${sDescID}" class="newslist-item-description"></div>
           <div class="newslist-item-footer">
             <a href="${e.path}" title="${pReadMore}">${pReadMore}
               <span class="read-more-arrow"></span>
@@ -604,6 +630,7 @@ export default async function decorate(block) {
           </div>
         </div>
       `;
+      getDescription(e, sDescID);
     }
     const item = range.createContextualFragment(itemHtml);
     item.querySelectorAll('a:not(.newslist-item-description a), a:not(.search-results-item-content a)').forEach((link) => {
