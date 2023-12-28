@@ -1,17 +1,11 @@
 // eslint-disable-next-line import/no-cycle
 import { sampleRUM, loadScript, getMetadata } from './lib-franklin.js';
 // eslint-disable-next-line import/no-cycle
-import { getCountry, getLanguage } from './scripts.js';
+import { getCountry, getLanguage, getSiteFromHostName } from './scripts.js';
 import { ANALYTICS_LINK_TYPE_CTA, ANALYTICS_TEMPLATE_ZONE_CONSENT_MANAGER } from './constants.js';
+import { getCookie } from './cookies.js';
 
 const ONETRUST_SDK = 'https://cdn.cookielaw.org/scripttemplates/otSDKStub.js';
-
-function getCookie(name) {
-  const value = `; ${window.document.cookie}`;
-  const parts = value.split(`; ${name}=`);
-  if (parts.length === 2) return parts.pop().split(';').shift();
-  return '';
-}
 
 export const isProd = () => {
   const { host } = window.location;
@@ -28,7 +22,6 @@ function addOneTrustCookieButton(text) {
     optanonWrapper.id = 'optanon-minimize-wrapper';
     optanonWrapper.setAttribute('data-analytics-template-zone', 'consent manager');
     optanonWrapper.setAttribute('data-analytics-module-name', 'consent manager');
-    optanonWrapper.classList.add('optanon-toggle-display');
 
     const optanonButton = document.createElement('button');
     optanonButton.id = OPTANON_BUTTON_ID;
@@ -37,6 +30,7 @@ function addOneTrustCookieButton(text) {
     optanonButton.setAttribute('data-analytics-content-type', 'cta');
     optanonButton.setAttribute('aria-label', text);
     optanonButton.textContent = text;
+    optanonButton.classList.add('optanon-toggle-display');
 
     optanonWrapper.appendChild(optanonButton);
     document.body.appendChild(optanonWrapper);
@@ -78,12 +72,11 @@ function attachOneTrustCookieListeners() {
       if (event.target.matches('button[class*="save-preference"], button[id*="accept"]')) {
         const minimizeButtonText = document.querySelector('button#onetrust-pc-btn-handler').textContent;
         localStorage.setItem(minimizeButtonKey, minimizeButtonText);
-        document.cookie = `OptanonAlertBoxClosed=${new Date().toISOString()};path=/`;
         addOneTrustCookieButton(minimizeButtonText);
       }
     });
     document.addEventListener('click', (event) => {
-      if (event.target.matches('.optanon-toggle-display')) {
+      if (event.target.matches('button.optanon-toggle-display')) {
         window.Optanon.ToggleInfoDisplay();
       }
     });
@@ -93,18 +86,30 @@ function attachOneTrustCookieListeners() {
   }
 }
 
+const getOneTrustID = () => {
+  const oneTrustIDProdMapping = {
+    us: 'b6b6947b-e233-46b5-9b4e-ccc2cd860869',
+    uk: '362e7a8e-16d1-4e8d-9ab4-e2ba4bca3edd',
+    de: '82193cd2-7337-4e95-956e-188d5cf0baaf',
+    fr: '0d7084e7-1b00-419b-ae50-368256d1ee83',
+    it: 'a9d0122b-3209-4753-a762-ea3b4855066d',
+    es: '80ebe858-88d5-4368-981d-150ffd344a75',
+    sg: '72a1c11a-1aba-4244-9fef-0ad7fb6ec5c6',
+    pt: 'pe4681292-6675-4d12-b28d-5ba7b1f839b5t',
+    jp: 'f5136d53-e03f-4a27-938b-9b2db9afd683',
+    br: '74a9dc14-8acf-4720-83a8-e4f16044137e',
+  };
+  const site = getSiteFromHostName();
+  return isProd() ? oneTrustIDProdMapping[site] : `${oneTrustIDProdMapping[site]}-test`;
+};
+
 async function addCookieOneTrust() {
-  let otId;
-  if (isProd()) {
-    otId = 'b6b6947b-e233-46b5-9b4e-ccc2cd860869';
-  } else {
-    otId = 'b6b6947b-e233-46b5-9b4e-ccc2cd860869-test';
-  }
+  const sOneTrustID = getOneTrustID();
 
   await loadScript(ONETRUST_SDK, {
     type: 'text/javascript',
     charset: 'UTF-8',
-    'data-domain-script': `${otId}`,
+    'data-domain-script': `${sOneTrustID}`,
   });
   attachOneTrustCookieListeners();
   window.OptanonWrapper = () => {
