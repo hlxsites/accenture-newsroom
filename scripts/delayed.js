@@ -87,7 +87,7 @@ function attachOneTrustCookieListeners() {
 }
 
 const getOneTrustID = () => {
-  const oneTrustIDProdMapping = {
+  const oOneTrustIDProdMapping = {
     us: 'b6b6947b-e233-46b5-9b4e-ccc2cd860869',
     uk: '362e7a8e-16d1-4e8d-9ab4-e2ba4bca3edd',
     de: '82193cd2-7337-4e95-956e-188d5cf0baaf',
@@ -99,8 +99,8 @@ const getOneTrustID = () => {
     jp: 'f5136d53-e03f-4a27-938b-9b2db9afd683',
     br: '74a9dc14-8acf-4720-83a8-e4f16044137e',
   };
-  const site = getSiteFromHostName();
-  return isProd() ? oneTrustIDProdMapping[site] : `${oneTrustIDProdMapping[site]}-test`;
+  const sSite = getSiteFromHostName();
+  return isProd() ? oOneTrustIDProdMapping[sSite] : `${oOneTrustIDProdMapping[sSite]}-test`;
 };
 
 async function addCookieOneTrust() {
