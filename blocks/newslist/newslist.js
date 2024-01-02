@@ -110,12 +110,10 @@ function filterByQuery(article, query) {
   // DOM manipulation in getDescrption function is very expensive to use for every
   // article filtering
   const longdescription = article.longdescriptionextracted.toLowerCase();
-  return queryTokens.every((token) => {
-    if (title.includes(token) || longdescription.includes(token)) {
-      return true;
-    }
-    return false;
-  });
+  const aSearchKeywords = article.keywords ? article.keywords.split(',').map((t) => t.toLowerCase().trim()) : [];
+  return queryTokens.every((token) => (title.includes(token)
+    || longdescription.includes(token)
+    || aSearchKeywords.includes(token)));
 }
 
 function ifArticleBetweenDates(article, fromDate, toDate) {
