@@ -53,7 +53,7 @@ async function generatePDF(pageName) {
  */
 
 const getTaxonomy = async () => {
-  const resp = await fetch('/new-tags.json');
+  const resp = await fetch('/tags.json');
   const tagsJson = await resp.json();
   return tagsJson.data;
 };
