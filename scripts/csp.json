@@ -28,7 +28,7 @@
       "dpm.demdex.net",
       "api.company-target.com",
       "adobedc.demdex.net",
-      "*.data.accenture.cn"
+      "*.accenture.cn"
   ],
   "img-src": [
     "'self'",
