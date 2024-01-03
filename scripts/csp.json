@@ -27,7 +27,8 @@
       "cdn.cookielaw.org",
       "dpm.demdex.net",
       "api.company-target.com",
-      "adobedc.demdex.net"
+      "adobedc.demdex.net",
+      "data.accenture.cn"
   ],
   "img-src": [
     "'self'",
