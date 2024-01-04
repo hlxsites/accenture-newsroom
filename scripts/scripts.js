@@ -69,6 +69,8 @@ export function getSiteFromHostName(hostname = window.location.hostname) {
   }
 
   // handle franklin hostnames
+  // https://main--accenture-newsroom-jp--hlxsites.hlx.live/
+  // https://main--accenture-newsroom-br--hlxsites.hlx.live/
   const franklinHostName = 'accenture-newsroom';
   if (hostname.includes(franklinHostName)) {
     for (let i = 0; i < allowedSites.length; i += 1) {
