@@ -41,6 +41,33 @@ export function getSiteFromHostName(hostname = window.location.hostname) {
   if (hostname === 'localhost') {
     return 'us';
   }
+
+  // handle lower envi hostnames (Dev, Stage)
+  // https://main--254599-nr-dev-br--accenture-cio-aemnewsroom.hlx.live/
+  // https://main--254599-nr-stage-br--accenture-cio-aemnewsorom.hlx.live/
+  const lowerEnviHostName = 'accenture-cio-aemnewsroom';
+  if (hostname.includes(lowerEnviHostName)) {
+    for (let i = 0; i < allowedSites.length; i += 1) {
+      if (hostname.includes(`${allowedSites[i]}--${lowerEnviHostName}`)) {
+        return allowedSites[i];
+      }
+    }
+    return 'us';
+  }
+
+  // handle cloudfront dev envi hostnames
+  // https://newsroom.ciodev.accenture.com/es
+  const cfDevEnviHostName = '.ciodev.accenture';
+  const hostHref = window.location.href;
+  if (hostname.includes(hostHref)) {
+    for (let i = 0; i < allowedSites.length; i += 1) {
+      if (hostHref.includes(`.${cfDevEnviHostName}/${allowedSites[i]}`)) {
+        return allowedSites[i];
+      }
+    }
+    return 'us';
+  }
+
   // handle franklin hostnames
   const franklinHostName = 'accenture-newsroom';
   if (hostname.includes(franklinHostName)) {
@@ -51,7 +78,10 @@ export function getSiteFromHostName(hostname = window.location.hostname) {
     }
     return 'us';
   }
+
   // handle main hostnames
+  // https://newsroom.accenturebr.com/
+  // https://newsroom.accenture.co.uk/
   const mainHostName = 'newsroom.accenture';
   if (hostname.includes(mainHostName)) {
     const remainingHostName = hostname.replace(`${mainHostName}`, '');
