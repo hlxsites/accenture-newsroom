@@ -6,11 +6,17 @@ indices:
       - /**
     target: /query-index.json
     properties:
+      lastModified:
+        select: none
+        value: parseTimestamp(headers["last-modified"], "ddd, DD MMM YYYY hh:mm:ss GMT")
       title:
         select: head > meta[property="og:title"]
         value: attribute(el, "content")
       description:
         select: head > meta[name="description"]
+        value: attribute(el, "content")
+      publisheddate:
+        select: head > meta[name="publisheddate"]
         value: attribute(el, "content")
       industries:
         select: head > meta[name="industries"]
@@ -21,6 +27,9 @@ indices:
       publisheddateinseconds:
         select: head > meta[name="publisheddate"]
         value: parseTimestamp(attribute(el, 'content'), 'ddd, DD MMM YYYY hh:mm:ss.SSS GMT')
+      longdescriptionextracted:
+        select: main > div:first-child
+        value: innerHTML(el)
       template:
         select: head > meta[name="template"]
         value: attribute(el, "content")
