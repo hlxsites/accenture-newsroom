@@ -110,7 +110,10 @@ const renderDescription = (oDivDesc, queryIndexEntry, sDescID) => {
   if (!oDescWrapper) {
     return;
   }
-  oDescWrapper.insertAdjacentHTML('beforeBegin', wrapper.innerHTML);
+  const oParentDescWrapper = oDescWrapper.parentNode;
+  oParentDescWrapper.classList.remove('newslist-item-description-pending');
+  oParentDescWrapper.classList.remove('search-result-item-description-pending');
+  oDescWrapper.insertAdjacentHTML('afterBegin', wrapper.innerHTML);
 };
 
 /**
@@ -598,7 +601,7 @@ export default async function decorate(block) {
     if (isSearch) {
       const sSearchContentID = `search-results-item-content-${i}`;
       itemHtml = `
-      <div class="search-results-item">
+      <div class="search-results-item search-result-item-description-pending">
         <div class="search-results-item-published-date">
           ${getHumanReadableDate(e.publisheddateinseconds * 1000)}
         </div>
@@ -612,7 +615,7 @@ export default async function decorate(block) {
     } else {
       const sDescID = `newslist-item-description-${i}`;
       itemHtml = `
-        <div class="newslist-item">
+        <div class="newslist-item newslist-item-description-pending">
           <div class="newslist-item-title">
             <h3>
               <a href="${e.path}" title="${e.title}">${e.title}</a>
