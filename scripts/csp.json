@@ -15,7 +15,8 @@
       "cdnjs.cloudflare.com",
       "play.vidyard.com",
       "api.demandbase.com",
-      "img.en25.com"     
+      "img.en25.com",
+      "*.accenture.cn"     
   ],
   "connect-src": [
       "'self'",
