@@ -95,7 +95,7 @@ const getOneTrustID = () => {
     it: 'a9d0122b-3209-4753-a762-ea3b4855066d',
     es: '80ebe858-88d5-4368-981d-150ffd344a75',
     sg: '72a1c11a-1aba-4244-9fef-0ad7fb6ec5c6',
-    pt: 'pe4681292-6675-4d12-b28d-5ba7b1f839b5t',
+    pt: 'e4681292-6675-4d12-b28d-5ba7b1f839b5',
     jp: 'f5136d53-e03f-4a27-938b-9b2db9afd683',
     br: '74a9dc14-8acf-4720-83a8-e4f16044137e',
   };
