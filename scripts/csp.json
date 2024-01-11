@@ -16,7 +16,7 @@
       "play.vidyard.com",
       "api.demandbase.com",
       "img.en25.com",
-      "*.accenture.cn"     
+      "https://data.accenture.cn"     
   ],
   "connect-src": [
       "'self'",
@@ -29,7 +29,7 @@
       "dpm.demdex.net",
       "api.company-target.com",
       "adobedc.demdex.net",
-      "*.accenture.cn"
+      "https://data.accenture.cn"
   ],
   "img-src": [
     "'self'",
