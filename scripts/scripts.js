@@ -836,49 +836,10 @@ const publishConfirmationHandler = (oSidekick) => {
   observer.observe(oShadowRoot, config);
 };
 
-async function publishLaterListener() {
-  const section = createTag('div');
-  const wrapper = createTag('div');
-  section.appendChild(wrapper);
-  const plBlock = buildBlock('publish-later', `<a href="${window.hlx.codeBasePath}/drafts/amol/publish-later.json">${window.hlx.codeBasePath}/drafts/amol/publish-later.json</a>`);
-  wrapper.appendChild(plBlock);
-  decorateBlock(plBlock);
-  await loadBlock(plBlock);
-  const { default: getModal } = await import('../blocks/modal/modal.js');
-  const customModal = await getModal('dialog-modal', () => section.innerHTML, (modal) => {
-    modal.querySelector('button[name="close"]')?.addEventListener('click', () => modal.close());
-  });
-  customModal.showModal();
-  const calOptions = {
-    input: true,
-    settings: {
-      selection: {
-        time: 24,
-      },
-    },
-    actions: {
-      changeToInput(e, calendar, dates, time, hours, minutes) {
-        if (dates[0]) {
-          const selectedDT = new Date(`${dates[0]}T${hours}:${minutes}:00.000`);
-          calendar.HTMLInputElement.value = selectedDT.toISOString();
-        } else {
-          calendar.HTMLInputElement.value = '';
-        }
-      },
-    },
-  };
-
-  // eslint-disable-next-line no-undef
-  const dateTimeEl = document.querySelector('#datetime');
-  if (dateTimeEl) {
-    // eslint-disable-next-line no-undef
-    const calendar = new VanillaCalendar(dateTimeEl, calOptions);
-    calendar.init();
-    const calendarContainer = document.querySelector('.vanilla-calendar');
-    if (calendarContainer) customModal.appendChild(calendarContainer);
-  }
+async function publishLaterListener(ev) {
+  const { publishLater } = await import('../tools/sidekick/authoring.js');
+  publishLater(ev.detail.data);
 }
-
 
 // Observe helix-sidekick element if already loaded on the html body
 const helixSideKickObserver = () => {

@@ -27,7 +27,6 @@
     {
       "id": "publishlater",
       "title": "Publish Later",
-      "isPalette": true,
       "environments": [
         "dev", "preview"
       ],
