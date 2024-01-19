@@ -129,6 +129,10 @@ h6 {
   font-size: var(--heading-font-size-xs)
 }
 
+strong {
+  -webkit-font-smoothing: antialiased
+}
+
 p,
 dl,
 ol,
@@ -579,4 +583,14 @@ main .section.highlight {
   #filter-year {
     width: 370px;
   }
+}
+
+.metadata.sidekick-library.block div  {
+  width: 100%;
+  display: flex;
+}
+
+.metadata.sidekick-library.block div div {
+  border-bottom: 1px solid;
+  padding: 5px;
 }

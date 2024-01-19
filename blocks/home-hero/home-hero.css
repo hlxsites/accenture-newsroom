@@ -140,7 +140,6 @@
     display: block;
     border-top: 4px solid #004dff;
     border-bottom: 4px solid #004dff;
-    padding-left: 7px;
     min-height: 85px;
     line-height: 85px;
   }
@@ -162,26 +161,17 @@
     font-weight: 600;
     color: #004dff;
     text-decoration: none;
-    margin-right: 20px;
   }
 
   .home-hero.block .home-hero-links-container ul li a:hover {
     color: #008;
   }
 
-  .home-hero.block .home-hero-links-container ul li::after {
-    content: '';
-    position: relative;
-    display: inline-block;
+  .home-hero.block .home-hero-links-container ul li.home-hero-divider {
     height: 2.5em;
     width: 2px;
     background-color: #e3e3e3;
-    top: 13px;
-    left: 5px;
-  }
-
-  .home-hero.block .home-hero-links-container ul li:last-child::after {
-    content: none;
+    margin: auto 0;
   }
 
   .home-hero.block .home-hero-stripe{

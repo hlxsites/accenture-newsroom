@@ -1,0 +1,34 @@
+.section .image-wrapper {
+  margin-top: 1rem;
+}
+
+.image.block picture {
+  display: flex;
+  justify-content: center;
+}
+
+.image.block img {
+  width: auto;
+}
+
+.image .caption {
+  font-size: 12px;
+  font-style: italic;
+  text-align: center;
+  margin-top: 6px;
+  line-height: 1.2;
+}
+
+/* variations */
+
+.image.block.left {
+  justify-content: left;
+}
+
+.image.block.right {
+  justify-content: right;
+}
+
+.image-wrapper + .default-content-wrapper > p {
+  margin-top: 0;
+}

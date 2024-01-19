@@ -62,7 +62,7 @@ export default async function decorate(block) {
     const preFooter = footer.querySelector('.section.pre-footer');
     const contactHrefText = getPlaceholder('contact', placeholders);
     preFooter.querySelectorAll('a').forEach((link) => {
-      const moduleName = link.href.includes(contactHrefText)
+      const moduleName = link.href.includes(contactHrefText) || link.href.includes('@')
         ? ANALYTICS_MODULE_CONTACT_US : ANALYTICS_MODULE_CORPORATE_INFORMATION_LINKS;
       annotateElWithAnalyticsTracking(
         link,

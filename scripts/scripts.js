@@ -673,14 +673,35 @@ async function loadEager(doc) {
   }
 }
 
+// Add custom event that will trigger if the jQuery is loaded
+export async function loadjQueryScript() {
+  const jqueryReadyEvent = new Event('jQueryReady');
+  const sJquerySrc = '/scripts/jquery-3.5.1.min.js';
+
+  return new Promise((resolve, reject) => {
+    if (!document.querySelector(`head > script[src="${sJquerySrc}"]`)) {
+      const script = document.createElement('script');
+      script.src = sJquerySrc;
+      const loaded = () => {
+        document.dispatchEvent(jqueryReadyEvent);
+        resolve();
+      };
+      script.onload = loaded;
+      script.onerror = reject;
+      document.head.append(script);
+    } else {
+      resolve();
+    }
+  });
+}
+
 async function loadJQueryDateRangePicker() {
   const filterInput = document.querySelector('#newslist-filter-input');
   if (!filterInput) {
     return;
   }
-  // await import('./moment.min.js');
   await loadScript('/scripts/moment.min.js');
-  await loadScript('/scripts/jquery-3.5.1.min.js');
+  await loadjQueryScript();
   await loadScript('/scripts/jquery.daterangepicker-20190409.js');
   await loadCSS('/styles/daterangepicker.css');
 
@@ -784,12 +805,12 @@ const preflightListener = async () => {
 };
 
 // Set event for the publish button for confirmation message
-const publishConfirmationPopUp = (oSidekick, oPublishButtons) => {
+const publishConfirmationPopUp = (oPublishButtons) => {
+  const oSidekick = document.querySelector('helix-sidekick');
   // Add plugin listeners here
   if (!oSidekick) {
     return;
   }
-  oSidekick.addEventListener('custom:preflight', preflightListener);
   oPublishButtons.forEach((oPublishBtn) => {
     // eslint-disable-next-line func-names, consistent-return
     oPublishBtn.addEventListener('mousedown', function (e) {
@@ -819,12 +840,11 @@ const publishConfirmationHandler = (oSidekick) => {
 
   // Options for the observer (which mutations to observe)
   const config = { childList: true, subtree: true };
-
   // Callback function to execute when mutations are observed
   const callback = (_mutationList, observer) => {
     const oPublishButtons = oSidekick.shadowRoot.querySelectorAll('button[title="Publish"]');
     if (oPublishButtons.length !== 0) {
-      publishConfirmationPopUp(oSidekick, oPublishButtons);
+      publishConfirmationPopUp(oPublishButtons);
       observer.disconnect();
     }
   };
@@ -843,32 +863,22 @@ async function publishLaterListener(ev) {
 
 // Observe helix-sidekick element if already loaded on the html body
 const helixSideKickObserver = () => {
-  const oSidekick = document.querySelector('helix-sidekick');
-  if (oSidekick) {
-    publishConfirmationHandler(oSidekick);
-    oSidekick.addEventListener('custom:publishlater', publishLaterListener);
-    return;
-  }
-  const oBody = document.querySelector('body');
-
-  // Options for the observer (which mutations to observe)
-  const config = { childList: true };
-
-  // Callback function to execute when mutations are observed
-  const callback = (_mutationList, observer) => {
-    const oAddedSidekick = document.querySelector('helix-sidekick');
-    if (oAddedSidekick) {
-      publishConfirmationHandler(oAddedSidekick);
+  // const oSidekick = document.querySelector('helix-sidekick');
+  const sk = document.querySelector('helix-sidekick');
+  if (sk) {
+    // sidekick already loaded
+    sk.addEventListener('custom:preflight', preflightListener);
+    sk.addEventListener('custom:publishlater', publishLaterListener);
+    publishConfirmationHandler(sk);
+  } else {
+    // wait for sidekick to be loaded
+    document.addEventListener('sidekick-ready', () => {
+      const oAddedSidekick = document.querySelector('helix-sidekick');
+      oAddedSidekick.addEventListener('custom:preflight', preflightListener);
       oAddedSidekick.addEventListener('custom:publishlater', publishLaterListener);
-      observer.disconnect();
-    }
-  };
-
-  // Create an observer instance linked to the callback function
-  const observer = new MutationObserver(callback);
-
-  // Start observing the target node for configured mutations
-  observer.observe(oBody, config);
+      publishConfirmationHandler(oAddedSidekick);
+    }, { once: true });
+  }
 };
 
 /**
