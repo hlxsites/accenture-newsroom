@@ -23,13 +23,11 @@
       "environments": [ "edit" ],
       "url": "/tools/sidekick/library",
       "includePaths": [ "**.docx**" ]
-    },
-    {
-      "specialViews": [{
-        "title": "PDF Viewer",
-        "path": "**.pdf",
-        "viewer": "/tools/pdf-viewer/index.html"
-      }]
     }
-  ]
+  ],
+  "specialViews": [{
+    "title": "PDF Viewer",
+    "path": "**.pdf",
+    "viewer": "/tools/pdf-viewer/index.html"
+  }]
 }
