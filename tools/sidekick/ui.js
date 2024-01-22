@@ -86,7 +86,7 @@ export async function acknowledge(title, message, type, btnLabel = 'Ok') {
     'acknowledge',
     `<h1>${title}</h1>`,
     `<p>${message}</p>`,
-    `<button value="true">${btnLabel}</button>`,
+    `<button class="button" value="true">${btnLabel}</button>`,
     type,
   );
 }
@@ -106,8 +106,8 @@ export async function confirm(title, message, type, yesLabel = 'Yes', noLabel = 
     'confirm',
     `<h1>${title}</h1>`,
     `<p>${message}</p>`,
-    `<button value="true">${yesLabel}</button>
-    <button value="false">${noLabel}</button>`,
+    `<button class="button cta" value="true">${yesLabel}</button>
+    <button class="button secondary" value="false">${noLabel}</button>`,
     type,
   );
 }

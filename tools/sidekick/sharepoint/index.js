@@ -55,12 +55,9 @@ export default class SharepointSDK {
     return `${GRAPHQL_ENDPOINT}/sites/${this.#domain},${this.#domainId},${this.#siteId}/drive/root:${this.#rootPath}`;
   }
 
-  async signIn() {
+  async signIn(clientId, authority) {
     const publicClientApplication = new PublicClientApplication({
-      auth: {
-        clientId: 'f4bd8221-936d-4fd8-949a-8c14864bf16a',
-        authority: 'https://login.microsoftonline.com/fa7b1b5a-7b34-4387-94ae-d2c178decee1',
-      },
+      auth: { clientId, authority },
     });
 
     await publicClientApplication.loginPopup({

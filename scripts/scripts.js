@@ -861,14 +861,26 @@ async function publishLaterListener(ev) {
   publishLater(ev.detail.data);
 }
 
+async function pageInfoEnhancer() {
+  const { enhancePageInfo } = await import('../tools/sidekick/authoring.js');
+  enhancePageInfo();
+}
+
 // Observe helix-sidekick element if already loaded on the html body
 const helixSideKickObserver = () => {
+  const observer = new MutationObserver((mutations) => {
+    if (!mutations.pop().target.classList.contains('dropdown-expanded')) {
+      return;
+    }
+    pageInfoEnhancer();
+  });
   // const oSidekick = document.querySelector('helix-sidekick');
   const sk = document.querySelector('helix-sidekick');
   if (sk) {
     // sidekick already loaded
     sk.addEventListener('custom:preflight', preflightListener);
     sk.addEventListener('custom:publishlater', publishLaterListener);
+    observer.observe(sk.shadowRoot.querySelector('.plugin.info'), { attributes: true, attributeFilter: ['class'] });
     publishConfirmationHandler(sk);
   } else {
     // wait for sidekick to be loaded
@@ -876,6 +888,7 @@ const helixSideKickObserver = () => {
       const oAddedSidekick = document.querySelector('helix-sidekick');
       oAddedSidekick.addEventListener('custom:preflight', preflightListener);
       oAddedSidekick.addEventListener('custom:publishlater', publishLaterListener);
+      observer.observe(oAddedSidekick.shadowRoot.querySelector('.plugin.info'), { attributes: true, attributeFilter: ['class'] });
       publishConfirmationHandler(oAddedSidekick);
     }, { once: true });
   }

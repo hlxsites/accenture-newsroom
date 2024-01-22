@@ -29,7 +29,10 @@ export default async function createDialog(modalId, header, content, footer, typ
   if (!dialogElement) {
     dialogElement = document.createElement('dialog');
     dialogElement.id = modalId;
-    dialogElement.classList.add(type);
+    dialogElement.classList.add('aem-Dialog');
+    if (type) {
+      dialogElement.classList.add(type);
+    }
 
     let headerHTML;
     if (typeof header === 'function') {
@@ -62,12 +65,14 @@ export default async function createDialog(modalId, header, content, footer, typ
       <section>
         <form class="form" method="dialog">
           ${(header || footer) ? `
-            <header class="dialog-header">
-              <button type="button" value="close"><span class="icon icon-x"></span></button>
+            <header>
+              <button type="button" value="close">
+                <span class="icon icon-x"></span>
+              </button>
               ${headerHTML}
             </header>` : ''}
-          <div class="dialog-content">${contentHTML}</div>
-          ${footer ? `<footer class="dialog-footer">${footerHTML}</footer>` : ''}
+          <div class="aem-Dialog-content">${contentHTML}</div>
+          ${footer ? `<footer>${footerHTML}</footer>` : ''}
         </form>
       </section>`;
 
