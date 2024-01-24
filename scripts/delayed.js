@@ -121,7 +121,7 @@ const loadAdobeDTM = async () => {
   if (isProd()) {
     await loadScript('https://assets.adobedtm.com/55621ea95d50/e22056dd1d90/launch-EN664f8f34ad5946f8a0f7914005f717cf.min.js');
   } else {
-    await loadScript('https://assets.adobedtm.com/55621ea95d50/e22056dd1d90/launch-EN379c80f941604b408953a2df1776d1c6-staging.min.js');
+    await loadScript('https://assets.adobedtm.com/55621ea95d50/15ee9f97ba5a/launch-492e907d7db4-staging.min.js');
   }
 };
 

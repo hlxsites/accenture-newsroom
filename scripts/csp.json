@@ -14,7 +14,9 @@
       "dpm.demdex.net",
       "cdnjs.cloudflare.com",
       "play.vidyard.com",
-      "api.demandbase.com"
+      "api.demandbase.com",
+      "img.en25.com",
+      "data.accenture.cn"
   ],
   "connect-src": [
       "'self'",
@@ -25,7 +27,9 @@
       "assets.adobedtm.com",
       "cdn.cookielaw.org",
       "dpm.demdex.net",
-      "api.company-target.com"
+      "api.company-target.com",
+      "adobedc.demdex.net",
+      "data.accenture.cn"
   ],
   "img-src": [
     "'self'",
