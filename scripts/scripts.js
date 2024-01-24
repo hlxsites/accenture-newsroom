@@ -879,7 +879,7 @@ const helixSideKickObserver = () => {
  * @param {Element} doc The container element
  */
 async function loadLazy(doc) {
-  await setCSP();
+  // await setCSP();
   const main = doc.querySelector('main');
   await loadBlocks(main);
 
