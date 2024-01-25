@@ -7,6 +7,7 @@ import {
   ANALYTICS_LINK_TYPE_CONTENT_MODULE,
   ANALYTICS_MODULE_YEAR_FILTER,
   ANALYTICS_LINK_TYPE_FILTER,
+  INVALID_TAG_ERROR,
 } from './constants.js';
 import ffetch from './ffetch.js';
 import {
@@ -785,7 +786,6 @@ const preflightListener = async () => {
 
 const hasInvalidTags = () => {
   const oAsideComponent = document.querySelector('.aside-container');
-  const sInvalidText = '(INVALID. Use the tagger to input a tag)';
   let bHasInvalidTags = false;
   if (!oAsideComponent) {
     return false;
@@ -803,7 +803,7 @@ const hasInvalidTags = () => {
   }
 
   aAllTagsText.forEach((sTags) => {
-    if (sTags.includes(sInvalidText)) {
+    if (sTags.includes(INVALID_TAG_ERROR)) {
       bHasInvalidTags = true;
     }
   });
@@ -833,7 +833,7 @@ const publishConfirmationPopUp = (oPublishButtons) => {
       const sTagRemarks = hasInvalidTags() ? 'With Invalid Tags' : '';
       if (hasInvalidTags()) {
         // eslint-disable-next-line no-alert
-        alert(` Page will not publish\n Content Date is ${getContentDate()}\n ${sTagRemarks}\n`);
+        alert(`Publishing Error: Unable to publish page. Invalid tags detected. Please review and correct the tags before attempting to publish again\nContent Date is ${getContentDate()}\n${sTagRemarks}\n`);
         e.stopImmediatePropagation();
         return false;
       }

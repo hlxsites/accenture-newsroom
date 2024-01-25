@@ -21,6 +21,7 @@ import {
   ANALYTICS_MODULE_SHARE,
   ANALYTICS_MODULE_SUBJECT_TAGS,
   ANALYTICS_TEMPLATE_ZONE_RIGHT_RAIL,
+  INVALID_TAG_ERROR,
 } from '../../scripts/constants.js';
 
 async function generatePDF(pageName) {
@@ -68,7 +69,7 @@ const getTagTitleHandler = (sTag, oTaxonomy) => {
   }
 
   if (!sDomain.includes('https://newsroom')) {
-    const sInvalidTag = `${sTag} (INVALID. Use the tagger to input a tag)`;
+    const sInvalidTag = `${sTag} ${INVALID_TAG_ERROR}`;
     return { tagTitle: sInvalidTag, valid: false };
   }
 
