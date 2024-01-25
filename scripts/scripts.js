@@ -830,15 +830,14 @@ const publishConfirmationPopUp = (oPublishButtons) => {
   oPublishButtons.forEach((oPublishBtn) => {
     // eslint-disable-next-line func-names, consistent-return
     oPublishBtn.addEventListener('mousedown', function (e) {
-      const sTagRemarks = hasInvalidTags() ? 'With Invalid Tags' : '';
       if (hasInvalidTags()) {
         // eslint-disable-next-line no-alert
-        alert(`Publishing Error: Unable to publish page. Invalid tags detected. Please review and correct the tags before attempting to publish again\nContent Date is ${getContentDate()}\n${sTagRemarks}\n`);
+        alert(`Publishing Error: Unable to publish page. Invalid tags detected. Please review and correct the tags before attempting to publish again.\nContent Date is ${getContentDate()}\n`);
         e.stopImmediatePropagation();
         return false;
       }
       // eslint-disable-next-line no-restricted-globals, no-alert
-      if (confirm(` Are you sure you want to publish this content live?\n Content Date is ${getContentDate()}\n ${sTagRemarks}\n`)) {
+      if (confirm(` Are you sure you want to publish this content live?\n Content Date is ${getContentDate()}`)) {
         // continue publishing
         this.click();
       } else {
