@@ -157,7 +157,7 @@ export function createTag(tag, attributes, html) {
 const isCloudFront = () => {
   const sHostOrigin = window.location.origin;
   return sHostOrigin.includes('https://newsroom');
-}
+};
 
 /**
  * Sets the Content-Security-Policy meta tag to the document based on JSON file
