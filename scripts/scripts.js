@@ -850,7 +850,7 @@ const publishConfirmationPopUp = (oPublishButtons) => {
   }
   oPublishButtons.forEach((oPublishBtn) => {
     // eslint-disable-next-line func-names, consistent-return
-    oPublishBtn.addEventListener('mousedown', function (e) {
+    oPublishBtn.addEventListener('click', function (e) {
       if (hasInvalidTags()) {
         // eslint-disable-next-line no-alert
         alert(`Publishing Error: Unable to publish page. Invalid tags detected. Please review and correct the tags before attempting to publish again.\nContent Date is ${getContentDate()}\n`);
