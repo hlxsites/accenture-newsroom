@@ -9,7 +9,14 @@
  * OF ANY KIND, either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-import { decorateBlocks, decorateSections, loadBlocks } from '../../scripts/lib-franklin.js';
+import {
+  decorateBlocks,
+  decorateSections,
+  fetchPlaceholders,
+  loadBlocks,
+} from '../../scripts/lib-franklin.js';
+// eslint-disable-next-line import/no-cycle
+import { getPlaceholder } from '../../scripts/scripts.js';
 import {
   acknowledge,
   confirm,
@@ -42,6 +49,22 @@ const DELAY = 10 * 60 * 1000;
 let _sdk;
 
 /**
+ * Formats the datetime into a human readable string.
+ * @param {Date} datetime the date to format
+ * @param {String} [timeZone] the timezone to use for formatting
+ * @returns a human readable string for the date.
+ */
+function formatDateTime(datetime, timeZone) {
+  return new Intl.DateTimeFormat('default', {
+    day: 'numeric',
+    month: 'short',
+    year: 'numeric',
+    hour: 'numeric',
+    minute: 'numeric',
+    timeZone,
+  }).format(datetime);
+}
+/**
  * Gets the list of cron jobs from the crontab file.
  * @param {Onject} sdk An instance of the sharepoint SDK
  * @param {string} tableName The name of the table to query
@@ -70,7 +93,8 @@ function formatCronJobData({ datetime, url }) {
 /**
  * Parses a cronjob entry into a usable object.
  * @param {Array} data The cronjob entry to parse
- * @returns an object containing the parsed data and having `datetime` and `url` properties
+ * @returns an object containing the parsed data and
+ *          having `datetime`, `action` and `url` properties
  */
 function parseCronJobData([datetime, action]) {
   const [, hh, mm, dd, mmm, yyyy] = datetime.match(/at (\d+):(\d+) on the (\d+) day of (\w+) in (\d+)/);
@@ -80,7 +104,20 @@ function parseCronJobData([datetime, action]) {
   return {
     datetime: localDate,
     url: `${window.location.origin}${action.split(' ').pop()}`,
+    action: action.split(' ').shift(),
   };
+}
+
+/**
+ * Returns a string with the message about the current timezone.
+ * @returns a message with the current timezone
+ */
+function getTimezoneMessage(placeholders) {
+  const tzOffset = new Date().getTimezoneOffset();
+  const template = getPlaceholder('Times are in {{tzName}} timezone ({{tzOffset}}).', placeholders);
+  return template
+    .replace('{{tzName}}', Intl.DateTimeFormat().resolvedOptions().timeZone)
+    .replace('{{tzOffset}}', `GMT${tzOffset < 0 ? `+${-tzOffset / 60}` : `-${tzOffset / 60}`}`);
 }
 
 /**
@@ -139,6 +176,7 @@ async function getSdk() {
  * @returns The formatted modal dialog
  */
 async function getPublishLaterModal(existingEntry) {
+  const placeholders = await fetchPlaceholders();
   const response = await fetch('/tools/sidekick/publish-later.plain.html');
   const html = await response.text();
 
@@ -185,7 +223,7 @@ async function getPublishLaterModal(existingEntry) {
   }
 
   const tzLabel = document.createElement('small');
-  tzLabel.textContent = `Times are in ${Intl.DateTimeFormat().resolvedOptions().timeZone} timezone (GMT${tzOffset < 0 ? `+${-tzOffset / 60}` : `-${tzOffset / 60}`}).`;
+  tzLabel.textContent = getTimezoneMessage(placeholders);
   input.after(tzLabel);
 
   const content = fragment.querySelector('form').innerHTML;
@@ -201,7 +239,8 @@ async function getPublishLaterModal(existingEntry) {
  * @param {Object} skConfig The Sidekick configuration
  */
 export async function publishLater(skConfig) {
-  let modal = await wait('Please wait…');
+  const placeholders = await fetchPlaceholders();
+  let modal = await wait(getPlaceholder('Please wait…', placeholders));
 
   let sdk;
   try {
@@ -211,7 +250,11 @@ export async function publishLater(skConfig) {
     modal.close();
     modal.remove();
     console.error('Could not log into Sharepoint', err);
-    await acknowledge('Error', 'Could not log into Sharepoint.', 'error');
+    await acknowledge(
+      getPlaceholder('Error', placeholders),
+      getPlaceholder('Could not log into Sharepoint.', placeholders),
+      'error',
+    );
     return;
   }
 
@@ -225,7 +268,11 @@ export async function publishLater(skConfig) {
   } catch (err) {
     modal.close();
     modal.remove();
-    await acknowledge('Error', 'Could not retrieve cron jobs.', 'error');
+    await acknowledge(
+      getPlaceholder('Error', placeholders),
+      getPlaceholder('Could not retrieve cron jobs.', placeholders),
+      'error',
+    );
     return;
   }
 
@@ -242,7 +289,7 @@ export async function publishLater(skConfig) {
     modal.remove();
 
     if (modal.returnValue === 'submit') {
-      modal = await wait('Publishing schedule…');
+      modal = await wait(getPlaceholder('Publishing schedule…', placeholders));
       const formData = new FormData(ev.target.querySelector('form'));
       const datetime = new Date(formData.get('datetime'));
 
@@ -256,15 +303,23 @@ export async function publishLater(skConfig) {
         await preview(skConfig, CRONTAB_PATH.replace('.xlsx', '.json'));
         modal.close();
         modal.remove();
-        await notify('Publishing scheduled successfully.', 'success', 3000);
+        await notify(getPlaceholder('Publishing scheduled successfully.', placeholders), 'success', 3000);
       } catch (err) {
         modal.close();
         modal.remove();
         if (existing) {
-          await acknowledge('Publish Later', 'Failed to update existing publishing schedule.', 'error');
+          await acknowledge(
+            getPlaceholder('Publish Later', placeholders),
+            getPlaceholder('Failed to update existing publishing schedule.', placeholders),
+            'error',
+          );
           console.error('Failed to update publishing job', err);
         } else {
-          await acknowledge('Publish Later', 'Failed to create publishing schedule.', 'error');
+          await acknowledge(
+            getPlaceholder('Publish Later', placeholders),
+            getPlaceholder('Failed to create publishing schedule.', placeholders),
+            'error',
+          );
           console.error('Failed to prepare publishing job', err);
         }
       }
@@ -273,25 +328,29 @@ export async function publishLater(skConfig) {
 
     if (modal.returnValue === 'delete') {
       const confirmed = await confirm(
-        'Delete schedule',
-        'Are you sure you want to delete this publishing schedule?',
+        getPlaceholder('Delete schedule', placeholders),
+        getPlaceholder('Are you sure you want to delete this publishing schedule?', placeholders),
         'error',
       );
       if (confirmed !== 'true') {
         return;
       }
       try {
-        modal = await wait('Deleting schedule…');
+        modal = await wait(getPlaceholder('Deleting schedule…', placeholders));
         await sdk.deleteRowInTable(CRONTAB_PATH, 'jobs', index - 1);
         await preview(skConfig, CRONTAB_PATH.replace('.xlsx', '.json'));
         modal.close();
         modal.remove();
-        await notify('Publishing job deleted successfully.', 'success', 3000);
+        await notify(getPlaceholder('Publishing job deleted successfully.', placeholders), 'success', 3000);
       } catch (err) {
         modal.close();
         modal.remove();
         console.error('Failed to delete publishing job', err);
-        await acknowledge('Publish Later', 'Failed to delete existing publishing schedule.', 'error');
+        await acknowledge(
+          getPlaceholder('Publish Later', placeholders),
+          getPlaceholder('Failed to delete existing publishing schedule.', placeholders),
+          'error',
+        );
       }
     }
   });
@@ -303,9 +362,7 @@ export async function publishLater(skConfig) {
  * Enhances the page info dropdown with additional information about the publishing schedule.
  */
 export async function enhancePageInfo() {
-  // const res = await fetch('https://admin.hlx.page/job/ramboz/accenture-newsroom/publish-later-ui/preview');
-  // const json = await res.json();
-  // console.log(json);
+  const placeholders = await fetchPlaceholders();
   const sk = document.querySelector('helix-sidekick');
   const info = sk.shadowRoot.querySelector('.plugin.page-info');
   let container = info.querySelector('.crontab-date-container');
@@ -315,11 +372,11 @@ export async function enhancePageInfo() {
     container.classList.add('crontab-date-container');
 
     const label = document.createElement('span');
-    label.textContent = 'Scheduled: ';
+    label.textContent = getPlaceholder('Scheduled: ', placeholders);
     container.append(label);
 
     date = document.createElement('time');
-    date.textContent = '…';
+    date.textContent = getPlaceholder('…', placeholders);
     container.append(date);
 
     info.append(container);
@@ -340,22 +397,103 @@ export async function enhancePageInfo() {
     cronjobs = await getCronJobs(sdk, 'jobs');
     existing = cronjobs.find((job) => String(job[1]).endsWith(new URL(url).pathname));
   } catch (err) {
-    await acknowledge('Error', 'Could not retrieve cron jobs.', 'error');
+    await acknowledge(
+      getPlaceholder('Error', placeholders),
+      getPlaceholder('Could not retrieve cron jobs.', placeholders),
+      'error',
+    );
     return;
   }
 
   if (!existing) {
-    date.textContent = 'Never';
+    date.textContent = getPlaceholder('Never', placeholders);
     return;
   }
 
   const { datetime } = parseCronJobData(existing);
   date.setAttribute('datetime', datetime.toISOString());
-  date.textContent = new Intl.DateTimeFormat('default', {
-    day: 'numeric',
-    month: 'short',
-    year: 'numeric',
-    hour: 'numeric',
-    minute: 'numeric',
-  }).format(datetime);
+  date.textContent = formatDateTime(datetime);
+}
+
+export async function publishLaterList() {
+  const placeholders = await fetchPlaceholders();
+  const modal = await wait(getPlaceholder('Please wait…', placeholders));
+
+  let sdk;
+  try {
+    sdk = await getSdk();
+    console.log('Connected to sharepoint');
+  } catch (err) {
+    modal.close();
+    modal.remove();
+    console.error('Could not log into Sharepoint', err);
+    await acknowledge(
+      getPlaceholder('Error', placeholders),
+      getPlaceholder('Could not log into Sharepoint.', placeholders),
+      'error',
+    );
+    return;
+  }
+
+  let cronjobs;
+  try {
+    cronjobs = await getCronJobs(sdk, 'jobs');
+  } catch (err) {
+    modal.close();
+    modal.remove();
+    await acknowledge(
+      getPlaceholder('Error', placeholders),
+      getPlaceholder('Could not retrieve cron jobs.', placeholders),
+      'error',
+    );
+    return;
+  }
+
+  modal.close();
+  modal.remove();
+
+  const jobsList = cronjobs.slice(1).map((job) => {
+    try {
+      return parseCronJobData(job);
+    } catch (err) {
+      return null;
+    }
+  }).filter((job) => job && job.datetime > Date.now() && job.action === 'publish')
+    .sort((a, b) => a.datetime - b.datetime);
+
+  const res = await fetch('/tools/sidekick/publish-later-list.plain.html');
+  const html = await res.text();
+
+  const fragment = document.createElement('div');
+  fragment.innerHTML = html;
+
+  const table = fragment.querySelector('.table');
+  jobsList.forEach((job) => {
+    const url = new URL(job.url);
+    table.innerHTML += `<div>
+      <div>${formatDateTime(job.datetime, 'UTC')}</div>
+      <div><a href="${url.pathname}" target="_blank">${url.pathname}</a></div>
+    </div>`;
+  });
+
+  const header = fragment.querySelector('h1,h2,h3');
+  header.remove();
+
+  decorateSections(fragment);
+  decorateBlocks(fragment);
+  await loadBlocks(fragment);
+
+  const tzLabel = document.createElement('small');
+  tzLabel.textContent = getTimezoneMessage();
+  table.querySelector('table').after(tzLabel);
+
+  if (!jobsList.length) {
+    table.querySelector('table tbody').innerHTML += `<tr><td colspan="2"><em>${getPlaceholder('No scheduled jobs.', placeholders)}</em></td></tr>`;
+  }
+
+  const content = fragment.firstElementChild;
+  const { default: createDialog } = await import('./modal/modal.js');
+  const dialog = await createDialog('dialog-modal', header, content, null);
+  dialog.classList.add('publishlater-all');
+  dialog.showModal();
 }

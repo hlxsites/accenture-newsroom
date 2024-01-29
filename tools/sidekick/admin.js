@@ -64,3 +64,15 @@ export async function clearCache(skConfig, path) {
     throw new Error(`Failed to publish ${path}`);
   }
 }
+
+/**
+ * @see https://www.aem.live/docs/admin.html#tag/status/operation/status
+ */
+export async function status(skConfig, path) {
+  const { owner, repo, ref } = skConfig.config;
+  const resp = await fetch(`https://admin.hlx.page/status/${owner}/${repo}/${ref}${path}`);
+  if (!resp.ok) {
+    throw new Error(`Failed to get status for ${path}`);
+  }
+  return resp.json();
+}

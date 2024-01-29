@@ -73,6 +73,7 @@
 
 .aem-Dialog header {
   height: auto;
+  padding-right: 2rem;
   border-bottom: 2px solid;
 }
 
@@ -135,6 +136,30 @@
 
 .aem-Dialog-content p {
   margin: 0;
+}
+
+.aem-Dialog-content .table {
+  display: inline-block;
+  max-height: 50vh;
+  overflow-y: auto;
+  margin-top: 1rem;
+}
+
+.aem-Dialog-content .table table {
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
+.aem-Dialog-content .table thead tr {
+  border: none;
+}
+
+.aem-Dialog-content .table thead th {
+  position: sticky;
+  top: 0;
+  background: white;
+  border-top: 1px solid;
+  border-bottom: 1px solid;
 }
 
 .aem-Dialog footer {
