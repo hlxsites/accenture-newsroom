@@ -27,9 +27,9 @@ import { preview } from './admin.js';
 
 // The Sharepoint configuration
 const SHAREPOINT_CONFIG = {
-  authority: 'https://login.microsoftonline.com/fa7b1b5a-7b34-4387-94ae-d2c178decee1',
-  clientId: 'a5047ece-6169-4aa9-91ed-7f3324c632d0',
-  domain: 'adobe.sharepoint.com',
+  authority: 'https://login.microsoftonline.com/e0793d39-0939-496d-b129-198edd916feb',
+  clientId: 'd52049b8-514c-49c7-acd6-55e3a6f14ebf',
+  domain: 'ts.accenture.com',
   domainId: 'fac8f079-f817-4127-be6b-700b19217904',
   siteId: 'b1df5119-9614-4126-8064-ab9bd8cef865',
   rootPath: '/sites/accenture/newsroom/en',
