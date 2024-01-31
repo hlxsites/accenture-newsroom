@@ -55,17 +55,28 @@ export function getSiteFromHostName(hostname = window.location.hostname) {
     return 'us';
   }
 
-  // handle cloudfront dev envi hostnames
-  // https://newsroom.ciodev.accenture.com/es
-  const cfDevEnviHostName = '.ciodev.accenture';
-  const hostHref = window.location.href;
-  if (hostname.includes(hostHref)) {
+  const cfHandler = (sCFHostname) => {
+    const hostHref = window.location.href;
     for (let i = 0; i < allowedSites.length; i += 1) {
-      if (hostHref.includes(`.${cfDevEnviHostName}/${allowedSites[i]}`)) {
+      if (hostHref.includes(`${sCFHostname}/${allowedSites[i]}`)) {
         return allowedSites[i];
       }
     }
     return 'us';
+  };
+
+  // handle cloudfront dev envi hostnames
+  // https://newsroom.ciodev.accenture.com/es
+  const cfDevEnviHostName = '.ciodev.accenture.com';
+  if (hostname.includes(cfDevEnviHostName)) {
+    return cfHandler(cfDevEnviHostName);
+  }
+
+  // handle cloudfront stage envi hostnames
+  // https://newsroom.ciostage.accenture.com/pt
+  const cfStageEnviHostName = '.ciostage.accenture.com';
+  if (hostname.includes(cfStageEnviHostName)) {
+    return cfHandler(cfStageEnviHostName);
   }
 
   // handle franklin hostnames
