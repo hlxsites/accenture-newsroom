@@ -61,7 +61,7 @@ export default class SharepointSDK {
     });
 
     await publicClientApplication.loginPopup({
-      redirectUri: '/tools/sidekick/sharepoint/auth.html',
+      redirectUri: `${window.location.origin}/tools/sidekick/sharepoint/auth.html`,
     });
 
     const account = publicClientApplication.getAllAccounts()[0];
