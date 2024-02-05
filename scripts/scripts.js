@@ -38,6 +38,7 @@ export const isMobile = () => window.innerWidth < 600;
 
 export function getSiteFromHostName(hostname = window.location.hostname) {
   const allowedSites = ['uk', 'de', 'fr', 'it', 'es', 'sg', 'pt', 'jp', 'br'];
+  const aAllowedSitesCF = ['asia-pacific', 'english-uk', 'uk', 'de', 'fr', 'it', 'es', 'sg', 'pt', 'jp', 'br'];
   if (hostname === 'localhost') {
     return 'us';
   }
@@ -57,9 +58,15 @@ export function getSiteFromHostName(hostname = window.location.hostname) {
 
   const cfHandler = (sCFHostname) => {
     const hostHref = window.location.href;
-    for (let i = 0; i < allowedSites.length; i += 1) {
-      if (hostHref.includes(`${sCFHostname}/${allowedSites[i]}`)) {
-        return allowedSites[i];
+    for (let i = 0; i < aAllowedSitesCF.length; i += 1) {
+      if (hostHref.includes(`${sCFHostname}/${aAllowedSitesCF[i]}`)) {
+        if (aAllowedSitesCF[i] === 'asia-pacific') {
+          return 'sg';
+        }
+        if (aAllowedSitesCF[i] === 'english-uk') {
+          return 'uk';
+        }
+        return aAllowedSitesCF[i];
       }
     }
     return 'us';
