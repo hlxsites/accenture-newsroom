@@ -39,10 +39,57 @@ export const isMobile = () => window.innerWidth < 600;
 
 export function getSiteFromHostName(hostname = window.location.hostname) {
   const allowedSites = ['uk', 'de', 'fr', 'it', 'es', 'sg', 'pt', 'jp', 'br'];
+  const aAllowedSitesCF = ['asia-pacific', 'english-uk', 'uk', 'de', 'fr', 'it', 'es', 'sg', 'pt', 'jp', 'br'];
   if (hostname === 'localhost') {
     return 'us';
   }
+
+  // handle lower envi hostnames (Dev, Stage)
+  // https://main--254599-nr-dev-br--accenture-cio-aemnewsroom.hlx.live/
+  // https://main--254599-nr-stage-br--accenture-cio-aemnewsorom.hlx.live/
+  const lowerEnviHostName = 'accenture-cio-aemnewsroom';
+  if (hostname.includes(lowerEnviHostName)) {
+    for (let i = 0; i < allowedSites.length; i += 1) {
+      if (hostname.includes(`${allowedSites[i]}--${lowerEnviHostName}`)) {
+        return allowedSites[i];
+      }
+    }
+    return 'us';
+  }
+
+  const cfHandler = (sCFHostname) => {
+    const hostHref = window.location.href;
+    for (let i = 0; i < aAllowedSitesCF.length; i += 1) {
+      if (hostHref.includes(`${sCFHostname}/${aAllowedSitesCF[i]}`)) {
+        if (aAllowedSitesCF[i] === 'asia-pacific') {
+          return 'sg';
+        }
+        if (aAllowedSitesCF[i] === 'english-uk') {
+          return 'uk';
+        }
+        return aAllowedSitesCF[i];
+      }
+    }
+    return 'us';
+  };
+
+  // handle cloudfront dev envi hostnames
+  // https://newsroom.ciodev.accenture.com/es
+  const cfDevEnviHostName = '.ciodev.accenture.com';
+  if (hostname.includes(cfDevEnviHostName)) {
+    return cfHandler(cfDevEnviHostName);
+  }
+
+  // handle cloudfront stage envi hostnames
+  // https://newsroom.ciostage.accenture.com/pt
+  const cfStageEnviHostName = '.ciostage.accenture.com';
+  if (hostname.includes(cfStageEnviHostName)) {
+    return cfHandler(cfStageEnviHostName);
+  }
+
   // handle franklin hostnames
+  // https://main--accenture-newsroom-jp--hlxsites.hlx.live/
+  // https://main--accenture-newsroom-br--hlxsites.hlx.live/
   const franklinHostName = 'accenture-newsroom';
   if (hostname.includes(franklinHostName)) {
     for (let i = 0; i < allowedSites.length; i += 1) {
@@ -52,7 +99,10 @@ export function getSiteFromHostName(hostname = window.location.hostname) {
     }
     return 'us';
   }
+
   // handle main hostnames
+  // https://newsroom.accenturebr.com/
+  // https://newsroom.accenture.co.uk/
   const mainHostName = 'newsroom.accenture';
   if (hostname.includes(mainHostName)) {
     const remainingHostName = hostname.replace(`${mainHostName}`, '');
