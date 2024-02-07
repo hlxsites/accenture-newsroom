@@ -69,6 +69,7 @@ export default class SharepointSDK {
     const accessTokenRequest = {
       scopes: ['files.readwrite', 'sites.readwrite.all'],
       account,
+      prompt: 'consent',
     };
 
     try {
