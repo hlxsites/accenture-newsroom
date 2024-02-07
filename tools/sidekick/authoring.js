@@ -97,9 +97,9 @@ function formatCronJobData({ datetime, url }) {
  *          having `datetime`, `action` and `url` properties
  */
 function parseCronJobData([datetime, action]) {
-  const [, hh, mm, dd, mmm, yyyy] = datetime.match(/at (\d+):(\d+) on the (\d+) day of (\w+) in (\d+)/);
+  const [, hh, mm, apm, dd, mmm, yyyy] = datetime.match(/at (\d+):(\d+)([ap]m)? on the (\d+) day of (\w+) in (\d+)/);
   const localDate = new Date(
-    Date.UTC(yyyy, MONTHS.indexOf(mmm), dd, hh, mm) - new Date().getTimezoneOffset() * 60000,
+    Date.UTC(yyyy, MONTHS.indexOf(mmm), dd, apm === 'pm' ? hh + 12 : hh, mm) - new Date().getTimezoneOffset() * 60000,
   );
   return {
     datetime: localDate,
