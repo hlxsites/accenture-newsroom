@@ -30,8 +30,8 @@ const SHAREPOINT_CONFIG = {
   authority: 'https://login.microsoftonline.com/e0793d39-0939-496d-b129-198edd916feb',
   clientId: 'd52049b8-514c-49c7-acd6-55e3a6f14ebf',
   domain: 'ts.accenture.com',
-  domainId: 'fac8f079-f817-4127-be6b-700b19217904',
-  siteId: 'b1df5119-9614-4126-8064-ab9bd8cef865',
+  domainId: '627f3086-805e-4a45-9800-af5f9c0cfb03', // AdobePlatformAuthor"
+  siteId: '47d42eab-993d-4993-ab4f-6f4c83e5a684', // Newsroom
   rootPath: '/sites/accenture/newsroom/en',
 };
 
