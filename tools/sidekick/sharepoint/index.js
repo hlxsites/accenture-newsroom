@@ -67,16 +67,16 @@ export default class SharepointSDK {
     const account = publicClientApplication.getAllAccounts()[0];
 
     const accessTokenRequest = {
-      scopes: ['files.readwrite', 'sites.readwrite.all'],
+      scopes: ['User.Read'],
       account,
     };
 
-    // try {
-    //   const res = await publicClientApplication.acquireTokenSilent(accessTokenRequest);
-    //   this.accessToken = res.accessToken;
-    // } catch (error) {
+    try {
+      const res = await publicClientApplication.acquireTokenSilent(accessTokenRequest);
+      this.accessToken = res.accessToken;
+    } catch (error) {
       // Acquire token silent failure, and send an interactive request
-      // if (error.name === 'InteractionRequiredAuthError') {
+      if (error.name === 'InteractionRequiredAuthError') {
         try {
           const res = await publicClientApplication.acquireTokenPopup(accessTokenRequest);
           // Acquire token interactive success
@@ -90,8 +90,8 @@ export default class SharepointSDK {
           // Give up
           throw new Error(`Cannot connect to Sharepoint: ${err.message}`);
         }
-      // }
-    // }
+      }
+    }
   }
 
   async testConnection() {
