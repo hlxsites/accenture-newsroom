@@ -67,7 +67,7 @@ export default class SharepointSDK {
     const account = publicClientApplication.getAllAccounts()[0];
 
     const accessTokenRequest = {
-      scopes: ['User.Read'],
+      scopes: ['User.Read', 'Files.ReadWrite.All', 'Sites.ReadWrite.All'],
       account,
     };
 
