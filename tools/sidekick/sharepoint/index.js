@@ -69,7 +69,6 @@ export default class SharepointSDK {
     const accessTokenRequest = {
       scopes: ['files.readwrite', 'sites.readwrite.all'],
       account,
-      prompt: 'consent',
     };
 
     try {
@@ -79,7 +78,7 @@ export default class SharepointSDK {
       // Acquire token silent failure, and send an interactive request
       if (error.name === 'InteractionRequiredAuthError') {
         try {
-          const res = await publicClientApplication.acquireTokenInteractive(accessTokenRequest);
+          const res = await publicClientApplication.acquireTokenPopup(accessTokenRequest);
           // Acquire token interactive success
           this.accessToken = res.accessToken;
         } catch (err) {
