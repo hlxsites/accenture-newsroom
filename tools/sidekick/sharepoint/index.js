@@ -79,7 +79,7 @@ export default class SharepointSDK {
       // Acquire token silent failure, and send an interactive request
       if (error.name === 'InteractionRequiredAuthError') {
         try {
-          const res = await publicClientApplication.acquireTokenPopup(accessTokenRequest);
+          const res = await publicClientApplication.acquireTokenInteractive(accessTokenRequest);
           // Acquire token interactive success
           this.accessToken = res.accessToken;
         } catch (err) {
