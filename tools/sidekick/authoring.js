@@ -246,10 +246,12 @@ export async function publishLater(skConfig) {
   let sdk;
   try {
     sdk = await getSdk();
+    // eslint-disable-next-line no-console
     console.log('Connected to sharepoint');
   } catch (err) {
     modal.close();
     modal.remove();
+    // eslint-disable-next-line no-console
     console.error('Could not log into Sharepoint', err);
     await acknowledge(
       getPlaceholder('Error', placeholders),
@@ -314,6 +316,7 @@ export async function publishLater(skConfig) {
             getPlaceholder('Failed to update existing publishing schedule.', placeholders),
             'error',
           );
+          // eslint-disable-next-line no-console
           console.error('Failed to update publishing job', err);
         } else {
           await acknowledge(
@@ -321,6 +324,7 @@ export async function publishLater(skConfig) {
             getPlaceholder('Failed to create publishing schedule.', placeholders),
             'error',
           );
+          // eslint-disable-next-line no-console
           console.error('Failed to prepare publishing job', err);
         }
       }
@@ -346,6 +350,7 @@ export async function publishLater(skConfig) {
       } catch (err) {
         modal.close();
         modal.remove();
+        // eslint-disable-next-line no-console
         console.error('Failed to delete publishing job', err);
         await acknowledge(
           getPlaceholder('Publish Later', placeholders),
@@ -387,6 +392,7 @@ export async function enhancePageInfo() {
   try {
     sdk = await getSdk();
   } catch (err) {
+    // eslint-disable-next-line no-console
     console.error('Could not log into Sharepoint', err);
     return;
   }
@@ -423,10 +429,12 @@ export async function publishLaterList() {
   let sdk;
   try {
     sdk = await getSdk();
+    // eslint-disable-next-line no-console
     console.log('Connected to sharepoint');
   } catch (err) {
     modal.close();
     modal.remove();
+    // eslint-disable-next-line no-console
     console.error('Could not log into Sharepoint', err);
     await acknowledge(
       getPlaceholder('Error', placeholders),

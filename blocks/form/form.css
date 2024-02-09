@@ -21,18 +21,6 @@
   position: relative;
 }
 
-.form .form-select-wrapper::after {
-  content: '';
-  position: absolute;
-  background-color: var(--highlight-color);
-  -webkit-mask: url('/icons/chevron.svg') center / 100% 100%;
-  mask: url('/icons/chevron.svg') center / 100% 100%;
-  bottom: .5rem;
-  right: 1rem;
-  width: 2.5rem;
-  height: 2.5rem;
-}
-
 .form button {
   display: block;
   height: 60px;

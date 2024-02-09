@@ -34,6 +34,7 @@ export default class SharepointSDK {
   }
 
   async #checkIsSignedIn() {
+    // eslint-disable-next-line no-console
     console.assert(this.accessToken, 'You need to sign-in first');
   }
 
