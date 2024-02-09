@@ -205,6 +205,7 @@ async function getPublishLaterModal(existingEntry) {
     try {
       date = parseCronJobData(existingEntry).datetime;
     } catch (err) {
+      // eslint-disable-next-line no-console
       console.error('Failed to parse existing schedule', err);
     }
   }
