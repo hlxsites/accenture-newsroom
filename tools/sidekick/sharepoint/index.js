@@ -148,6 +148,7 @@ export default class SharepointSDK {
     this.#checkIsSignedIn();
 
     const options = this.#setRequestOptions('POST');
+    console.log('appendRowsToTable ',rows);
     options.body = JSON.stringify({
       values: rows,
     });

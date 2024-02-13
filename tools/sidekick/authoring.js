@@ -87,6 +87,8 @@ function formatCronJobData({ datetime, url }) {
   return [[
     `at ${pad(datetime.getUTCHours())}:${pad(datetime.getUTCMinutes())} on the ${datetime.getUTCDate()} day of ${MONTHS[datetime.getUTCMonth()]} in ${datetime.getUTCFullYear()}`,
     `publish ${new URL(url).pathname}`,
+    '',
+    ''
   ]];
 }
 
