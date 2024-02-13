@@ -36,3 +36,6 @@ indices:
       robots:
         select: head > meta[name="robots"]
         value: attribute(el, "content")
+      keywords:
+        select: head > meta[name="keywords"]
+        value: attribute(el, "content")
