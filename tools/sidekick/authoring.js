@@ -84,10 +84,11 @@ async function getCronJobs(sdk, tableName) {
  */
 function formatCronJobData({ datetime, url }) {
   const pad = (n) => n.toString().padStart(2, '0');
+  const sOrigin = window.location.origin;
   return [[
     `at ${pad(datetime.getUTCHours())}:${pad(datetime.getUTCMinutes())} on the ${datetime.getUTCDate()} day of ${MONTHS[datetime.getUTCMonth()]} in ${datetime.getUTCFullYear()}`,
     `publish ${new URL(url).pathname}`,
-    '',
+    `${sOrigin}${new URL(url).pathname}`,
     ''
   ]];
 }
@@ -196,12 +197,6 @@ async function getPublishLaterModal(existingEntry) {
   decorateBlocks(fragment);
   await loadBlocks(fragment);
 
-  const footer = [...fragment.querySelectorAll('button')].map((btn) => {
-    btn.parentElement.remove();
-    btn.classList.add(btn.type === 'submit' ? 'cta' : 'secondary');
-    return btn.outerHTML;
-  }).join('') || null;
-
   let date;
   if (existingEntry) {
     try {
@@ -211,6 +206,15 @@ async function getPublishLaterModal(existingEntry) {
       console.error('Failed to parse existing schedule', err);
     }
   }
+
+  const footer = [...fragment.querySelectorAll('button')].map((btn) => {
+    btn.parentElement.remove();
+    btn.classList.add(btn.type === 'submit' ? 'cta' : 'secondary');
+    if (date < minDate && btn.type === 'submit') {
+      btn.setAttribute('disabled', true);
+    }
+    return btn.outerHTML;
+  }).join('') || null;
 
   const tzOffset = new Date().getTimezoneOffset();
   const minDate = new Date(Date.now() - tzOffset * 60000 + DELAY);
