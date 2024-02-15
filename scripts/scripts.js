@@ -879,6 +879,10 @@ const observePluginInfo = (oSidekick) => {
   if (!oSidekick) {
     return;
   }
+  const oShadowRoot = oSidekick.shadowRoot;
+  if (!oShadowRoot) {
+    return;
+  }
 
   const infoObserver = new MutationObserver((mutations) => {
     if (!mutations.pop().target.classList.contains('dropdown-expanded')) {
