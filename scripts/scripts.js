@@ -874,14 +874,40 @@ async function pageInfoEnhancer() {
   enhancePageInfo();
 }
 
-// Observe helix-sidekick element if already loaded on the html body
-const helixSideKickObserver = () => {
-  const observer = new MutationObserver((mutations) => {
+// Observe Plugin Info icon
+const observePluginInfo = (oSidekick) => {
+  if (!oSidekick) {
+    return;
+  }
+
+  const infoObserver = new MutationObserver((mutations) => {
     if (!mutations.pop().target.classList.contains('dropdown-expanded')) {
       return;
     }
     pageInfoEnhancer();
   });
+
+  // Options for the observer (which mutations to observe)
+  const config = { childList: true, subtree: true };
+  // Callback function to execute when mutations are observed
+  const callback = (_mutationList, observer) => {
+    const oPuglinInfo = sk.shadowRoot.querySelector('.plugin.info');
+    if (oPuglinInfo) {
+      infoObserver.observe(sk.shadowRoot.querySelector('.plugin.info'), { attributes: true, attributeFilter: ['class'] });
+      observer.disconnect();
+    }
+  };
+
+  // Create an observer instance linked to the callback function
+  const observer = new MutationObserver(callback);
+
+  // Start observing the target node for configured mutations
+  observer.observe(oShadowRoot, config);
+};
+
+// Observe helix-sidekick element if already loaded on the html body
+const helixSideKickObserver = () => {
+
   // const oSidekick = document.querySelector('helix-sidekick');
   const sk = document.querySelector('helix-sidekick');
   if (sk) {
@@ -889,7 +915,7 @@ const helixSideKickObserver = () => {
     sk.addEventListener('custom:preflight', preflightListener);
     sk.addEventListener('custom:publishlater', publishLaterListener);
     sk.addEventListener('custom:publishlater-all', publishLaterAllListener);
-    observer.observe(sk.shadowRoot.querySelector('.plugin.info'), { attributes: true, attributeFilter: ['class'] });
+    observePluginInfo(sk);
     publishConfirmationHandler(sk);
   } else {
     // wait for sidekick to be loaded
@@ -898,7 +924,7 @@ const helixSideKickObserver = () => {
       oAddedSidekick.addEventListener('custom:preflight', preflightListener);
       oAddedSidekick.addEventListener('custom:publishlater', publishLaterListener);
       oAddedSidekick.addEventListener('custom:publishlater-all', publishLaterAllListener);
-      observer.observe(oAddedSidekick.shadowRoot.querySelector('.plugin.info'), { attributes: true, attributeFilter: ['class'] });
+      observePluginInfo(oAddedSidekick);
       publishConfirmationHandler(oAddedSidekick);
     }, { once: true });
   }

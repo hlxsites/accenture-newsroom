@@ -207,6 +207,10 @@ async function getPublishLaterModal(existingEntry) {
     }
   }
 
+  const tzOffset = new Date().getTimezoneOffset();
+  const minDate = new Date(Date.now() - tzOffset * 60000 + DELAY);
+  const input = fragment.querySelector('input[type="datetime-local"]');
+
   const footer = [...fragment.querySelectorAll('button')].map((btn) => {
     btn.parentElement.remove();
     btn.classList.add(btn.type === 'submit' ? 'cta' : 'secondary');
@@ -216,9 +220,6 @@ async function getPublishLaterModal(existingEntry) {
     return btn.outerHTML;
   }).join('') || null;
 
-  const tzOffset = new Date().getTimezoneOffset();
-  const minDate = new Date(Date.now() - tzOffset * 60000 + DELAY);
-  const input = fragment.querySelector('input[type="datetime-local"]');
   if (input) {
     input.setAttribute('min', minDate.toISOString().slice(0, -8));
     if (date) {
