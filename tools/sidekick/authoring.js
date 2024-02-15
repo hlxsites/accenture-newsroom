@@ -210,6 +210,7 @@ async function getPublishLaterModal(existingEntry) {
   const tzOffset = new Date().getTimezoneOffset();
   const minDate = new Date(Date.now() - tzOffset * 60000 + DELAY);
   const input = fragment.querySelector('input[type="datetime-local"]');
+  const oCurrentTime = new Date();
 
   const footer = [...fragment.querySelectorAll('button')].map((btn) => {
     btn.parentElement.remove();
@@ -228,6 +229,10 @@ async function getPublishLaterModal(existingEntry) {
     }
     if (date < minDate) {
       input.setAttribute('disabled', true);
+    }
+    if (oCurrentTime >= date) {
+      input.removeAttribute('disabled');
+      input.setAttribute('value', '');
     }
   }
 
