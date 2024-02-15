@@ -19,7 +19,7 @@
   margin: .25rem 0;
 }
 
-.aem-Dialog .form input:hover, 
+.aem-Dialog .form input:hover,
 .aem-Dialog .form input:focus {
   background-color: var(--overlay-background-color);
 }
@@ -51,6 +51,10 @@
   background-color: var(--link-color);
   border-color: var(--link-color);
   color: var(--background-color);
+}
+
+.aem-Dialog .button.cta.disabled {
+  opacity: 0.3;
 }
 
 .aem-Dialog .button.cta:hover,

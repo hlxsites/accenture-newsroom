@@ -216,6 +216,7 @@ async function getPublishLaterModal(existingEntry) {
     btn.classList.add(btn.type === 'submit' ? 'cta' : 'secondary');
     if (date < minDate && btn.type === 'submit') {
       btn.setAttribute('disabled', true);
+      btn.classList.add('disabled');
     }
     return btn.outerHTML;
   }).join('') || null;
