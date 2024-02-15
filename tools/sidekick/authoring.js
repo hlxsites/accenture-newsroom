@@ -210,7 +210,7 @@ async function getPublishLaterModal(existingEntry) {
   const tzOffset = new Date().getTimezoneOffset();
   const minDate = new Date(Date.now() - tzOffset * 60000 + DELAY);
   const input = fragment.querySelector('input[type="datetime-local"]');
-  const oCurrentTime = new Date();
+  const oCurrentTime = new Date(Date.now() - tzOffset * 60000);
 
   const footer = [...fragment.querySelectorAll('button')].map((btn) => {
     btn.parentElement.remove();
