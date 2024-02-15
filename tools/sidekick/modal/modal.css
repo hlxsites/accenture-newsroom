@@ -53,14 +53,17 @@
   color: var(--background-color);
 }
 
-.aem-Dialog .button.cta.disabled {
-  opacity: 0.3;
-}
-
 .aem-Dialog .button.cta:hover,
 .aem-Dialog .button.cta:focus,
 .aem-Dialog .button.cta:active {
   opacity: .7;
+}
+
+.aem-Dialog .button.cta.disabled,
+.aem-Dialog .button.cta.disabled:hover,
+.aem-Dialog .button.cta.disabled:focus,
+.aem-Dialog .button.cta.disabled:active {
+  opacity: .3;
 }
 
 .aem-Dialog button.secondary {
