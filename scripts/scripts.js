@@ -895,9 +895,9 @@ const observePluginInfo = (oSidekick) => {
   const config = { childList: true, subtree: true };
   // Callback function to execute when mutations are observed
   const callback = (_mutationList, observer) => {
-    const oPuglinInfo = sk.shadowRoot.querySelector('.plugin.info');
+    const oPuglinInfo = oSidekick.shadowRoot.querySelector('.plugin.info');
     if (oPuglinInfo) {
-      infoObserver.observe(sk.shadowRoot.querySelector('.plugin.info'), { attributes: true, attributeFilter: ['class'] });
+      infoObserver.observe(oSidekick.shadowRoot.querySelector('.plugin.info'), { attributes: true, attributeFilter: ['class'] });
       observer.disconnect();
     }
   };
