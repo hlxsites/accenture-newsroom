@@ -231,6 +231,7 @@ async function getPublishLaterModal(existingEntry) {
       input.setAttribute('disabled', true);
     }
     if (oCurrentTime >= date) {
+      input.setAttribute('min', minDate.toISOString().slice(0, -8));
       input.removeAttribute('disabled');
       input.setAttribute('value', '');
     }
