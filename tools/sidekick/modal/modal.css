@@ -199,3 +199,9 @@
 .aem-Dialog.error .form header {
   border-bottom-color: red;
 }
+
+button.button.cta.disable {
+	background: none;
+    border: 1px solid var(--secondary-text-color);
+    color: var(--text-color);
+}

@@ -215,6 +215,7 @@ async function getPublishLaterModal(existingEntry) {
   const tzOffset = new Date().getTimezoneOffset();
   const minDate = new Date(Date.now() - tzOffset * 60000 + DELAY);
   const input = fragment.querySelector('input[type="datetime-local"]');
+  const update = fragment.querySelector('#dialog-modal button[type="submit"]');
   if (input) {
     input.setAttribute('min', minDate.toISOString().slice(0, -8));
     if (date) {
@@ -222,6 +223,8 @@ async function getPublishLaterModal(existingEntry) {
     }
     if (date < minDate) {
       input.setAttribute('disabled', true);
+      update.setAttribute('disabled',true);
+      update.classList.add('disabled')
     }
   }
 
