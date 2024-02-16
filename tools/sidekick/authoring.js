@@ -173,13 +173,13 @@ async function getSdk() {
   return _sdk;
 }
 
-const generatePublishLaterModalFragment = async (html, existingEntry, oDateTimeParseCronJobData, oCurrentTime) => {
+const generatePublishLaterModalFragment = async (html, existingEntry, oDateData) => {
   const fragment = document.createElement('div');
   fragment.innerHTML = html;
 
   const link = fragment.querySelector('a[href*=".json"]');
   if (link && existingEntry) {
-    if (oCurrentTime < oDateTimeParseCronJobData) {
+    if (oDateData.currentTime < oDateData.datetimeCrontab) {
       link.href = `${link.href}?sheet=edit`;
       link.textContent = link.href;
     }
@@ -203,15 +203,15 @@ const getDateTimeParseCronJobData = (existingEntry) => {
   }
 };
 
-const modalFooterHandler = (oModalFragment, oDateTimeParseCronJobData, minDate, oCurrentTime) => {
+const modalFooterHandler = (oModalFragment, oDateData) => {
   const footer = [...oModalFragment.querySelectorAll('button')].map((btn) => {
     btn.parentElement.remove();
     btn.classList.add(btn.type === 'submit' ? 'cta' : 'secondary');
-    if (oDateTimeParseCronJobData < minDate && btn.type === 'submit') {
+    if (oDateData.datetimeCrontab < oDateData.minDate && btn.type === 'submit') {
       btn.setAttribute('disabled', true);
       btn.classList.add('disabled');
     }
-    if (btn.type === 'submit' && oCurrentTime >= oDateTimeParseCronJobData) {
+    if (btn.type === 'submit' && oDateData.currentTime >= oDateData.datetimeCrontab) {
       btn.removeAttribute('disabled');
       btn.classList.remove('disabled');
     }
@@ -221,7 +221,7 @@ const modalFooterHandler = (oModalFragment, oDateTimeParseCronJobData, minDate, 
   return footer;
 };
 
-const modalInputHandler = (oModalFragment, oDateTimeParseCronJobData, minDate, oCurrentTime, placeholders) => {
+const modalInputHandler = (oModalFragment, oDateData, placeholders) => {
   const input = oModalFragment.querySelector('input[type="datetime-local"]');
   if (!input) {
     return;
@@ -232,19 +232,19 @@ const modalInputHandler = (oModalFragment, oDateTimeParseCronJobData, minDate, o
 
   input.setAttribute('min', minDate.toISOString().slice(0, -8));
 
-  if (!oDateTimeParseCronJobData) {
+  if (!oDateData.datetimeCrontab) {
     return;
   }
 
-  input.setAttribute('value', oDateTimeParseCronJobData.toISOString().slice(0, -8));
+  input.setAttribute('value', oDateData.datetimeCrontab.toISOString().slice(0, -8));
 
   // if less than 10 mins before scheduled pub then disabled the update buttton
-  if (oDateTimeParseCronJobData < minDate) {
+  if (oDateData.datetimeCrontab < oDateData.minDate) {
     input.setAttribute('disabled', true);
   }
 
   // if the page is already publish and has a record on the crontab file
-  if (oCurrentTime >= oDateTimeParseCronJobData) {
+  if (oDateData.currentTime >= oDateData.datetimeCrontab) {
     input.setAttribute('min', minDate.toISOString().slice(0, -8));
     input.removeAttribute('disabled');
     input.setAttribute('value', '');
@@ -262,17 +262,19 @@ async function getPublishLaterModal(existingEntry) {
   const response = await fetch('/tools/sidekick/publish-later.plain.html');
   const sResponseHtml = await response.text();
 
-  const tzOffset = new Date().getTimezoneOffset();
-  const minDate = new Date(Date.now() - tzOffset * 60000 + DELAY);
-  const oCurrentTime = new Date(Date.now() - tzOffset * 60000);
+  const oDateData = {
+    tzOffset: new Date().getTimezoneOffset(),
+    minDate: new Date(Date.now() - tzOffset * 60000 + DELAY),
+    currentTime: new Date(Date.now() - tzOffset * 60000),
+    datetimeCrontab: getDateTimeParseCronJobData(existingEntry)
+  };
 
-  const oDateTimeParseCronJobData = getDateTimeParseCronJobData(existingEntry);
-  const oModalFragment = await generatePublishLaterModalFragment(sResponseHtml, existingEntry, oDateTimeParseCronJobData, oCurrentTime);
+  const oModalFragment = await generatePublishLaterModalFragment(sResponseHtml, existingEntry, oDateData);
   const header = oModalFragment.querySelector('h1,h2,h3');
 
-  modalInputHandler(oModalFragment, oDateTimeParseCronJobData, minDate, oCurrentTime, placeholders);
+  modalInputHandler(oModalFragment, oDateData, placeholders);
 
-  const footer = modalFooterHandler(oModalFragment, oDateTimeParseCronJobData, minDate, oCurrentTime);
+  const footer = modalFooterHandler(oModalFragment, oDateData);
   const content = oModalFragment.querySelector('form').innerHTML;
 
   const { default: createDialog } = await import('./modal/modal.js');
