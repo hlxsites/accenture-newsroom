@@ -173,7 +173,7 @@ async function getSdk() {
   return _sdk;
 }
 
-const generatePublishLaterModalFragment = async (html, existingEntry, oCurrentTime) => {
+const generatePublishLaterModalFragment = async (html, existingEntry, oDateTimeParseCronJobData, oCurrentTime) => {
   const fragment = document.createElement('div');
   fragment.innerHTML = html;
   const header = fragment.querySelector('h1,h2,h3');
@@ -181,7 +181,7 @@ const generatePublishLaterModalFragment = async (html, existingEntry, oCurrentTi
 
   const link = fragment.querySelector('a[href*=".json"]');
   if (link && existingEntry) {
-    if (!oCurrentTime >= date) {
+    if (!oCurrentTime >= oDateTimeParseCronJobData) {
       link.href = `${link.href}?sheet=edit`;
       link.textContent = link.href;
     }
@@ -265,7 +265,7 @@ async function getPublishLaterModal(existingEntry) {
   const oCurrentTime = new Date(Date.now() - tzOffset * 60000);
 
   const oDateTimeParseCronJobData = getDateTimeParseCronJobData(existingEntry);
-  const oModalFragment = await generatePublishLaterModalFragment(html, existingEntry, oCurrentTime);
+  const oModalFragment = await generatePublishLaterModalFragment(html, existingEntry, oDateTimeParseCronJobData, oCurrentTime);
 
   modalInputHandler(oModalFragment, oDateTimeParseCronJobData, minDate, placeholders);
 
