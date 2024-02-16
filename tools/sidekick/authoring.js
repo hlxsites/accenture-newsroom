@@ -258,14 +258,13 @@ async function getPublishLaterModal(existingEntry) {
   const response = await fetch('/tools/sidekick/publish-later.plain.html');
   const sResponseHtml = await response.text();
 
-  const header = response.querySelector('h1,h2,h3');
-
   const tzOffset = new Date().getTimezoneOffset();
   const minDate = new Date(Date.now() - tzOffset * 60000 + DELAY);
   const oCurrentTime = new Date(Date.now() - tzOffset * 60000);
 
   const oDateTimeParseCronJobData = getDateTimeParseCronJobData(existingEntry);
   const oModalFragment = await generatePublishLaterModalFragment(sResponseHtml, existingEntry, oDateTimeParseCronJobData, oCurrentTime);
+  const header = oModalFragment.querySelector('h1,h2,h3');
 
   modalInputHandler(oModalFragment, oDateTimeParseCronJobData, minDate, oCurrentTime, placeholders);
 
