@@ -183,19 +183,10 @@ async function getPublishLaterModal(existingEntry) {
   const response = await fetch('/tools/sidekick/publish-later.plain.html');
   const html = await response.text();
 
-  const fragment = document.createElement('div');
-  fragment.innerHTML = html;
-  const link = fragment.querySelector('a[href*=".json"]');
-  if (link && existingEntry) {
-    link.href = `${link.href}?sheet=edit`;
-    link.textContent = link.href;
-  }
-  const header = fragment.querySelector('h1,h2,h3');
-  header.remove();
-
-  decorateSections(fragment);
-  decorateBlocks(fragment);
-  await loadBlocks(fragment);
+  const tzOffset = new Date().getTimezoneOffset();
+  const minDate = new Date(Date.now() - tzOffset * 60000 + DELAY);
+  const input = fragment.querySelector('input[type="datetime-local"]');
+  const oCurrentTime = new Date(Date.now() - tzOffset * 60000);
 
   let date;
   if (existingEntry) {
@@ -207,10 +198,22 @@ async function getPublishLaterModal(existingEntry) {
     }
   }
 
-  const tzOffset = new Date().getTimezoneOffset();
-  const minDate = new Date(Date.now() - tzOffset * 60000 + DELAY);
-  const input = fragment.querySelector('input[type="datetime-local"]');
-  const oCurrentTime = new Date(Date.now() - tzOffset * 60000);
+  const fragment = document.createElement('div');
+  fragment.innerHTML = html;
+  const link = fragment.querySelector('a[href*=".json"]');
+  if (link && existingEntry) {
+    if (!oCurrentTime >= date) {
+      link.href = `${link.href}?sheet=edit`;
+      link.textContent = link.href;
+    }
+  }
+
+  const header = fragment.querySelector('h1,h2,h3');
+  header.remove();
+
+  decorateSections(fragment);
+  decorateBlocks(fragment);
+  await loadBlocks(fragment);
 
   const footer = [...fragment.querySelectorAll('button')].map((btn) => {
     btn.parentElement.remove();
@@ -230,6 +233,8 @@ async function getPublishLaterModal(existingEntry) {
     if (date < minDate) {
       input.setAttribute('disabled', true);
     }
+
+    // if the page is already publish and has a record on the crontab file
     if (oCurrentTime >= date) {
       input.setAttribute('min', minDate.toISOString().slice(0, -8));
       input.removeAttribute('disabled');
