@@ -193,6 +193,63 @@ const generatePublishLaterModalFragment = async (html, existingEntry, oCurrentTi
   return fragment;
 };
 
+const getDateTimeParseCronJobData = (existingEntry) => {
+  if (!existingEntry) {
+    return;
+  }
+  try {
+    return parseCronJobData(existingEntry).datetime;
+  } catch (err) {
+    // eslint-disable-next-line no-console
+    console.error('Failed to parse existing schedule', err);
+  }
+};
+
+const modalFooterHandler = (oDateTimeParseCronJobData, minDate, oCurrentTime) => {
+  const footer = [...oModalFragment.querySelectorAll('button')].map((btn) => {
+    btn.parentElement.remove();
+    btn.classList.add(btn.type === 'submit' ? 'cta' : 'secondary');
+    if (oDateTimeParseCronJobData < minDate && btn.type === 'submit' && !oCurrentTime >= oDateTimeParseCronJobData) {
+      btn.setAttribute('disabled', true);
+      btn.classList.add('disabled');
+    }
+    return btn.outerHTML;
+  }).join('') || null;
+
+  return footer;
+};
+
+const modalInputHandler = (oModalFragment, oDateTimeParseCronJobData, minDate, placeholders) => {
+  const input = oModalFragment.querySelector('input[type="datetime-local"]');
+  if (!input) {
+    return;
+  }
+  const tzLabel = document.createElement('small');
+  tzLabel.textContent = getTimezoneMessage(placeholders);
+  input.after(tzLabel);
+
+  input.setAttribute('min', minDate.toISOString().slice(0, -8));
+
+  if (!oDateTimeParseCronJobData) {
+    return;
+  }
+
+  input.setAttribute('value', oDateTimeParseCronJobData.toISOString().slice(0, -8));
+
+  // if less than 10 mins before scheduled pub then disabled the update buttton
+  if (oDateTimeParseCronJobData < minDate) {
+    input.setAttribute('disabled', true);
+  }
+
+  // if the page is already publish and has a record on the crontab file
+  if (oCurrentTime >= oDateTimeParseCronJobData) {
+    input.setAttribute('min', minDate.toISOString().slice(0, -8));
+    input.removeAttribute('disabled');
+    input.setAttribute('value', '');
+    input.classList.remove('disabled')
+  }
+};
+
 /**
  * Loads and formats the publish later modal.
  * @param {Object} [existingEntry] The existing publish later entry, if any
@@ -207,52 +264,12 @@ async function getPublishLaterModal(existingEntry) {
   const minDate = new Date(Date.now() - tzOffset * 60000 + DELAY);
   const oCurrentTime = new Date(Date.now() - tzOffset * 60000);
 
+  const oDateTimeParseCronJobData = getDateTimeParseCronJobData(existingEntry);
   const oModalFragment = await generatePublishLaterModalFragment(html, existingEntry, oCurrentTime);
 
-  let date;
-  if (existingEntry) {
-    try {
-      date = parseCronJobData(existingEntry).datetime;
-    } catch (err) {
-      // eslint-disable-next-line no-console
-      console.error('Failed to parse existing schedule', err);
-    }
-  }
+  modalInputHandler(oModalFragment, oDateTimeParseCronJobData, minDate, placeholders);
 
-  const input = oModalFragment.querySelector('input[type="datetime-local"]');
-
-  const footer = [...oModalFragment.querySelectorAll('button')].map((btn) => {
-    btn.parentElement.remove();
-    btn.classList.add(btn.type === 'submit' ? 'cta' : 'secondary');
-    if (date < minDate && btn.type === 'submit' && !oCurrentTime >= date) {
-      btn.setAttribute('disabled', true);
-      btn.classList.add('disabled');
-    }
-    return btn.outerHTML;
-  }).join('') || null;
-
-  if (input) {
-    input.setAttribute('min', minDate.toISOString().slice(0, -8));
-    if (date) {
-      input.setAttribute('value', date.toISOString().slice(0, -8));
-    }
-    if (date < minDate) {
-      input.setAttribute('disabled', true);
-    }
-
-    // if the page is already publish and has a record on the crontab file
-    if (oCurrentTime >= date) {
-      input.setAttribute('min', minDate.toISOString().slice(0, -8));
-      input.removeAttribute('disabled');
-      input.setAttribute('value', '');
-      input.classList.remove('disabled')
-    }
-  }
-
-  const tzLabel = document.createElement('small');
-  tzLabel.textContent = getTimezoneMessage(placeholders);
-  input.after(tzLabel);
-
+  const footer = modalFooterHandler(oDateTimeParseCronJobData, minDate, oCurrentTime);
   const content = oModalFragment.querySelector('form').innerHTML;
 
   const { default: createDialog } = await import('./modal/modal.js');
