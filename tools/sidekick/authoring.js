@@ -346,6 +346,7 @@ export async function publishLater(skConfig) {
     index = cronjobs.indexOf(existing);
   }
 
+  modal = await wait(getPlaceholder('Please wait…', placeholders));
   modal = await getPublishLaterModal(existing);
   modal.addEventListener('close', async (ev) => {
     modal.remove();
