@@ -207,9 +207,13 @@ const modalFooterHandler = (oModalFragment, oDateTimeParseCronJobData, minDate, 
   const footer = [...oModalFragment.querySelectorAll('button')].map((btn) => {
     btn.parentElement.remove();
     btn.classList.add(btn.type === 'submit' ? 'cta' : 'secondary');
-    if (oDateTimeParseCronJobData < minDate && btn.type === 'submit' && !oCurrentTime >= oDateTimeParseCronJobData) {
+    if (oDateTimeParseCronJobData < minDate && btn.type === 'submit') {
       btn.setAttribute('disabled', true);
       btn.classList.add('disabled');
+    }
+    if (btn.type === 'submit' && !oCurrentTime >= oDateTimeParseCronJobData) {
+      btn.removeAttribute('disabled');
+      btn.classList.remove('disabled');
     }
     return btn.outerHTML;
   }).join('') || null;
