@@ -176,8 +176,6 @@ async function getSdk() {
 const generatePublishLaterModalFragment = async (html, existingEntry, oDateTimeParseCronJobData, oCurrentTime) => {
   const fragment = document.createElement('div');
   fragment.innerHTML = html;
-  const header = fragment.querySelector('h1,h2,h3');
-  header.remove();
 
   const link = fragment.querySelector('a[href*=".json"]');
   if (link && existingEntry) {
@@ -259,6 +257,8 @@ async function getPublishLaterModal(existingEntry) {
   const placeholders = await fetchPlaceholders();
   const response = await fetch('/tools/sidekick/publish-later.plain.html');
   const html = await response.text();
+
+  const header = html.querySelector('h1,h2,h3');
 
   const tzOffset = new Date().getTimezoneOffset();
   const minDate = new Date(Date.now() - tzOffset * 60000 + DELAY);
