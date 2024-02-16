@@ -179,7 +179,7 @@ const generatePublishLaterModalFragment = async (html, existingEntry, oDateTimeP
 
   const link = fragment.querySelector('a[href*=".json"]');
   if (link && existingEntry) {
-    if (!oCurrentTime >= oDateTimeParseCronJobData) {
+    if (oCurrentTime < oDateTimeParseCronJobData) {
       link.href = `${link.href}?sheet=edit`;
       link.textContent = link.href;
     }
