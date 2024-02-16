@@ -219,7 +219,7 @@ const modalFooterHandler = (oDateTimeParseCronJobData, minDate, oCurrentTime) =>
   return footer;
 };
 
-const modalInputHandler = (oModalFragment, oDateTimeParseCronJobData, minDate, placeholders) => {
+const modalInputHandler = (oModalFragment, oDateTimeParseCronJobData, minDate, oCurrentTime, placeholders) => {
   const input = oModalFragment.querySelector('input[type="datetime-local"]');
   if (!input) {
     return;
@@ -267,7 +267,7 @@ async function getPublishLaterModal(existingEntry) {
   const oDateTimeParseCronJobData = getDateTimeParseCronJobData(existingEntry);
   const oModalFragment = await generatePublishLaterModalFragment(html, existingEntry, oDateTimeParseCronJobData, oCurrentTime);
 
-  modalInputHandler(oModalFragment, oDateTimeParseCronJobData, minDate, placeholders);
+  modalInputHandler(oModalFragment, oDateTimeParseCronJobData, minDate, oCurrentTime, placeholders);
 
   const footer = modalFooterHandler(oDateTimeParseCronJobData, minDate, oCurrentTime);
   const content = oModalFragment.querySelector('form').innerHTML;
