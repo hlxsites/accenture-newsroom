@@ -188,7 +188,6 @@ async function getPublishLaterModal(existingEntry) {
   const oCurrentTime = new Date(Date.now() - tzOffset * 60000);
   const fragment = document.createElement('div');
   fragment.innerHTML = html;
-  const input = fragment.querySelector('input[type="datetime-local"]');
 
   let date;
   if (existingEntry) {
@@ -214,6 +213,8 @@ async function getPublishLaterModal(existingEntry) {
   decorateSections(fragment);
   decorateBlocks(fragment);
   await loadBlocks(fragment);
+
+  const input = fragment.querySelector('input[type="datetime-local"]');
 
   const footer = [...fragment.querySelectorAll('button')].map((btn) => {
     btn.parentElement.remove();
