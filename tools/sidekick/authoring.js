@@ -205,7 +205,7 @@ const getDateTimeParseCronJobData = (existingEntry) => {
   }
 };
 
-const modalFooterHandler = (oDateTimeParseCronJobData, minDate, oCurrentTime) => {
+const modalFooterHandler = (oModalFragment, oDateTimeParseCronJobData, minDate, oCurrentTime) => {
   const footer = [...oModalFragment.querySelectorAll('button')].map((btn) => {
     btn.parentElement.remove();
     btn.classList.add(btn.type === 'submit' ? 'cta' : 'secondary');
@@ -269,7 +269,7 @@ async function getPublishLaterModal(existingEntry) {
 
   modalInputHandler(oModalFragment, oDateTimeParseCronJobData, minDate, oCurrentTime, placeholders);
 
-  const footer = modalFooterHandler(oDateTimeParseCronJobData, minDate, oCurrentTime);
+  const footer = modalFooterHandler(oModalFragment, oDateTimeParseCronJobData, minDate, oCurrentTime);
   const content = oModalFragment.querySelector('form').innerHTML;
 
   const { default: createDialog } = await import('./modal/modal.js');
