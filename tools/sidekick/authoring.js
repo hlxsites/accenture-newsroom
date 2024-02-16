@@ -564,4 +564,8 @@ export async function publishLaterList() {
   const dialog = await createDialog('dialog-modal', header, content, null);
   dialog.classList.add('publishlater-all');
   dialog.showModal();
+
+  modal.addEventListener('close', () => {
+    modal.remove();
+  });
 }
