@@ -911,7 +911,6 @@ const observePluginInfo = (oSidekick) => {
 
 // Observe helix-sidekick element if already loaded on the html body
 const helixSideKickObserver = () => {
-
   // const oSidekick = document.querySelector('helix-sidekick');
   const sk = document.querySelector('helix-sidekick');
   if (sk) {

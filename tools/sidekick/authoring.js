@@ -89,7 +89,7 @@ function formatCronJobData({ datetime, url }) {
     `at ${pad(datetime.getUTCHours())}:${pad(datetime.getUTCMinutes())} on the ${datetime.getUTCDate()} day of ${MONTHS[datetime.getUTCMonth()]} in ${datetime.getUTCFullYear()}`,
     `publish ${new URL(url).pathname}`,
     `${sOrigin}${new URL(url).pathname}`,
-    ''
+    '',
   ]];
 }
 
@@ -173,13 +173,14 @@ async function getSdk() {
   return _sdk;
 }
 
-const generatePublishLaterModalFragment = async (html, existingEntry, oDateData) => {
+const getPublishLaterModalFragment = async (html, existingEntry, oDateData) => {
+  const { currentTime, datetimeCrontab } = oDateData;
   const fragment = document.createElement('div');
   fragment.innerHTML = html;
 
   const link = fragment.querySelector('a[href*=".json"]');
   if (link && existingEntry) {
-    if (oDateData.currentTime < oDateData.datetimeCrontab) {
+    if (currentTime < datetimeCrontab) {
       link.href = `${link.href}?sheet=edit`;
       link.textContent = link.href;
     }
@@ -192,26 +193,26 @@ const generatePublishLaterModalFragment = async (html, existingEntry, oDateData)
 };
 
 const getDateTimeParseCronJobData = (existingEntry) => {
-  if (!existingEntry) {
-    return;
-  }
   try {
-    return parseCronJobData(existingEntry).datetime;
+    const { datetime } = parseCronJobData(existingEntry);
+    return datetime;
   } catch (err) {
     // eslint-disable-next-line no-console
     console.error('Failed to parse existing schedule', err);
   }
+  return null;
 };
 
 const modalFooterHandler = (oModalFragment, oDateData) => {
+  const { currentTime, datetimeCrontab, minDate } = oDateData;
   const footer = [...oModalFragment.querySelectorAll('button')].map((btn) => {
     btn.parentElement.remove();
     btn.classList.add(btn.type === 'submit' ? 'cta' : 'secondary');
-    if (oDateData.datetimeCrontab < oDateData.minDate && btn.type === 'submit') {
+    if (datetimeCrontab < minDate && btn.type === 'submit') {
       btn.setAttribute('disabled', true);
       btn.classList.add('disabled');
     }
-    if (btn.type === 'submit' && oDateData.currentTime >= oDateData.datetimeCrontab) {
+    if (btn.type === 'submit' && currentTime >= datetimeCrontab) {
       btn.removeAttribute('disabled');
       btn.classList.remove('disabled');
     }
@@ -222,6 +223,7 @@ const modalFooterHandler = (oModalFragment, oDateData) => {
 };
 
 const modalInputHandler = (oModalFragment, oDateData, placeholders) => {
+  const { currentTime, datetimeCrontab, minDate } = oDateData;
   const input = oModalFragment.querySelector('input[type="datetime-local"]');
   if (!input) {
     return;
@@ -232,24 +234,38 @@ const modalInputHandler = (oModalFragment, oDateData, placeholders) => {
 
   input.setAttribute('min', minDate.toISOString().slice(0, -8));
 
-  if (!oDateData.datetimeCrontab) {
+  if (!datetimeCrontab) {
     return;
   }
 
-  input.setAttribute('value', oDateData.datetimeCrontab.toISOString().slice(0, -8));
+  input.setAttribute('value', datetimeCrontab.toISOString().slice(0, -8));
 
   // if less than 10 mins before scheduled pub then disabled the update buttton
-  if (oDateData.datetimeCrontab < oDateData.minDate) {
+  if (datetimeCrontab < minDate) {
     input.setAttribute('disabled', true);
   }
 
   // if the page is already publish and has a record on the crontab file
-  if (oDateData.currentTime >= oDateData.datetimeCrontab) {
+  if (currentTime >= datetimeCrontab) {
     input.setAttribute('min', minDate.toISOString().slice(0, -8));
     input.removeAttribute('disabled');
     input.setAttribute('value', '');
-    input.classList.remove('disabled')
+    input.classList.remove('disabled');
   }
+};
+
+const getDateData = (existingEntry) => {
+  const oTzOffset = new Date().getTimezoneOffset();
+  const oMinDate = new Date(Date.now() - oTzOffset * 60000 + DELAY);
+  const oCurrentTime = new Date(Date.now() - oTzOffset * 60000);
+  const oDatetimeCrontab = getDateTimeParseCronJobData(existingEntry);
+
+  return {
+    tzOffset: oTzOffset,
+    minDate: oMinDate,
+    currentTime: oCurrentTime,
+    datetimeCrontab: oDatetimeCrontab,
+  };
 };
 
 /**
@@ -260,16 +276,11 @@ const modalInputHandler = (oModalFragment, oDateData, placeholders) => {
 async function getPublishLaterModal(existingEntry) {
   const placeholders = await fetchPlaceholders();
   const response = await fetch('/tools/sidekick/publish-later.plain.html');
-  const sResponseHtml = await response.text();
+  const sResHtml = await response.text();
 
-  const oDateData = {
-    tzOffset: new Date().getTimezoneOffset(),
-    minDate: new Date(Date.now() - tzOffset * 60000 + DELAY),
-    currentTime: new Date(Date.now() - tzOffset * 60000),
-    datetimeCrontab: getDateTimeParseCronJobData(existingEntry)
-  };
+  const oDateData = getDateData(existingEntry);
 
-  const oModalFragment = await generatePublishLaterModalFragment(sResponseHtml, existingEntry, oDateData);
+  const oModalFragment = await getPublishLaterModalFragment(sResHtml, existingEntry, oDateData);
   const header = oModalFragment.querySelector('h1,h2,h3');
 
   modalInputHandler(oModalFragment, oDateData, placeholders);
