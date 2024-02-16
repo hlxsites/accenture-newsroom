@@ -211,7 +211,7 @@ const modalFooterHandler = (oModalFragment, oDateTimeParseCronJobData, minDate, 
       btn.setAttribute('disabled', true);
       btn.classList.add('disabled');
     }
-    if (btn.type === 'submit' && !oCurrentTime >= oDateTimeParseCronJobData) {
+    if (btn.type === 'submit' && oCurrentTime >= oDateTimeParseCronJobData) {
       btn.removeAttribute('disabled');
       btn.classList.remove('disabled');
     }
