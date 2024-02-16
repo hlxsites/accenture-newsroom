@@ -565,7 +565,7 @@ export async function publishLaterList() {
   dialog.classList.add('publishlater-all');
   dialog.showModal();
 
-  modal.addEventListener('close', () => {
-    modal.remove();
+  dialog.addEventListener('close', () => {
+    dialog.remove();
   });
 }
