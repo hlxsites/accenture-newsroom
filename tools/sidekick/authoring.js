@@ -173,6 +173,26 @@ async function getSdk() {
   return _sdk;
 }
 
+const generatePublishLaterModalFragment = async (html, existingEntry, oCurrentTime) => {
+  const fragment = document.createElement('div');
+  fragment.innerHTML = html;
+  const header = fragment.querySelector('h1,h2,h3');
+  header.remove();
+
+  const link = fragment.querySelector('a[href*=".json"]');
+  if (link && existingEntry) {
+    if (!oCurrentTime >= date) {
+      link.href = `${link.href}?sheet=edit`;
+      link.textContent = link.href;
+    }
+  }
+
+  decorateSections(fragment);
+  decorateBlocks(fragment);
+  await loadBlocks(fragment);
+  return fragment;
+};
+
 /**
  * Loads and formats the publish later modal.
  * @param {Object} [existingEntry] The existing publish later entry, if any
@@ -186,8 +206,8 @@ async function getPublishLaterModal(existingEntry) {
   const tzOffset = new Date().getTimezoneOffset();
   const minDate = new Date(Date.now() - tzOffset * 60000 + DELAY);
   const oCurrentTime = new Date(Date.now() - tzOffset * 60000);
-  const fragment = document.createElement('div');
-  fragment.innerHTML = html;
+
+  const oModalFragment = await generatePublishLaterModalFragment(html, existingEntry, oCurrentTime);
 
   let date;
   if (existingEntry) {
@@ -199,27 +219,12 @@ async function getPublishLaterModal(existingEntry) {
     }
   }
 
-  const link = fragment.querySelector('a[href*=".json"]');
-  if (link && existingEntry) {
-    if (!oCurrentTime >= date) {
-      link.href = `${link.href}?sheet=edit`;
-      link.textContent = link.href;
-    }
-  }
+  const input = oModalFragment.querySelector('input[type="datetime-local"]');
 
-  const header = fragment.querySelector('h1,h2,h3');
-  header.remove();
-
-  decorateSections(fragment);
-  decorateBlocks(fragment);
-  await loadBlocks(fragment);
-
-  const input = fragment.querySelector('input[type="datetime-local"]');
-
-  const footer = [...fragment.querySelectorAll('button')].map((btn) => {
+  const footer = [...oModalFragment.querySelectorAll('button')].map((btn) => {
     btn.parentElement.remove();
     btn.classList.add(btn.type === 'submit' ? 'cta' : 'secondary');
-    if (date < minDate && btn.type === 'submit') {
+    if (date < minDate && btn.type === 'submit' && !oCurrentTime >= date) {
       btn.setAttribute('disabled', true);
       btn.classList.add('disabled');
     }
@@ -240,6 +245,7 @@ async function getPublishLaterModal(existingEntry) {
       input.setAttribute('min', minDate.toISOString().slice(0, -8));
       input.removeAttribute('disabled');
       input.setAttribute('value', '');
+      input.classList.remove('disabled')
     }
   }
 
@@ -247,7 +253,7 @@ async function getPublishLaterModal(existingEntry) {
   tzLabel.textContent = getTimezoneMessage(placeholders);
   input.after(tzLabel);
 
-  const content = fragment.querySelector('form').innerHTML;
+  const content = oModalFragment.querySelector('form').innerHTML;
 
   const { default: createDialog } = await import('./modal/modal.js');
   const dialog = await createDialog('dialog-modal', header, content, footer);
