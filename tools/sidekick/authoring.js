@@ -185,8 +185,10 @@ async function getPublishLaterModal(existingEntry) {
 
   const tzOffset = new Date().getTimezoneOffset();
   const minDate = new Date(Date.now() - tzOffset * 60000 + DELAY);
-  const input = fragment.querySelector('input[type="datetime-local"]');
   const oCurrentTime = new Date(Date.now() - tzOffset * 60000);
+  const fragment = document.createElement('div');
+  fragment.innerHTML = html;
+  const input = fragment.querySelector('input[type="datetime-local"]');
 
   let date;
   if (existingEntry) {
@@ -198,8 +200,6 @@ async function getPublishLaterModal(existingEntry) {
     }
   }
 
-  const fragment = document.createElement('div');
-  fragment.innerHTML = html;
   const link = fragment.querySelector('a[href*=".json"]');
   if (link && existingEntry) {
     if (!oCurrentTime >= date) {
