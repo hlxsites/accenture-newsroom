@@ -223,7 +223,7 @@ const getDateTimeParseCronJobData = (existingEntry) => {
   try {
     const oTzOffset = new Date().getTimezoneOffset();
     const { datetime } = parseCronJobDataToLocal(existingEntry);
-    return datetime - oTzOffset * 60000;
+    return new Date(datetime - oTzOffset * 60000);
   } catch (err) {
     // eslint-disable-next-line no-console
     console.error('Failed to parse existing schedule', err);
