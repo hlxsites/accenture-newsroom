@@ -99,25 +99,6 @@ function formatCronJobData({ datetime, url }) {
  * @returns an object containing the parsed data and
  *          having `datetime`, `action` and `url` properties
  */
-function parseCronJobData([datetime, action]) {
-  const [, hh, mm, apm, dd, mmm, yyyy] = datetime.match(/at (\d+):(\d+)([ap]m)? on the (\d+) day of (\w+) in (\d+)/);
-  let iHours;
-  const iParseHour = parseInt(hh, 10);
-  if (apm) {
-    iHours = apm === 'pm' ? iParseHour + 12 : iParseHour;
-  } else {
-    iHours = iParseHour;
-  }
-  const oTzOffset = new Date().getTimezoneOffset();
-  const oUTCDate = Date.UTC(yyyy, MONTHS.indexOf(mmm), dd, iHours, mm);
-  const localDate = new Date(oUTCDate - oTzOffset * 60000);
-  return {
-    datetime: localDate,
-    url: `${window.location.origin}${action.split(' ').pop()}`,
-    action: action.split(' ').shift(),
-  };
-}
-
 const parseCronJobDataToLocal = ([datetime, action]) => {
   const [, hh, mm, apm, dd, mmm, yyyy] = datetime.match(/at (\d+):(\d+)([ap]m)? on the (\d+) day of (\w+) in (\d+)/);
   let iHours;
@@ -197,6 +178,13 @@ async function getSdk() {
   return _sdk;
 }
 
+/**
+ * Get the modal Fragment from the form component
+ * @param {String} [html] HTML string response from /tools/sidekick/publish-later.plain.html
+ * @param {Object} [existingEntry] The existing publish later entry, if any
+ * @param {Object} [oDateData] Object dates
+ * @returns Fragment of modal dialog
+ */
 const getPublishLaterModalFragment = async (html, existingEntry, oDateData) => {
   const { currentTime, datetimeCrontab } = oDateData;
   const fragment = document.createElement('div');
@@ -216,6 +204,11 @@ const getPublishLaterModalFragment = async (html, existingEntry, oDateData) => {
   return fragment;
 };
 
+/**
+ * Get the existing datetime from the cronjobdata
+ * @param {Object} [existingEntry] The existing publish later entry, if any
+ * @returns UTC date from the cronjobdata or null
+ */
 const getDateTimeParseCronJobData = (existingEntry) => {
   if (!existingEntry) {
     return null;
@@ -231,6 +224,12 @@ const getDateTimeParseCronJobData = (existingEntry) => {
   return null;
 };
 
+/**
+ * Conditions for the buttons of modal to disable or enable.
+ * @param {Object} [oModalFragment] Modal Fragment from getPublishLaterModalFragment method
+ * @param {Object} [oDateData] Object dates
+ * @returns Html string of footer of modal dialog
+ */
 const modalFooterHandler = (oModalFragment, oDateData) => {
   const { currentTime, datetimeCrontab, minDate } = oDateData;
   const footer = [...oModalFragment.querySelectorAll('button')].map((btn) => {
@@ -250,6 +249,13 @@ const modalFooterHandler = (oModalFragment, oDateData) => {
   return footer;
 };
 
+/**
+ * Conditions for the input of modal to disable or enable.
+ * @param {Object} [oModalFragment] Modal Fragment from getPublishLaterModalFragment method
+ * @param {Object} [oDateData] Object dates
+ * @param {Object} [placeholders] Object contains of translations
+ * @returns void
+ */
 const modalInputHandler = (oModalFragment, oDateData, placeholders) => {
   const { currentTime, datetimeCrontab, minDate } = oDateData;
   const input = oModalFragment.querySelector('input[type="datetime-local"]');
@@ -282,6 +288,11 @@ const modalInputHandler = (oModalFragment, oDateData, placeholders) => {
   }
 };
 
+/**
+ * Gets an object consist of the dates needed for publish modal
+ * @param {Object} [existingEntry] The existing publish later entry, if any
+ * @returns Dates Object
+ */
 const getDateData = (existingEntry) => {
   const oTzOffset = new Date().getTimezoneOffset();
   const oMinDate = new Date(Date.now() - oTzOffset * 60000 + DELAY);
