@@ -498,7 +498,7 @@ export async function enhancePageInfo() {
     return;
   }
 
-  const { datetime } = parseCronJobData(existing);
+  const { datetime } = parseCronJobToLocal(existing);
   date.setAttribute('datetime', datetime.toISOString());
   date.textContent = formatDateTime(datetime);
 }
