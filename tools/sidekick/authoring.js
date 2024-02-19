@@ -561,7 +561,7 @@ export async function publishLaterList() {
   jobsList.forEach((job) => {
     const url = new URL(job.url);
     table.innerHTML += `<div>
-      <div>${formatDateTime(job.datetime, 'UTC')}</div>
+      <div>${formatDateTime(job.datetime)}</div>
       <div><a href="${url.pathname}" target="_blank">${url.pathname}</a></div>
     </div>`;
   });
