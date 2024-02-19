@@ -103,9 +103,8 @@ function parseCronJobData([datetime, action]) {
   const [, hh, mm, apm, dd, mmm, yyyy] = datetime.match(/at (\d+):(\d+)([ap]m)? on the (\d+) day of (\w+) in (\d+)/);
   let iHours;
   if (apm) {
-    if (apm === 'pm') {
-      iHours = parseInt(hh, 10) + 12
-    }
+    const iParseHour = parseInt(hh, 10);
+    iHours = apm === 'pm' ? iParseHour + 12 : iParseHour;
   } else {
     iHours = hh;
   }
