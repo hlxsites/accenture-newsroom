@@ -118,7 +118,7 @@ function parseCronJobData([datetime, action]) {
   };
 }
 
-const parseCronJobToLocal = ([datetime, action]) => {
+const parseCronJobDataToLocal = ([datetime, action]) => {
   const [, hh, mm, apm, dd, mmm, yyyy] = datetime.match(/at (\d+):(\d+)([ap]m)? on the (\d+) day of (\w+) in (\d+)/);
   let iHours;
   const iParseHour = parseInt(hh, 10);
@@ -221,8 +221,9 @@ const getDateTimeParseCronJobData = (existingEntry) => {
     return null;
   }
   try {
-    const { datetime } = parseCronJobData(existingEntry);
-    return datetime;
+    const oTzOffset = new Date().getTimezoneOffset();
+    const { datetime } = parseCronJobDataToLocal(existingEntry);
+    return datetime - oTzOffset * 60000;
   } catch (err) {
     // eslint-disable-next-line no-console
     console.error('Failed to parse existing schedule', err);
@@ -503,7 +504,7 @@ export async function enhancePageInfo() {
     return;
   }
 
-  const { datetime } = parseCronJobToLocal(existing);
+  const { datetime } = parseCronJobDataToLocal(existing);
   date.setAttribute('datetime', datetime.toISOString());
   date.textContent = formatDateTime(datetime);
 }
@@ -549,7 +550,7 @@ export async function publishLaterList() {
 
   const jobsList = cronjobs.slice(1).map((job) => {
     try {
-      return parseCronJobToLocal(job);
+      return parseCronJobDataToLocal(job);
     } catch (err) {
       return null;
     }
