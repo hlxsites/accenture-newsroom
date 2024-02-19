@@ -102,11 +102,11 @@ function formatCronJobData({ datetime, url }) {
 function parseCronJobData([datetime, action]) {
   const [, hh, mm, apm, dd, mmm, yyyy] = datetime.match(/at (\d+):(\d+)([ap]m)? on the (\d+) day of (\w+) in (\d+)/);
   let iHours;
+  const iParseHour = parseInt(hh, 10);
   if (apm) {
-    const iParseHour = parseInt(hh, 10);
     iHours = apm === 'pm' ? iParseHour + 12 : iParseHour;
   } else {
-    iHours = hh;
+    iHours = iParseHour;
   }
   const localDate = new Date(Date.UTC(yyyy, MONTHS.indexOf(mmm), dd, iHours, mm) - new Date().getTimezoneOffset() * 60000);
   return {
