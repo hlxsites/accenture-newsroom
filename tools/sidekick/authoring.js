@@ -108,7 +108,9 @@ function parseCronJobData([datetime, action]) {
   } else {
     iHours = iParseHour;
   }
-  const localDate = new Date(Date.UTC(yyyy, MONTHS.indexOf(mmm), dd, iHours, mm) - new Date().getTimezoneOffset() * 60000);
+  const oTzOffset = new Date().getTimezoneOffset();
+  const oUTCDate = Date.UTC(yyyy, MONTHS.indexOf(mmm), dd, iHours, mm);
+  const localDate = new Date(oUTCDate - oTzOffset * 60000);
   return {
     datetime: localDate,
     url: `${window.location.origin}${action.split(' ').pop()}`,
@@ -215,6 +217,9 @@ const getPublishLaterModalFragment = async (html, existingEntry, oDateData) => {
 };
 
 const getDateTimeParseCronJobData = (existingEntry) => {
+  if (!existingEntry) {
+    return null;
+  }
   try {
     const { datetime } = parseCronJobData(existingEntry);
     return datetime;
