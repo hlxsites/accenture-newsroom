@@ -116,6 +116,23 @@ function parseCronJobData([datetime, action]) {
   };
 }
 
+const parseCronJobToLocal = ([datetime, action]) => {
+  const [, hh, mm, apm, dd, mmm, yyyy] = datetime.match(/at (\d+):(\d+)([ap]m)? on the (\d+) day of (\w+) in (\d+)/);
+  let iHours;
+  const iParseHour = parseInt(hh, 10);
+  if (apm) {
+    iHours = apm === 'pm' ? iParseHour + 12 : iParseHour;
+  } else {
+    iHours = iParseHour;
+  }
+  const localDate = new Date(Date.UTC(yyyy, MONTHS.indexOf(mmm), dd, iHours, mm));
+  return {
+    datetime: localDate,
+    url: `${window.location.origin}${action.split(' ').pop()}`,
+    action: action.split(' ').shift(),
+  };
+};
+
 /**
  * Returns a string with the message about the current timezone.
  * @returns a message with the current timezone
@@ -527,7 +544,7 @@ export async function publishLaterList() {
 
   const jobsList = cronjobs.slice(1).map((job) => {
     try {
-      return parseCronJobData(job);
+      return parseCronJobToLocal(job);
     } catch (err) {
       return null;
     }
