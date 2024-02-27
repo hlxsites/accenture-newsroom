@@ -1,8 +1,10 @@
+/* eslint-disable prefer-destructuring */
 /* eslint-disable no-unused-vars */
 /* eslint-disable no-undef */
+const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
 
 function showAlert() {
-  const alertBox = document.getElementById('customAlert');
+  const alertBox = document.getElementById('custom-alert');
   alertBox.style.display = 'block';
   setTimeout(() => {
     alertBox.style.display = 'none';
@@ -22,36 +24,44 @@ async function populateTags() {
   const response = await resp.json();
   if (response) {
     const { data } = response;
-    const subjects = data.map((item) => item.Subjects);
-    subjects.sort();
-    const industries = data.map((item) => item.Industries);
-    industries.sort();
+    const subjects = data.map((item) => [item['Subjects Text'], item['Subjects Value']]);
+    const industries = data.map((item) => [item['Industries Text'], item['Industries Value']]);
     const selectSubjects = document.getElementById('dropdown-subjects');
     subjects.forEach((item) => {
       if (item) {
         const option = document.createElement('option');
-        option.value = item;
-        option.text = item;
-        selectSubjects.appendChild(option);
+        option.value = item[1];
+        option.text = item[0];
+        if (item[0] !== '') {
+          selectSubjects.appendChild(option);
+        }
       }
     });
     const selectIndustries = document.getElementById('dropdown-industries');
     industries.forEach((item) => {
       if (item) {
         const option = document.createElement('option');
-        option.value = item;
-        option.text = item;
-        selectIndustries.appendChild(option);
+        option.value = item[1];
+        option.text = item[0];
+        if (item[0] !== '') {
+          selectIndustries.appendChild(option);
+        }
       }
     });
   }
 }
 
 function processForm() {
-  const publishDate = document.getElementById('publishDate').value;
+  const publishDate = document.getElementById('publishDate').value || new Date().toISOString();
+  const publishDateMetadata = publishDate.replace('T', ' ');
+  const publishDateObj = new Date(publishDate);
+  const publishDateFormatted = `${months[publishDateObj.getMonth()]} ${publishDateObj.getDate()}, ${publishDateObj.getFullYear()}`;
   const title = document.getElementById('title').value;
-  const description = document.querySelector('form div#description .ql-editor').innerHTML;
-  const abstract = document.querySelector('form div#abstract .ql-editor').innerHTML;
+  const subTitle = document.getElementById('subtitle').value;
+  const rawAbstract = document.querySelector('form div#abstract .ql-editor').innerHTML;
+  const abstract = rawAbstract.replace(/<p>&nbsp;<\/p>/g, '');
+  const rawBody = document.querySelector('form div#body .ql-editor').innerHTML;
+  const body = rawBody.replace(/<p>&nbsp;<\/p>/g, '');
   const subjectsDropdown = document.getElementById('dropdown-subjects');
   const selectedSubjects = Array
     .from(subjectsDropdown.selectedOptions)
@@ -64,38 +74,49 @@ function processForm() {
   const industries = selectedIndustries.join(', ');
   // create the html to paste into the word doc
   const htmlToPaste = `
-    <h1>${title}</h1>
+    ${publishDateFormatted || ''}
+    <h1>${title || ''}</h1>
+    <h6>${subTitle || ''}</h6>
     <br>
-    ${abstract}
+    ${abstract || ''}
     ---
-
+    ${body || ''}
+  
     <table border="1">
       <tr bgcolor="#f7caac">
         <td colspan="2">Metadata</td>
       </tr>
       <tr>
-        <td>Published Date</td>
-        <td>${publishDate}</td>
+        <td>Template</td>
+        <td>Article</td>
       </tr>
       <tr>
-        <td>Title</td>
-        <td>${title}</td>
+        <td width="20%">Published Date</td>
+        <td>${publishDateMetadata || ''}</td>
       </tr>
       <tr>
-        <td>Description</td>
-        <td>${description}</td>
+        <td width="20%">Title</td>
+        <td>${title || ''}</td>
       </tr>
       <tr>
-        <td>Abstract</td>
-        <td>${abstract}</td>
+        <td width="20%">Description</td>
+        <td>${abstract || ''}</td>
       </tr>
       <tr>
-        <td>Subjects</td>
-        <td>${subjects}</td>
+        <td width="20%">Abstract</td>
+        <td>${abstract || ''}</td>
       </tr>
       <tr>
-        <td>Industries</td>
-        <td>${industries}</td>
+        <td width="20%">Subjects</td>
+        <td>${subjects || ''}</td>
+      </tr>
+      <tr>
+        <td width="20%">Industries</td>
+        <td>${industries || ''}</td>
+      </tr>
+      <tr>
+        <td width="20%">Keywords</td>
+        <td></td>
       </tr>
     </table>
   `;
@@ -115,10 +136,10 @@ async function init() {
     },
     theme: 'snow',
   };
-  const descContainer = document.querySelector('form div#description');
-  const descriptionEditor = await new Quill(descContainer, rteOptions);
   const abstractContainer = document.querySelector('form div#abstract');
   const abstractEditor = await new Quill(abstractContainer, rteOptions);
+  const bodyContainer = document.querySelector('form div#body');
+  const bodyEditor = await new Quill(bodyContainer, rteOptions);
   const copyButton = document.getElementById('copyToClipboard');
   copyButton.addEventListener('click', () => {
     processForm();
