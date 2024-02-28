@@ -1,0 +1,28 @@
+/* nothing here yet */
+
+body {
+  display: unset;
+}
+
+main {
+  padding: 5%;
+}
+
+label {
+  font-weight: bolder;
+}
+
+select, div#abstract, div#body {
+  width: 100%;
+  max-width: 50rem;
+  height: 200px;
+}
+
+.ql-toolbar {
+  max-width: 50rem;
+}
+
+button#copy-to-clipboard {
+  min-width: 50rem;
+  line-height: 200%;
+}
