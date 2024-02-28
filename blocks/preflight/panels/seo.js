@@ -150,12 +150,27 @@ async function checkLorem() {
   return result.icon;
 }
 
+async function getStatus() {
+  //   const adminUrl = getAdminUrl(url, 'status');
+  const adminUrl = "https://preflight-gen-tab--accenture-newsroom--hlxsites.hlx.page/drafts/jay/dhc/1-daily-health-check-page"
+    const resp = await fetch(adminUrl,{ method: 'HEAD' });
+    if (!resp.ok) return {};
+    const json = await resp.json();
+    console.log(json);
+    const preview = json.preview.lastModified || 'Never';
+    const live = json.live.lastModified || 'Never';
+    const edit = json.edit.url;
+    return { url, edit, preview, live };
+  }
+
 async function checkLinks() {
   const result = { ...linksResult.value };
   const links = document.querySelectorAll('a[href^="/"]');
 
   let badLink;
   links.forEach(async (link) => {
+    const resStatus = await getStatus();
+    console.log(resStatus)
     const resp = await fetch(link.href, { method: 'HEAD' });
     if (!resp.ok) badLink = true;
   });

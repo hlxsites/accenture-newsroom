@@ -5,14 +5,14 @@ const NOT_FOUND = { preview: { lastModified: 'Not found' }, live: { lastModified
 const content = signal({});
 
 function getAdminUrl(url, type) {
-  const project = url.hostname === 'localhost' ? 'main--milo--adobecom' : url.hostname.split('.')[0];
+  const project = url.hostname === 'localhost' ? 'accenture-newsroom' : url.hostname.split('.')[0];
   const [branch, repo, owner] = project.split('--');
   const base = `https://admin.hlx.page/${type}/${owner}/${repo}/${branch}${url.pathname}`;
   return type === 'status' ? `${base}?editUrl=auto` : base;
 }
 
 async function getStatus(url) {
-  const adminUrl = getAdminUrl(url, 'status');
+const adminUrl = getAdminUrl(url, 'status');
   const resp = await fetch(adminUrl);
   if (!resp.ok) return {};
   const json = await resp.json();
