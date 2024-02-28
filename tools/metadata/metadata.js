@@ -1,7 +1,11 @@
 /* eslint-disable prefer-destructuring */
 /* eslint-disable no-unused-vars */
 /* eslint-disable no-undef */
-const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+
+function getLocale() {
+  return (navigator.languages && navigator.languages.length)
+    ? navigator.languages[0] : navigator.language;
+}
 
 function showAlert() {
   const alertBox = document.getElementById('custom-alert');
@@ -55,7 +59,9 @@ function processForm() {
   const publishDate = document.getElementById('publishDate').value || new Date().toISOString();
   const publishDateMetadata = publishDate.replace('T', ' ');
   const publishDateObj = new Date(publishDate);
-  const publishDateFormatted = `${months[publishDateObj.getMonth()]} ${publishDateObj.getDate()}, ${publishDateObj.getFullYear()}`;
+  const formattedDateLong = new Intl.DateTimeFormat(getLocale(), {
+    dateStyle: 'long',
+  }).format(publishDateObj);
   const title = document.getElementById('title').value;
   const subTitle = document.getElementById('subtitle').value;
   const rawAbstract = document.querySelector('form div#abstract .ql-editor').innerHTML;
@@ -74,7 +80,7 @@ function processForm() {
   const industries = selectedIndustries.join(', ');
   // create the html to paste into the word doc
   const htmlToPaste = `
-    ${publishDateFormatted || ''}
+    ${formattedDateLong || ''}
     <h1>${title || ''}</h1>
     <h6>${subTitle || ''}</h6>
     <br>
@@ -140,7 +146,7 @@ async function init() {
   const abstractEditor = await new Quill(abstractContainer, rteOptions);
   const bodyContainer = document.querySelector('form div#body');
   const bodyEditor = await new Quill(bodyContainer, rteOptions);
-  const copyButton = document.getElementById('copyToClipboard');
+  const copyButton = document.getElementById('copy-to-clipboard');
   copyButton.addEventListener('click', () => {
     processForm();
   });
