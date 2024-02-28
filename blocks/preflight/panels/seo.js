@@ -154,7 +154,8 @@ async function getStatus() {
   //   const adminUrl = getAdminUrl(url, 'status');
   const adminUrl = "https://admin.hlx.page/status/hlxsites/accenture-newsroom/preflight-gen-tab/drafts/jay/dhc/1-daily-health-check-page?editUrl=auto"
     const resp = await fetch(adminUrl,{ method: 'HEAD' });
-    if (!resp.ok) return {};
+    console.log(resp);
+    // if (!resp.ok) return {};
     const json = await resp.json();
     console.log(json);
     const preview = json.preview.lastModified || 'Never';
@@ -168,9 +169,9 @@ async function checkLinks() {
   const links = document.querySelectorAll('a[href^="/"]');
 
   let badLink;
+  const resStatus = await getStatus();
+  console.log(resStatus)
   links.forEach(async (link) => {
-    const resStatus = await getStatus();
-    console.log(resStatus)
     const resp = await fetch(link.href, { method: 'HEAD' });
     if (!resp.ok) badLink = true;
   });
@@ -200,7 +201,7 @@ function SeoItem({ icon, title, description }) {
 async function getResults() {
   checkH1s();
   checkTitle();
-  await checkCanon();
+  // await checkCanon();
   checkDescription();
   checkBody();
   checkLorem();
