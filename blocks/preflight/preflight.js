@@ -1,13 +1,13 @@
 import { html, render, signal } from './htm-preact.js';
 import { createTag } from '../../scripts/scripts.js';
-// import General from './panels/general.js';
+import General from './panels/general.js';
 import SEO from './panels/seo.js';
 
 const HEADING = 'Accenture Newsroom Preflight';
 const IMG_PATH = '/blocks/preflight/img';
 
 const tabs = signal([
-  // { title: 'General', selected: true },
+  { title: 'General', selected: true },
   { title: 'SEO', selected: true },
 ]);
 
@@ -20,6 +20,8 @@ function setTab(active) {
 
 function setPanel(title) {
   switch (title) {
+    case 'General':
+      return html`<${General} />`;
     case 'SEO':
       return html`<${SEO} />`;
     default:
