@@ -152,7 +152,7 @@ async function checkLorem() {
 
 async function getStatus() {
   //   const adminUrl = getAdminUrl(url, 'status');
-  const adminUrl = "https://preflight-gen-tab--accenture-newsroom--hlxsites.hlx.page/drafts/jay/dhc/1-daily-health-check-page"
+  const adminUrl = "https://admin.hlx.page/status/hlxsites/accenture-newsroom/preflight-gen-tab/drafts/jay/dhc/1-daily-health-check-page?editUrl=auto"
     const resp = await fetch(adminUrl,{ method: 'HEAD' });
     if (!resp.ok) return {};
     const json = await resp.json();
