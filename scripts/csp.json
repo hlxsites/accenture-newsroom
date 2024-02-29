@@ -14,7 +14,8 @@
       "dpm.demdex.net",
       "cdnjs.cloudflare.com",
       "play.vidyard.com",
-      "api.demandbase.com"
+      "api.demandbase.com",
+      "admin.hlx.page"
   ],
   "connect-src": [
       "'self'",
@@ -25,7 +26,8 @@
       "assets.adobedtm.com",
       "cdn.cookielaw.org",
       "dpm.demdex.net",
-      "api.company-target.com"
+      "api.company-target.com",
+      "admin.hlx.page"
   ],
   "img-src": [
     "'self'",

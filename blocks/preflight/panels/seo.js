@@ -152,7 +152,7 @@ async function checkLorem() {
 
 async function getStatus() {
   //   const adminUrl = getAdminUrl(url, 'status');
-  const adminUrl = "https://admin.hlx.page/status/hlxsites/accenture-newsroom/preflight-gen-tab/drafts/jay/dhc/1-daily-health-check-page?editUrl=auto"
+  const adminUrl = "https://admin.hlx.page/status/hlxsites/accenture-newsroom/preflight-gen-tab/news/2024/accenture-completes-acquisition-of-navisite-to-help-clients-modernize-and-reinvent-their-businesses-with-cloud?editUrl=auto"
     const resp = await fetch(adminUrl,{ method: 'HEAD' });
     console.log(resp);
     // if (!resp.ok) return {};
