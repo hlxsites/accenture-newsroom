@@ -20,6 +20,71 @@ function writeToClipboard(blob) {
   navigator.clipboard.write(data);
 }
 
+function getSiteFromHostName(hostname = window.location.hostname) {
+  const allowedSites = ['uk', 'de', 'fr', 'it', 'es', 'sg', 'pt', 'jp', 'br'];
+  if (hostname === 'localhost') {
+    return 'us';
+  }
+  // handle franklin hostnames
+  const franklinHostName = 'accenture-newsroom';
+  if (hostname.includes(franklinHostName)) {
+    for (let i = 0; i < allowedSites.length; i += 1) {
+      if (hostname.includes(`${franklinHostName}-${allowedSites[i]}`)) {
+        return allowedSites[i];
+      }
+    }
+    return 'us';
+  }
+  // handle main hostnames
+  const mainHostName = 'newsroom.accenture';
+  if (hostname.includes(mainHostName)) {
+    const remainingHostName = hostname.replace(`${mainHostName}`, '');
+    for (let i = 0; i < allowedSites.length; i += 1) {
+      if (remainingHostName.includes(`${allowedSites[i]}`)) {
+        return allowedSites[i];
+      }
+    }
+  }
+  return 'us';
+}
+
+function getCountry() {
+  const siteToCountryMapping = {
+    us: 'us',
+    uk: 'gb',
+    de: 'de',
+    fr: 'fr',
+    it: 'it',
+    es: 'sp',
+    sg: 'sg',
+    pt: 'pt',
+    jp: 'jp',
+    br: 'br',
+  };
+  const site = getSiteFromHostName();
+  return siteToCountryMapping[site];
+}
+
+// Tranlationg date to locally
+function getHumanReadableDate(dateString) {
+  if (!dateString) return dateString;
+  const date = new Date(parseInt(dateString, 10));
+  const specialCountries = ['pt', 'br', 'sp'];
+  // display the date in GMT timezone
+  const country = getCountry();
+  const localedate = date.toLocaleDateString(getDateLocales(country), {
+    timeZone: 'GMT',
+    year: 'numeric',
+    month: 'long',
+    day: '2-digit',
+  });
+  if (specialCountries.includes(country)) {
+    // de means 'of' in pt/br/sp, replacing with empty string
+    return localedate.replace(/de /g, '');
+  }
+  return localedate;
+}
+
 async function populateTags() {
   // Replace with your JSON endpoint
   const tags = '/tags.json';
@@ -33,22 +98,36 @@ async function populateTags() {
     const selectSubjects = document.getElementById('dropdown-subjects');
     subjects.forEach((item) => {
       if (item) {
-        const option = document.createElement('option');
-        option.value = item[1];
-        option.text = item[0];
+        const checkbox = document.createElement('input') ;
+        checkbox.classList.add('checkbox')
+        checkbox.type = "checkbox"
+        checkbox.value = item[1];
+        
+        const span = document.createElement('span') ;
+        span.classList.add('tag-Label')
+        span.appendChild(checkbox);
+        span.appendChild(document.createTextNode(item[0]));
+
         if (item[0] !== '') {
-          selectSubjects.appendChild(option);
+          selectSubjects.appendChild(span);
         }
       }
     });
     const selectIndustries = document.getElementById('dropdown-industries');
     industries.forEach((item) => {
       if (item) {
-        const option = document.createElement('option');
-        option.value = item[1];
-        option.text = item[0];
+        const checkbox = document.createElement('input') ;
+        checkbox.classList.add('checkbox')
+        checkbox.type = "checkbox"
+        checkbox.value = item[1];
+        
+        const span = document.createElement('span') ;
+        span.classList.add('tag-Label')
+        span.appendChild(checkbox);
+        span.appendChild(document.createTextNode(item[0]));
+
         if (item[0] !== '') {
-          selectIndustries.appendChild(option);
+          selectIndustries.appendChild(span);
         }
       }
     });
@@ -56,7 +135,7 @@ async function populateTags() {
 }
 
 function processForm() {
-  const publishDate = document.getElementById('publishDate').value || new Date().toISOString();
+  const publishDate = document.getElementById('publishDate').value || getHumanReadableDate(new Date().toString());
   const publishDateMetadata = publishDate.replace('T', ' ');
   const publishDateObj = new Date(publishDate);
   const formattedDateLong = new Intl.DateTimeFormat(getLocale(), {
@@ -69,14 +148,30 @@ function processForm() {
   const rawBody = document.querySelector('form div#body .ql-editor').innerHTML;
   const body = rawBody.replace(/<p>&nbsp;<\/p>/g, '');
   const subjectsDropdown = document.getElementById('dropdown-subjects');
-  const selectedSubjects = Array
-    .from(subjectsDropdown.selectedOptions)
-    .map((option) => option.value);
-  const subjects = selectedSubjects.join(', ');
+  const checkedSubject= subjectsDropdown.querySelectorAll('.checkbox');
+  const selectedsubject = [];
+  checkedSubject.forEach((checkSubject) => {
+    if (checkSubject.checked) {
+      selectedsubject.push(checkSubject.value);
+    }
+  });
+  // console.log("Checked checkboxes:", checkedCheckboxes);
+  // const selectedSubjects = Array
+  //   .from(subjectsDropdown.selectSubjects)
+    // .map((label) => option.value);
+  const subjects = selectedsubject.join(', ');
   const industriesDropdown = document.getElementById('dropdown-industries');
-  const selectedIndustries = Array
-    .from(industriesDropdown.selectedOptions)
-    .map((option) => option.value);
+  const checkindustries= industriesDropdown.querySelectorAll('.checkbox');
+  const selectedIndustries = [];
+  checkindustries.forEach((checkindustries) => {
+    if (checkindustries.checked) {
+      selectedIndustries.push(checkindustries.value);
+    }
+  });
+  // console.log("Checked checkboxes:", checkedCheckboxes);
+  // const selectedIndustries = Array
+  //   .from(industriesDropdown.selectedOptions)
+  //   .map((option) => option.value);
   const industries = selectedIndustries.join(', ');
   // create the html to paste into the word doc
   const htmlToPaste = `

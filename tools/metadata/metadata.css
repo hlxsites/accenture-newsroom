@@ -12,15 +12,39 @@ label {
   font-weight: bolder;
 }
 
-select, div#abstract, div#body {
+form {
+  max-width: 50rem;
+}
+ 
+.tag-Label {
+  display: flex; /* Use flexbox for label layout */
+}
+
+input.checkbox {
+    width: 24px;
+    margin: 5px 8px;
+}
+
+div#dropdown-industries {
   width: 100%;
   max-width: 50rem;
   height: 200px;
+  overflow-y: auto;
+  border: 1px solid #ccc;
+  padding: 5px;
 }
 
-.ql-toolbar {
+div#dropdown-subjects { 
+  width: 100%;
   max-width: 50rem;
+  height: 200px;
+  overflow-y: auto;
+  border: 1px solid #ccc;
+  padding: 5px;
 }
+/* .ql-toolbar {
+  max-width: 50rem;
+} */
 
 button#copy-to-clipboard {
   min-width: 50rem;
