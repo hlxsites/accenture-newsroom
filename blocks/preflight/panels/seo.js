@@ -50,6 +50,7 @@ async function checkTitle() {
   return result.icon;
 }
 
+// eslint-disable-next-line no-unused-vars
 async function checkCanon() {
   const canon = document.querySelector("link[rel='canonical']");
   const result = { ...canonResult.value };
@@ -152,17 +153,22 @@ async function checkLorem() {
 
 async function getStatus() {
   //   const adminUrl = getAdminUrl(url, 'status');
-  const adminUrl = "https://admin.hlx.page/status/hlxsites/accenture-newsroom/preflight-gen-tab/news/2024/accenture-completes-acquisition-of-navisite-to-help-clients-modernize-and-reinvent-their-businesses-with-cloud?editUrl=auto"
-    const resp = await fetch(adminUrl,{ method: 'HEAD' });
-    console.log(resp);
-    // if (!resp.ok) return {};
-    const json = await resp.json();
-    console.log(json);
-    const preview = json.preview.lastModified || 'Never';
-    const live = json.live.lastModified || 'Never';
-    const edit = json.edit.url;
-    return { url, edit, preview, live };
-  }
+  const adminUrl = 'https://admin.hlx.page/status/hlxsites/accenture-newsroom/preflight-gen-tab/news/2024/accenture-completes-acquisition-of-navisite-to-help-clients-modernize-and-reinvent-their-businesses-with-cloud';
+  const resp = await fetch(adminUrl, { method: 'HEAD', credentials: 'include' });
+  console.log(resp);
+  // if (!resp.ok) return {};
+  const json = await resp.json();
+  console.log(json);
+  const preview = json.preview.lastModified || 'Never';
+  const live = json.live.lastModified || 'Never';
+  const edit = json.edit.url;
+  return {
+    // url,
+    edit,
+    preview,
+    live,
+  };
+}
 
 async function checkLinks() {
   const result = { ...linksResult.value };
@@ -170,7 +176,7 @@ async function checkLinks() {
 
   let badLink;
   const resStatus = await getStatus();
-  console.log(resStatus)
+  console.log(resStatus);
   links.forEach(async (link) => {
     const resp = await fetch(link.href, { method: 'HEAD' });
     if (!resp.ok) badLink = true;
