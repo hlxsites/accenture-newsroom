@@ -65,24 +65,84 @@ function getCountry() {
   return siteToCountryMapping[site];
 }
 
+function getDateLocales(country) {
+  const countryDateLocales = {
+    us: 'en-US',
+    gb: 'en-US',
+    de: 'de-DE',
+    fr: 'fr-FR',
+    it: 'it-IT',
+    sp: 'es-ES',
+    sg: 'en-US',
+    pt: 'pt-PT',
+    jp: 'ja-JP',
+    br: 'pt-BR',
+  };
+  return countryDateLocales[country] || 'en-US';
+}
+
 // Tranlationg date to locally
 function getHumanReadableDate(dateString) {
   if (!dateString) return dateString;
   const date = new Date(parseInt(dateString, 10));
-  const specialCountries = ['pt', 'br', 'sp'];
-  // display the date in GMT timezone
+  // Condition of date and time format per Geo
   const country = getCountry();
+  let yearFormat;
+  let monthFormat;
+  let dayFormat;
+  switch (country) {
+    case 'sg':
+      monthFormat = 'short';
+      yearFormat = 'numeric'; 
+      dayFormat = '2-digit';
+      break;
+    case 'jp':
+      yearFormat = 'numeric';
+      monthFormat = 'numeric';
+      dayFormat = '2-digit';
+      break;
+    case 'sp':
+      yearFormat = 'numeric';
+      monthFormat = 'long';
+      dayFormat = '2-digit';
+      break;
+    default:
+      yearFormat = 'numeric';
+      monthFormat = 'long';
+      dayFormat = '2-digit';
+      break;
+  }
+  // display the date in GMT timezone
   const localedate = date.toLocaleDateString(getDateLocales(country), {
     timeZone: 'GMT',
-    year: 'numeric',
-    month: 'long',
-    day: '2-digit',
+    year: yearFormat,
+    month: monthFormat,
+    day: dayFormat,
   });
-  if (specialCountries.includes(country)) {
-    // de means 'of' in pt/br/sp, replacing with empty string
-    return localedate.replace(/de /g, '');
+
+  if (country == 'fr'){
+    return 'le ' + localedate;
   }
   return localedate;
+}
+//Creating category list for subject or industry
+function dropdownWriter(item,categorylist){
+  if (!item && item.length > 0){
+    return;
+  } 
+    const checkbox = document.createElement('input') ;
+    checkbox.classList.add('checkbox')
+    checkbox.type = "checkbox"
+    checkbox.value = item[1];
+    
+    const span = document.createElement('span') ;
+    span.classList.add('tag-Label')
+    span.appendChild(checkbox);
+    span.appendChild(document.createTextNode(item[0]));
+
+    if (item[0] !== '') {
+      categorylist.appendChild(span);
+    }
 }
 
 async function populateTags() {
@@ -95,52 +155,45 @@ async function populateTags() {
     const { data } = response;
     const subjects = data.map((item) => [item['Subjects Text'], item['Subjects Value']]);
     const industries = data.map((item) => [item['Industries Text'], item['Industries Value']]);
+
     const selectSubjects = document.getElementById('dropdown-subjects');
     subjects.forEach((item) => {
-      if (item) {
-        const checkbox = document.createElement('input') ;
-        checkbox.classList.add('checkbox')
-        checkbox.type = "checkbox"
-        checkbox.value = item[1];
-        
-        const span = document.createElement('span') ;
-        span.classList.add('tag-Label')
-        span.appendChild(checkbox);
-        span.appendChild(document.createTextNode(item[0]));
-
-        if (item[0] !== '') {
-          selectSubjects.appendChild(span);
-        }
-      }
+      dropdownWriter(item,selectSubjects)
     });
     const selectIndustries = document.getElementById('dropdown-industries');
     industries.forEach((item) => {
-      if (item) {
-        const checkbox = document.createElement('input') ;
-        checkbox.classList.add('checkbox')
-        checkbox.type = "checkbox"
-        checkbox.value = item[1];
-        
-        const span = document.createElement('span') ;
-        span.classList.add('tag-Label')
-        span.appendChild(checkbox);
-        span.appendChild(document.createTextNode(item[0]));
-
-        if (item[0] !== '') {
-          selectIndustries.appendChild(span);
-        }
-      }
+      dropdownWriter(item,selectIndustries);
     });
   }
 }
+//Collection of selected Categories
+function getSelectedCategories(categoryDropdownList){
+  const checkCategoryList = categoryDropdownList.querySelectorAll('.checkbox');
+  let selectedCategories = [];
+  checkCategoryList.forEach((checkCategory) => {
+    if (checkCategory.checked) {
+      selectedCategories.push(checkCategory.value);
+    }
+  });
+  return selectedCategories
+}
+//Date Formatter for publishdate in medata table
+function getFormatedDate(date) {
+  const year = date.getFullYear();
+  const month = ('0' + (date.getMonth() + 1)).slice(-2); // Adding leading zero and slicing last two digits
+  const day = ('0' + date.getDate()).slice(-2);
+  const hours = ('0' + date.getHours()).slice(-2);
+  const minutes = ('0' + date.getMinutes()).slice(-2);
+  const seconds = ('0' + date.getSeconds()).slice(-2);
+  
+  return year + '-' + month + '-' + day + ' ' + hours + ':' + minutes;
+}
 
 function processForm() {
-  const publishDate = document.getElementById('publishDate').value || getHumanReadableDate(new Date().toString());
+  const publishDate = document.getElementById('publishDate').value || getFormatedDate(new Date());//metadate Table 
   const publishDateMetadata = publishDate.replace('T', ' ');
   const publishDateObj = new Date(publishDate);
-  const formattedDateLong = new Intl.DateTimeFormat(getLocale(), {
-    dateStyle: 'long',
-  }).format(publishDateObj);
+  const formattedDateLong = getHumanReadableDate(publishDateObj.getTime());//Article Header Date
   const title = document.getElementById('title').value;
   const subTitle = document.getElementById('subtitle').value;
   const rawAbstract = document.querySelector('form div#abstract .ql-editor').innerHTML;
@@ -148,31 +201,10 @@ function processForm() {
   const rawBody = document.querySelector('form div#body .ql-editor').innerHTML;
   const body = rawBody.replace(/<p>&nbsp;<\/p>/g, '');
   const subjectsDropdown = document.getElementById('dropdown-subjects');
-  const checkedSubject= subjectsDropdown.querySelectorAll('.checkbox');
-  const selectedsubject = [];
-  checkedSubject.forEach((checkSubject) => {
-    if (checkSubject.checked) {
-      selectedsubject.push(checkSubject.value);
-    }
-  });
-  // console.log("Checked checkboxes:", checkedCheckboxes);
-  // const selectedSubjects = Array
-  //   .from(subjectsDropdown.selectSubjects)
-    // .map((label) => option.value);
-  const subjects = selectedsubject.join(', ');
+  const subjects = getSelectedCategories(subjectsDropdown).join(', ');
   const industriesDropdown = document.getElementById('dropdown-industries');
-  const checkindustries= industriesDropdown.querySelectorAll('.checkbox');
-  const selectedIndustries = [];
-  checkindustries.forEach((checkindustries) => {
-    if (checkindustries.checked) {
-      selectedIndustries.push(checkindustries.value);
-    }
-  });
-  // console.log("Checked checkboxes:", checkedCheckboxes);
-  // const selectedIndustries = Array
-  //   .from(industriesDropdown.selectedOptions)
-  //   .map((option) => option.value);
-  const industries = selectedIndustries.join(', ');
+  const industries = getSelectedCategories(industriesDropdown).join(', ');
+
   // create the html to paste into the word doc
   const htmlToPaste = `
     ${formattedDateLong || ''}
