@@ -2,6 +2,97 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable no-undef */
 
+/**
+ * Sanitizes a string for use as class name.
+ * @param {string} name The unsanitized string
+ * @returns {string} The class name
+ */
+export function toClassName(name) {
+  return typeof name === 'string'
+    ? name.toLowerCase().replace(/[^0-9a-z]/gi, '-').replace(/-+/g, '-').replace(/^-|-$/g, '')
+    : '';
+}
+
+/**
+ * Sanitizes a string for use as a js property name.
+ * @param {string} name The unsanitized string
+ * @returns {string} The camelCased name
+ */
+function toCamelCase(name) {
+  return toClassName(name).replace(/-([a-z])/g, (g) => g[1].toUpperCase());
+}
+
+/**
+ * Gets placeholders object.
+ * @param {string} [prefix] Location of placeholders
+ * @returns {object} Window placeholders object
+ */
+async function fetchPlaceholders(prefix = 'default') {
+  window.placeholders = window.placeholders || {};
+  const loaded = window.placeholders[`${prefix}-loaded`];
+  if (!loaded) {
+    window.placeholders[`${prefix}-loaded`] = new Promise((resolve, reject) => {
+      fetch(`${prefix === 'default' ? '' : prefix}/placeholders.json`)
+        .then((resp) => {
+          if (resp.ok) {
+            return resp.json();
+          }
+          throw new Error(`${resp.status}: ${resp.statusText}`);
+        }).then((json) => {
+          const placeholders = {};
+          json.data
+            .filter((placeholder) => placeholder.Key)
+            .forEach((placeholder) => {
+              placeholders[toCamelCase(placeholder.Key)] = placeholder.Text;
+            });
+          window.placeholders[prefix] = placeholders;
+          resolve();
+        }).catch((error) => {
+          // error loading placeholders
+          window.placeholders[prefix] = {};
+          reject(error);
+        });
+    });
+  }
+  await window.placeholders[`${prefix}-loaded`];
+  return window.placeholders[prefix];
+}
+
+function getPlaceholder(key, placeholders) {
+  if (placeholders && placeholders[key]) {
+    return placeholders[key];
+  }
+  return key;
+}
+
+// DOM helper
+export function createEl(name, attributes = {}, content = '', parentEl = null) {
+  const el = document.createElement(name);
+
+  Object.keys(attributes).forEach((key) => {
+    el.setAttribute(key, attributes[key]);
+  });
+  if (content) {
+    if (typeof content === 'string') {
+      el.innerHTML = content;
+    } else if (content instanceof NodeList) {
+      content.forEach((itemEl) => {
+        el.append(itemEl);
+      });
+    } else if (content instanceof HTMLCollection) {
+      Array.from(content).forEach((itemEl) => {
+        el.append(itemEl);
+      });
+    } else {
+      el.append(content);
+    }
+  }
+  if (parentEl) {
+    parentEl.append(el);
+  }
+  return el;
+}
+
 function getLocale() {
   return (navigator.languages && navigator.languages.length)
     ? navigator.languages[0] : navigator.language;
@@ -166,6 +257,7 @@ async function populateTags() {
     });
   }
 }
+
 //Collection of selected Categories
 function getSelectedCategories(categoryDropdownList){
   const checkCategoryList = categoryDropdownList.querySelectorAll('.checkbox');
@@ -255,9 +347,106 @@ function processForm() {
   `;
   writeToClipboard(new Blob([htmlToPaste], { type: 'text/html' }));
   showAlert();
+
+}
+//Form Creation
+function addForm() {
+ const formContainer = document.getElementById('metadata-form');
+ // Create form element
+ const form = document.createElement('form');
+ const inputlabel = ['Publish Date', 'Title', 'Subtitle','Abstract', 'Body','Subject Tags','Industry Tags'];
+ const keyValuePair = {
+  'Subject' : 'dropdown-subjects',
+  'Industry': 'dropdown-industries'
+ }
+
+ inputlabel.forEach((labelText) => {
+  //for complex id
+  let attributeName;
+  if (labelText.includes('Subject Tags')) {
+    // attributeName = dropdownLabel[0];
+    attributeName = keyValuePair['Subject']
+  }  else if (labelText.includes('Industry Tags')){
+    attributeName = keyValuePair['Industry']
+  } else {
+    attributeName = toCamelCase(labelText);
+  }
+
+  //label
+  const label = document.createElement('label');
+  label.innerText = !getPlaceholder(labelText.toString, placeholders) === null ? getPlaceholder(labelText.toString, placeholders) : labelText;
+  label.setAttribute('for', attributeName);
+  const space = document.createElement('br');
+  label.appendChild(space);
+  
+  //input 
+  if (labelText.includes('Publish Date') || labelText.includes('Title') || labelText.includes('Subtitle')){
+    const input = document.createElement('input');
+    input.setAttribute('type', attributeName.includes('publishDate') ? 'datetime-local' : 'text');
+    input.setAttribute('id', attributeName);
+    input.setAttribute('name', attributeName);
+    form.appendChild(label);
+    form.appendChild(input);
+    
+  } else {
+    const input = document.createElement('div');
+    input.setAttribute('id', attributeName);
+    input.setAttribute('name', attributeName);
+    form.appendChild(label);
+    form.appendChild(input);
+    form.appendChild(space)
+    
+  }
+});
+ formContainer.appendChild(form);
+}
+
+async function populateTranslation() {
+  const placeholders = await fetchPlaceholders();
+  const defaultIntruction = "Use this tool to enter relevant metadata and paste the content into Word pre-formatted."
+  //Translation getter
+  const ptitle = getPlaceholder('metadataHelper', placeholders);
+  const pMessage = getPlaceholder('metadateSubtitle', placeholders)
+  const pCopyButtonText = getPlaceholder('copyToClipboard',placeholders);
+  const pAlertText = getPlaceholder('metadataCopiedToTheClipboard',placeholders);
+
+  // const mtitle = !getPlaceholder('metadataHelper', placeholders) === null ? getPlaceholder('metadataHelper', placeholders) : "Metadata Helper";
+  // const pMessage = !getPlaceholder('metadateSubtitle', placeholders) == null ? getPlaceholder('metadateSubtitle', placeholders) : defaultIntruction ;
+
+  //condition for placeholder
+  const ptitleTs = ptitle ===  'copyToClipboard' ? "Metadata Helper" : ptitle;
+  const pMessageTs = pMessage ===  'copyToClipboard' ? defaultIntruction : pMessage;
+  const pCopyButtonTextTs = pCopyButtonText ===  'copyToClipboard' ? "Copy to Clipboard" : pCopyButtonText;
+  const pAlertTextTs = pAlertText ===  'metadataCopiedToTheClipboard' ? "Metadata copied to the clipboard" : pAlertText;
+
+  // Html markup creation
+  const metadataIntro = document.getElementById('intro');
+  const metadataTitle = document.createElement('h1');
+  metadataTitle.setAttribute('id','pick-your-tags')
+  metadataTitle.textContent = ptitleTs;
+  const message = document.createElement('p');;
+  message.textContent = pMessageTs;
+  metadataIntro.appendChild(metadataTitle);
+  metadataIntro.appendChild(message);
+  addForm();
+  //Copy button
+  const metadatabtn= document.getElementById('metadata-button');
+  const copyBtn = document.createElement('button');
+  copyBtn.innerText = pCopyButtonTextTs
+  copyBtn.setAttribute('id', 'copy-to-clipboard');
+  //alert message
+  const alertMessage = document.createElement('div');
+  alertMessage.innerText = pAlertTextTs
+  alertMessage.setAttribute('id', 'custom-alert');
+  // alertMessage.style.display = 'none'; 
+  // alertMessage.style.backgroundColor = 'yellow'; 
+  // alertMessage.style.padding = '10px';
+  metadatabtn.appendChild(copyBtn)
+  metadatabtn.appendChild(alertMessage);
 }
 
 async function init() {
+  await populateTranslation();
   await populateTags();
   const rteOptions = {
     modules: {

@@ -20,12 +20,18 @@ form {
   display: flex; /* Use flexbox for label layout */
 }
 
+div#abstract, div#body {
+  width: 100%;
+  max-width: 50rem;
+  height: 200px;
+}
+
 input.checkbox {
     width: 24px;
     margin: 5px 8px;
 }
 
-div#dropdown-industries {
+div#dropdown-industries, div#dropdown-subjects {
   width: 100%;
   max-width: 50rem;
   height: 200px;
@@ -34,17 +40,11 @@ div#dropdown-industries {
   padding: 5px;
 }
 
-div#dropdown-subjects { 
-  width: 100%;
-  max-width: 50rem;
-  height: 200px;
-  overflow-y: auto;
-  border: 1px solid #ccc;
-  padding: 5px;
+div#custom-alert {
+  display: none; 
+  background-color: yellow;
+  padding: 10px;
 }
-/* .ql-toolbar {
-  max-width: 50rem;
-} */
 
 button#copy-to-clipboard {
   min-width: 50rem;
