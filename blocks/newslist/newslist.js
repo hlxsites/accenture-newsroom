@@ -152,7 +152,6 @@ function addParam(name, value) {
  * @returns
  */
 function getPaginationGroups(totalPages, currentPage) {
-
   if (currentPage > totalPages) {
     throw new Error('Page not found');
   }
@@ -303,10 +302,6 @@ function updatePagination(paginationContainer, totalResults, pageOffset) {
       if (error.message === 'Page not found') {
         // Redirect to a "Page not found" page
         window.location.href = '/404';
-        return; // Exit the function early
-      } else {
-        // Handle any other errors
-        console.error(error);
         return; // Exit the function early
       }
     }
