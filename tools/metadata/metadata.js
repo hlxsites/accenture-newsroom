@@ -184,7 +184,7 @@ function getHumanReadableDate(dateString) {
   switch (country) {
     case 'sg':
       monthFormat = 'short';
-      yearFormat = 'numeric'; 
+      yearFormat = 'numeric';
       dayFormat = '2-digit';
       break;
     case 'jp':
@@ -211,29 +211,29 @@ function getHumanReadableDate(dateString) {
     day: dayFormat,
   });
 
-  if (country == 'fr'){
-    return 'le ' + localedate;
+  if (country === 'fr') {
+    return `le ${localedate}`;
   }
   return localedate;
 }
-//Creating category list for subject or industry
-function dropdownWriter(item,categorylist){
-  if (!item && item.length > 0){
+// Creating category list for subject or industry
+function dropdownWriter(item, categorylist) {
+  if (!item && item.length > 0) {
     return;
-  } 
-    const checkbox = document.createElement('input') ;
-    checkbox.classList.add('checkbox')
-    checkbox.type = "checkbox"
-    checkbox.value = item[1];
-    
-    const span = document.createElement('span') ;
-    span.classList.add('tag-Label')
-    span.appendChild(checkbox);
-    span.appendChild(document.createTextNode(item[0]));
+  }
+  const checkbox = document.createElement('input');
+  checkbox.classList.add('checkbox');
+  checkbox.type = 'checkbox';
+  checkbox.value = item[1];
 
-    if (item[0] !== '') {
-      categorylist.appendChild(span);
-    }
+  const span = document.createElement('span');
+  span.classList.add('tag-Label');
+  span.appendChild(checkbox);
+  span.appendChild(document.createTextNode(item[0]));
+
+  if (item[0] !== '') {
+    categorylist.appendChild(span);
+  }
 }
 
 async function populateTags() {
@@ -249,43 +249,42 @@ async function populateTags() {
 
     const selectSubjects = document.getElementById('dropdown-subjects');
     subjects.forEach((item) => {
-      dropdownWriter(item,selectSubjects)
+      dropdownWriter(item, selectSubjects);
     });
     const selectIndustries = document.getElementById('dropdown-industries');
     industries.forEach((item) => {
-      dropdownWriter(item,selectIndustries);
+      dropdownWriter(item, selectIndustries);
     });
   }
 }
 
-//Collection of selected Categories
-function getSelectedCategories(categoryDropdownList){
+// Collection of selected Categories
+function getSelectedCategories(categoryDropdownList) {
   const checkCategoryList = categoryDropdownList.querySelectorAll('.checkbox');
-  let selectedCategories = [];
+  const selectedCategories = [];
   checkCategoryList.forEach((checkCategory) => {
     if (checkCategory.checked) {
       selectedCategories.push(checkCategory.value);
     }
   });
-  return selectedCategories
+  return selectedCategories;
 }
-//Date Formatter for publishdate in medata table
+// Date Formatter for publishdate in medata table
 function getFormatedDate(date) {
   const year = date.getFullYear();
-  const month = ('0' + (date.getMonth() + 1)).slice(-2); // Adding leading zero and slicing last two digits
-  const day = ('0' + date.getDate()).slice(-2);
-  const hours = ('0' + date.getHours()).slice(-2);
-  const minutes = ('0' + date.getMinutes()).slice(-2);
-  const seconds = ('0' + date.getSeconds()).slice(-2);
-  
-  return year + '-' + month + '-' + day + ' ' + hours + ':' + minutes;
+  const month = (date.getMonth() + 1).toString().padStart(2, '0');// Adding leading zero and slicing last two digits
+  const day = (date.getDate()).toString().padStart(2, '0');
+  const hours = (date.getHours()).toString().padStart(2, '0');
+  const minutes = (date.getMinutes()).toString().padStart(2, '0');
+
+  return `${year}-${month}-${day} ${hours}:${minutes}`;
 }
 
 function processForm() {
-  const publishDate = document.getElementById('publishDate').value || getFormatedDate(new Date());//metadate Table 
+  const publishDate = document.getElementById('publishDate').value || getFormatedDate(new Date());// metadate Table
   const publishDateMetadata = publishDate.replace('T', ' ');
   const publishDateObj = new Date(publishDate);
-  const formattedDateLong = getHumanReadableDate(publishDateObj.getTime());//Article Header Date
+  const formattedDateLong = getHumanReadableDate(publishDateObj.getTime());// Article Header Date
   const title = document.getElementById('title').value;
   const subTitle = document.getElementById('subtitle').value;
   const rawAbstract = document.querySelector('form div#abstract .ql-editor').innerHTML;
@@ -306,7 +305,6 @@ function processForm() {
     ${abstract || ''}
     ---
     ${body || ''}
-  
     <table border="1">
       <tr bgcolor="#f7caac">
         <td colspan="2">Metadata</td>
@@ -347,101 +345,93 @@ function processForm() {
   `;
   writeToClipboard(new Blob([htmlToPaste], { type: 'text/html' }));
   showAlert();
-
 }
-//Form Creation
+// Form Creation
 function addForm() {
- const formContainer = document.getElementById('metadata-form');
- // Create form element
- const form = document.createElement('form');
- const inputlabel = ['Publish Date', 'Title', 'Subtitle','Abstract', 'Body','Subject Tags','Industry Tags'];
- const keyValuePair = {
-  'Subject' : 'dropdown-subjects',
-  'Industry': 'dropdown-industries'
- }
+  const formContainer = document.getElementById('metadata-form');
+  // Create form element
+  const form = document.createElement('form');
+  const inputlabel = ['Publish Date', 'Title', 'Subtitle', 'Abstract', 'Body', 'Subject Tags', 'Industry Tags'];
+  const keyValuePair = {
+    Subject: 'dropdown-subjects',
+    Industry: 'dropdown-industries',
+  };
 
- inputlabel.forEach((labelText) => {
-  //for complex id
-  let attributeName;
-  if (labelText.includes('Subject Tags')) {
-    // attributeName = dropdownLabel[0];
-    attributeName = keyValuePair['Subject']
-  }  else if (labelText.includes('Industry Tags')){
-    attributeName = keyValuePair['Industry']
-  } else {
-    attributeName = toCamelCase(labelText);
-  }
+  inputlabel.forEach((labelText) => {
+    // for complex id
+    let attributeName;
+    if (labelText.includes('Subject Tags')) {
+      // attributeName = dropdownLabel[0];
+      attributeName = keyValuePair.Subject;
+    } else if (labelText.includes('Industry Tags')) {
+      attributeName = keyValuePair.Industry;
+    } else {
+      attributeName = toCamelCase(labelText);
+    }
 
-  //label
-  const label = document.createElement('label');
-  label.innerText = !getPlaceholder(labelText.toString, placeholders) === null ? getPlaceholder(labelText.toString, placeholders) : labelText;
-  label.setAttribute('for', attributeName);
-  const space = document.createElement('br');
-  label.appendChild(space);
-  
-  //input 
-  if (labelText.includes('Publish Date') || labelText.includes('Title') || labelText.includes('Subtitle')){
-    const input = document.createElement('input');
-    input.setAttribute('type', attributeName.includes('publishDate') ? 'datetime-local' : 'text');
-    input.setAttribute('id', attributeName);
-    input.setAttribute('name', attributeName);
-    form.appendChild(label);
-    form.appendChild(input);
-    
-  } else {
-    const input = document.createElement('div');
-    input.setAttribute('id', attributeName);
-    input.setAttribute('name', attributeName);
-    form.appendChild(label);
-    form.appendChild(input);
-    form.appendChild(space)
-    
-  }
-});
- formContainer.appendChild(form);
+    // label
+    const label = document.createElement('label');
+    const plabeltext = getPlaceholder(labelText.toString, placeholders);
+    label.innerText = plabeltext === labelText ? plabeltext : labelText;
+    label.setAttribute('for', attributeName);
+    const space = document.createElement('br');
+    label.appendChild(space);
+
+    // input
+    if (labelText.includes('Publish Date') || labelText.includes('Title') || labelText.includes('Subtitle')) {
+      const input = document.createElement('input');
+      input.setAttribute('type', attributeName.includes('publishDate') ? 'datetime-local' : 'text');
+      input.setAttribute('id', attributeName);
+      input.setAttribute('name', attributeName);
+      form.appendChild(label);
+      form.appendChild(input);
+    } else {
+      const input = document.createElement('div');
+      input.setAttribute('id', attributeName);
+      input.setAttribute('name', attributeName);
+      form.appendChild(label);
+      form.appendChild(input);
+      form.appendChild(space);
+    }
+  });
+  formContainer.appendChild(form);
 }
 
 async function populateTranslation() {
   const placeholders = await fetchPlaceholders();
-  const defaultIntruction = "Use this tool to enter relevant metadata and paste the content into Word pre-formatted."
-  //Translation getter
+  const defaultIntruction = 'Use this tool to enter relevant metadata and paste the content into Word pre-formatted.';
+  // Translation getter
   const ptitle = getPlaceholder('metadataHelper', placeholders);
-  const pMessage = getPlaceholder('metadateSubtitle', placeholders)
-  const pCopyButtonText = getPlaceholder('copyToClipboard',placeholders);
-  const pAlertText = getPlaceholder('metadataCopiedToTheClipboard',placeholders);
+  const pMessage = getPlaceholder('metadateSubtitle', placeholders);
+  const pCopyButtonText = getPlaceholder('copyToClipboard', placeholders);
+  const pAlertText = getPlaceholder('metadataCopiedToTheClipboard', placeholders);
 
-  // const mtitle = !getPlaceholder('metadataHelper', placeholders) === null ? getPlaceholder('metadataHelper', placeholders) : "Metadata Helper";
-  // const pMessage = !getPlaceholder('metadateSubtitle', placeholders) == null ? getPlaceholder('metadateSubtitle', placeholders) : defaultIntruction ;
-
-  //condition for placeholder
-  const ptitleTs = ptitle ===  'copyToClipboard' ? "Metadata Helper" : ptitle;
-  const pMessageTs = pMessage ===  'copyToClipboard' ? defaultIntruction : pMessage;
-  const pCopyButtonTextTs = pCopyButtonText ===  'copyToClipboard' ? "Copy to Clipboard" : pCopyButtonText;
-  const pAlertTextTs = pAlertText ===  'metadataCopiedToTheClipboard' ? "Metadata copied to the clipboard" : pAlertText;
+  // Condition for placeholder
+  const ptitleTs = ptitle === 'metadataHelper' ? 'Metadata Helper' : ptitle;
+  const pMessageTs = pMessage === 'metadateSubtitle' ? defaultIntruction : pMessage;
+  const pCopyButtonTextTs = pCopyButtonText === 'copyToClipboard' ? 'Copy to Clipboard' : pCopyButtonText;
+  const pAlertTextTs = pAlertText === 'metadataCopiedToTheClipboard' ? 'Metadata copied to the clipboard' : pAlertText;
 
   // Html markup creation
   const metadataIntro = document.getElementById('intro');
   const metadataTitle = document.createElement('h1');
-  metadataTitle.setAttribute('id','pick-your-tags')
+  metadataTitle.setAttribute('id', 'pick-your-tags');
   metadataTitle.textContent = ptitleTs;
-  const message = document.createElement('p');;
+  const message = document.createElement('p');
   message.textContent = pMessageTs;
   metadataIntro.appendChild(metadataTitle);
   metadataIntro.appendChild(message);
   addForm();
-  //Copy button
-  const metadatabtn= document.getElementById('metadata-button');
+  // Copy button
+  const metadatabtn = document.getElementById('metadata-button');
   const copyBtn = document.createElement('button');
-  copyBtn.innerText = pCopyButtonTextTs
+  copyBtn.innerText = pCopyButtonTextTs;
   copyBtn.setAttribute('id', 'copy-to-clipboard');
-  //alert message
+  // alert message
   const alertMessage = document.createElement('div');
-  alertMessage.innerText = pAlertTextTs
+  alertMessage.innerText = pAlertTextTs;
   alertMessage.setAttribute('id', 'custom-alert');
-  // alertMessage.style.display = 'none'; 
-  // alertMessage.style.backgroundColor = 'yellow'; 
-  // alertMessage.style.padding = '10px';
-  metadatabtn.appendChild(copyBtn)
+  metadatabtn.appendChild(copyBtn);
   metadatabtn.appendChild(alertMessage);
 }
 
