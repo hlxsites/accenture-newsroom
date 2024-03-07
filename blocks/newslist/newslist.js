@@ -300,9 +300,9 @@ function updatePagination(paginationContainer, totalResults, pageOffset) {
       paginationGroups = getPaginationGroups(totalPages, pageOffset);
     } catch (error) {
       if (error.message === 'Page not found') {
-        // Redirect to a "Page not found" page
-        window.location.href = '/404';
-        return; // Exit the function early
+        // Redirect to the homepage
+        window.location.href = '/';
+        return;
       }
     }
     for (let i = 0; i < paginationGroups.length; i += 1) {
