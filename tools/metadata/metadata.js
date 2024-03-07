@@ -347,7 +347,8 @@ function processForm() {
   showAlert();
 }
 // Form Creation
-function addForm() {
+function addForm(placeholders) {
+  // const placeholders =  await fetchPlaceholders();placeholders
   const formContainer = document.getElementById('metadata-form');
   // Create form element
   const form = document.createElement('form');
@@ -359,6 +360,7 @@ function addForm() {
 
   inputlabel.forEach((labelText) => {
     // for complex id
+    const labelTextcc = toCamelCase(labelText);
     let attributeName;
     if (labelText.includes('Subject Tags')) {
       // attributeName = dropdownLabel[0];
@@ -371,8 +373,8 @@ function addForm() {
 
     // label
     const label = document.createElement('label');
-    const plabeltext = getPlaceholder(labelText.toString, placeholders);
-    label.innerText = plabeltext === labelText ? plabeltext : labelText;
+    const plabeltext = getPlaceholder(labelTextcc, placeholders);
+    label.innerText = plabeltext === labelTextcc ? labelText : plabeltext;
     label.setAttribute('for', attributeName);
     const space = document.createElement('br');
     label.appendChild(space);
@@ -421,7 +423,7 @@ async function populateTranslation() {
   message.textContent = pMessageTs;
   metadataIntro.appendChild(metadataTitle);
   metadataIntro.appendChild(message);
-  addForm();
+  addForm(placeholders);
   // Copy button
   const metadatabtn = document.getElementById('metadata-button');
   const copyBtn = document.createElement('button');
