@@ -323,15 +323,11 @@ function processForm() {
         <td>${abstract || ''}</td>
       </tr>
       <tr>
-        <td width="20%">Abstract</td>
-        <td>${abstract || ''}</td>
-      </tr>
-      <tr>
         <td width="20%">Subtitle</td>
         <td>${subTitle || ''}</td>
       </tr>
       <tr>
-      <td width="20%">Published Date</td>
+      <td width="20%">PublishedDate</td>
       <td>${publishDateMetadata || ''}</td>
       </tr>
       <tr>
