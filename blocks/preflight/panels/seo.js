@@ -152,7 +152,8 @@ async function checkLorem() {
 }
 
 async function getStatus() {
-  const link = document.querySelector('a');
+  const link = document.querySelector('a[href$=".pdf"]');
+  console.log('pdflink: ', link);
   const curHost = window.location.hostname.split('.');
   const repoInfo = curHost[0].split('--');
   const ownerRepoBranch = `${repoInfo[2]}/${repoInfo[1]}/${repoInfo[0]}`;
