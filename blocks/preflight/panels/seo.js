@@ -152,7 +152,8 @@ async function checkLorem() {
 }
 
 async function getStatus() {
-  const link = document.querySelector('a[href$=".pdf"]');
+  // const link = document.querySelector('a[href$=".pdf"]');
+  const link = '/news/2024/accenture-completes-acquisition-of-navisite-to-help-clients-modernize-and-reinvent-their-businesses-with-cloud';
   console.log('pdflink: ', link);
   const curHost = window.location.hostname.split('.');
   const repoInfo = curHost[0].split('--');
@@ -168,6 +169,9 @@ async function getStatus() {
     console.log('Preview Status:', preview);
     console.log('Publish Status:', live);
     console.log('Edit Url:', edit);
+    // if (json.live.status === 404) {
+
+    // }
   }
 }
 
