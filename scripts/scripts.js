@@ -856,16 +856,45 @@ const publishConfirmationHandler = (oSidekick) => {
   observer.observe(oShadowRoot, config);
 };
 
+let bSchedPubInProgress = false;
 async function publishLaterListener(ev) {
   // eslint-disable-next-line import/no-cycle
   const { publishLater } = await import('../tools/sidekick/authoring.js');
-  publishLater(ev.detail.data);
+  if (bSchedPubInProgress) {
+    // Sched still in progress
+    return;
+  }
+
+  bSchedPubInProgress = true;
+  try {
+    await publishLater(ev.detail.data);
+  } catch (error) {
+    // eslint-disable-next-line no-console
+    console.log(error);
+    bSchedPubInProgress = false;
+  } finally {
+    bSchedPubInProgress = false;
+  }
 }
 
 async function publishLaterAllListener(ev) {
   // eslint-disable-next-line import/no-cycle
   const { publishLaterList } = await import('../tools/sidekick/authoring.js');
-  publishLaterList(ev.detail.data);
+  if (bSchedPubInProgress) {
+    // Sched still in progress
+    return;
+  }
+
+  bSchedPubInProgress = true;
+  try {
+    await publishLaterList(ev.detail.data);
+  } catch (error) {
+    // eslint-disable-next-line no-console
+    console.log(error);
+    bSchedPubInProgress = false;
+  } finally {
+    bSchedPubInProgress = false;
+  }
 }
 
 async function pageInfoEnhancer() {
