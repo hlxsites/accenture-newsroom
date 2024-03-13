@@ -152,22 +152,25 @@ async function checkLorem() {
 }
 
 async function getStatus() {
-  //   const adminUrl = getAdminUrl(url, 'status');
-  const adminUrl = 'https://admin.hlx.page/status/hlxsites/accenture-newsroom/preflight-gen-tab/news/2024/accenture-completes-acquisition-of-navisite-to-help-clients-modernize-and-reinvent-their-businesses-with-cloud';
-  const resp = await fetch(adminUrl, { method: 'HEAD', credentials: 'include' });
-  console.log(resp);
-  // if (!resp.ok) return {};
-  const json = await resp.json();
-  console.log(json);
-  const preview = json.preview.lastModified || 'Never';
-  const live = json.live.lastModified || 'Never';
-  const edit = json.edit.url;
-  return {
-    // url,
-    edit,
-    preview,
-    live,
-  };
+  const link = document.querySelector('a');
+  const curHost = window.location.hostname.split('.');
+  const repoInfo = curHost[0].split('--');
+  const ownerRepoBranch = `${repoInfo[2]}/${repoInfo[1]}/${repoInfo[0]}`;
+  const statusResp = await fetch(`https://admin.hlx.page/status/${ownerRepoBranch}${link.getAttribute('href')}?editUrl=auto`);
+  console.log(statusResp);
+  if (statusResp.ok) {
+    const json = await statusResp.json();
+    console.log(json);
+    // const preview = json.preview.lastModified || 'Never';
+    // const live = json.live.lastModified || 'Never';
+    // const edit = json.edit.url;
+    // return {
+    //   // url,
+    //   edit,
+    //   preview,
+    //   live,
+    // };
+  }
 }
 
 async function checkLinks() {
