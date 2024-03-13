@@ -162,15 +162,12 @@ async function getStatus() {
   if (statusResp.ok) {
     const json = await statusResp.json();
     console.log(json);
-    // const preview = json.preview.lastModified || 'Never';
-    // const live = json.live.lastModified || 'Never';
-    // const edit = json.edit.url;
-    // return {
-    //   // url,
-    //   edit,
-    //   preview,
-    //   live,
-    // };
+    const preview = json.preview.lastModified || 'Never';
+    const live = json.live.lastModified || 'Never';
+    const edit = json.edit.url;
+    console.log('Preview Status:', preview);
+    console.log('Publish Status:', live);
+    console.log('Edit Url:', edit);
   }
 }
 
