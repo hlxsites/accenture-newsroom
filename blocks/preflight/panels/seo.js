@@ -158,7 +158,8 @@ async function getStatus() {
   const curHost = window.location.hostname.split('.');
   const repoInfo = curHost[0].split('--');
   const ownerRepoBranch = `${repoInfo[2]}/${repoInfo[1]}/${repoInfo[0]}`;
-  const statusResp = await fetch(`https://admin.hlx.page/status/${ownerRepoBranch}${link.getAttribute('href')}?editUrl=auto`);
+  // const statusResp = await fetch(`https://admin.hlx.page/status/${ownerRepoBranch}${link.getAttribute('href')}?editUrl=auto`);
+  const statusResp = await fetch(`https://admin.hlx.page/status/${ownerRepoBranch}${link}?editUrl=auto`);
   console.log(statusResp);
   if (statusResp.ok) {
     const json = await statusResp.json();
