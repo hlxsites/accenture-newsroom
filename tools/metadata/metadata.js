@@ -313,10 +313,7 @@ function processForm() {
         <td>Template</td>
         <td>Article</td>
       </tr>
-      <tr>
-        <td width="20%">Published Date</td>
-        <td>${publishDateMetadata || ''}</td>
-      </tr>
+     
       <tr>
         <td width="20%">Title</td>
         <td>${title || ''}</td>
@@ -328,6 +325,14 @@ function processForm() {
       <tr>
         <td width="20%">Abstract</td>
         <td>${abstract || ''}</td>
+      </tr>
+      <tr>
+        <td width="20%">Subtitle</td>
+        <td>${subTitle || ''}</td>
+      </tr>
+      <tr>
+      <td width="20%">Published Date</td>
+      <td>${publishDateMetadata || ''}</td>
       </tr>
       <tr>
         <td width="20%">Subjects</td>
