@@ -848,6 +848,77 @@ const getContentDate = () => {
   const extractedDate = sPublishDate.split(' ')[0];
   return extractedDate;
 };
+// API link generator
+function getAdminUrl(url, action) {
+  const testBranch = 'auto-publish-pdf--accenture-newsroom--hlxsites';
+  const project = window.location.hostname === 'localhost' ? testBranch : window.location.hostname.split('.')[0];
+  const [branch, repo, owner] = project.split('--');
+  const base = `https://admin.hlx.page/${action}/${owner}/${repo}/${branch}${url}`;
+  return action === 'status' ? `${base}?editUrl=auto` : base;
+}
+
+// Publishing Asset
+async function handleLiveAction(linkPath, confirmPublish) {
+  fetch(getAdminUrl(linkPath, 'live'), { method: 'GET' })
+    .then((response) => response.json())
+    .then((response) => {
+      console.log('status-live', response.live.status);
+      if (response.live.status === 404) {
+        // confirmPublish.click();
+        console.log('All asset is been publish');
+      }
+    });
+}
+// Previewing Asset
+async function handlePreviewAction(linkPath) {
+  fetch(getAdminUrl(linkPath, 'preview'), { method: 'GET' })
+    .then((response) => response.json())
+    .then((response) => {
+      console.log('status-preview', response.preview.status);
+      if (response.preview.status === 404) {
+        console.log('test---');
+        handleLiveAction(linkPath);
+      }
+    });
+}
+// Asset Condition
+function pdfCondition(linkPath, response, confirmPublish) {
+  switch (response.preview.status) {
+    case 404: // Asset not been preview
+      handlePreviewAction(linkPath);
+      break;
+    case 200: // Asset is been preview
+      handleLiveAction(linkPath, confirmPublish);
+      break;
+    default:
+      break;
+  }
+}
+
+// Getting Asset Status
+function getStatus(confirmPublish) {
+  const link = document.querySelectorAll('a[href$=".pdf"]');
+  link.forEach((pdflink) => {
+    const linkPath = pdflink.getAttribute('href');
+    fetch(getAdminUrl(linkPath, 'status'))
+      .then((response) => response.json())
+      .then((response) => {
+        console.log(`preview: ${response.preview.status}:${linkPath}`);
+        console.log(`live: ${response.live.status}:${linkPath}`);
+        console.log(response);
+        // Condition if the pdf link is not existing
+        if (!response.edit.status === 404) {
+          pdfCondition(linkPath, response, confirmPublish);
+        } else {
+          // alert(`Not found PDF files: '${linkPath}`);
+          // confirmPublish.click();
+        }
+      })
+      .catch((error) => {
+        console.log('There was a problem with the fetch operation:', error);
+      });
+  });
+}
 
 // Set event for the publish button for confirmation message
 const publishConfirmationPopUp = (oPublishButtons) => {
@@ -857,8 +928,10 @@ const publishConfirmationPopUp = (oPublishButtons) => {
     return;
   }
   oPublishButtons.forEach((oPublishBtn) => {
+    console.log('5555');
     // eslint-disable-next-line func-names, consistent-return
     oPublishBtn.addEventListener('mousedown', function (e) {
+      console.log('11202');
       if (hasInvalidTags()) {
         // eslint-disable-next-line no-alert
         alert(`Publishing Error: Unable to publish page. Invalid tags detected. Please review and correct the tags before attempting to publish again.\nContent Date is ${getContentDate()}\n`);
@@ -868,7 +941,8 @@ const publishConfirmationPopUp = (oPublishButtons) => {
       // eslint-disable-next-line no-restricted-globals, no-alert
       if (confirm(` Are you sure you want to publish this content live?\n Content Date is ${getContentDate()}`)) {
         // continue publishing
-        this.click();
+        getStatus(this);
+        // this.click();
       } else {
         // avoid publishing
         e.stopImmediatePropagation();
