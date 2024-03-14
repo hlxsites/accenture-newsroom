@@ -150,30 +150,65 @@ async function checkLorem() {
   loremResult.value = result;
   return result.icon;
 }
+// API link generator
+function getAdminUrl(url, action) {
+  const testBranch = 'preflight-gen-tab--accenture-newsroom--hlxsites';
+  const project = window.location.hostname === 'localhost' ? testBranch : window.location.hostname.split('.')[0];
+  const [branch, repo, owner] = project.split('--');
+  const base = `https://admin.hlx.page/${action}/${owner}/${repo}/${branch}${url}`;
+  return action === 'status' ? `${base}?editUrl=auto` : base;
+}
 
-async function getStatus() {
-  // const link = document.querySelector('a[href$=".pdf"]');
-  const link = '/news/2024/accenture-completes-acquisition-of-navisite-to-help-clients-modernize-and-reinvent-their-businesses-with-cloud';
-  console.log('pdflink: ', link);
-  const curHost = window.location.hostname.split('.');
-  const repoInfo = curHost[0].split('--');
-  const ownerRepoBranch = `${repoInfo[2]}/${repoInfo[1]}/${repoInfo[0]}`;
-  // const statusResp = await fetch(`https://admin.hlx.page/status/${ownerRepoBranch}${link.getAttribute('href')}?editUrl=auto`);
-  const statusResp = await fetch(`https://admin.hlx.page/status/${ownerRepoBranch}${link}?editUrl=auto`);
-  console.log(statusResp);
-  if (statusResp.ok) {
-    const json = await statusResp.json();
-    console.log(json);
-    const preview = json.preview.lastModified || 'Never';
-    const live = json.live.lastModified || 'Never';
-    const edit = json.edit.url;
-    console.log('Preview Status:', preview);
-    console.log('Publish Status:', live);
-    console.log('Edit Url:', edit);
-    // if (json.live.status === 404) {
-
-    // }
+// Publishing Asset
+async function handleLiveAction(linkPath) {
+  fetch(getAdminUrl(linkPath, 'live'), { method: 'GET' })
+    .then((response) => response.json())
+    .then((response) => {
+      console.log('status-live', response.live.status);
+      if (response.live.status === 404) {
+        window.alert('Pdf is been publish');
+      }
+    });
+}
+// Previewing Asset
+async function handlePreviewAction(linkPath) {
+  fetch(getAdminUrl(linkPath, 'preview'), { method: 'GET' })
+    .then((response) => response.json())
+    .then((response) => {
+      console.log('status-preview', response.preview.status);
+      if (response.preview.status === 404) {
+        console.log('test---');
+        handleLiveAction(linkPath);
+      }
+    });
+}
+// Asset Condition
+function pdfCondition(linkPath, response) {
+  switch (response.preview.status) {
+    case 404: // Asset not been preview
+      handlePreviewAction(linkPath);
+      break;
+    case 200: // Asset is been preview
+      handleLiveAction(linkPath);
+      break;
+    default:
+      break;
   }
+}
+
+// Getting Asset Status
+function getStatus() {
+  const link = document.querySelectorAll('a[href$=".pdf"]');
+  link.forEach((pdflink) => {
+    const linkPath = pdflink.getAttribute('href');
+    fetch(getAdminUrl(linkPath, 'status'))
+      .then((response) => response.json())
+      .then((response) => {
+        console.log(`preview: ${response.preview.status}:${linkPath}`);
+        console.log(`live: ${response.live.status}:${linkPath}`);
+        pdfCondition(linkPath, response);
+      });
+  });
 }
 
 async function checkLinks() {
