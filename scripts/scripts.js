@@ -910,8 +910,8 @@ function getStatus(confirmPublish) {
         if (!response.edit.status === 404) {
           pdfCondition(linkPath, response, confirmPublish);
         } else {
-          // alert(`Not found PDF files: '${linkPath}`);
-          // confirmPublish.click();
+          alert(`Not found PDF files: '${linkPath}`);
+          confirmPublish.click();
         }
       })
       .catch((error) => {
