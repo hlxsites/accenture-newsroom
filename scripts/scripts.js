@@ -859,24 +859,21 @@ function getAdminUrl(url, action) {
 
 // Publishing Asset
 async function handleLiveAction(linkPath, confirmPublish) {
-  fetch(getAdminUrl(linkPath, 'live'), { method: 'GET' })
+  fetch(getAdminUrl(linkPath, 'live'), { method: 'Post' })
     .then((response) => response.json())
     .then((response) => {
-      console.log('status-live', response.live.status);
       if (response.live.status === 404) {
-        // confirmPublish.click();
+        confirmPublish.click();
         console.log('All asset is been publish');
       }
     });
 }
 // Previewing Asset
 async function handlePreviewAction(linkPath) {
-  fetch(getAdminUrl(linkPath, 'preview'), { method: 'GET' })
+  fetch(getAdminUrl(linkPath, 'preview'), { method: 'Post' })
     .then((response) => response.json())
     .then((response) => {
-      console.log('status-preview', response.preview.status);
       if (response.preview.status === 404) {
-        console.log('test---');
         handleLiveAction(linkPath);
       }
     });
@@ -896,7 +893,7 @@ function pdfCondition(linkPath, response, confirmPublish) {
 }
 
 // Getting Asset Status
-function getStatus(confirmPublish) {
+function getPdfStatus(confirmPublish) {
   const link = document.querySelectorAll('a[href$=".pdf"]');
   link.forEach((pdflink) => {
     const linkPath = pdflink.getAttribute('href');
@@ -910,12 +907,9 @@ function getStatus(confirmPublish) {
         if (!response.edit.status === 404) {
           pdfCondition(linkPath, response, confirmPublish);
         } else {
-          // alert(`Not found PDF files: '${linkPath}`);
+          alert(`Not found PDF files: '${linkPath}`);
           // confirmPublish.click();
         }
-      })
-      .catch((error) => {
-        console.log('There was a problem with the fetch operation:', error);
       });
   });
 }
@@ -928,10 +922,8 @@ const publishConfirmationPopUp = (oPublishButtons) => {
     return;
   }
   oPublishButtons.forEach((oPublishBtn) => {
-    console.log('5555');
     // eslint-disable-next-line func-names, consistent-return
     oPublishBtn.addEventListener('mousedown', function (e) {
-      console.log('11202');
       if (hasInvalidTags()) {
         // eslint-disable-next-line no-alert
         alert(`Publishing Error: Unable to publish page. Invalid tags detected. Please review and correct the tags before attempting to publish again.\nContent Date is ${getContentDate()}\n`);
@@ -941,8 +933,7 @@ const publishConfirmationPopUp = (oPublishButtons) => {
       // eslint-disable-next-line no-restricted-globals, no-alert
       if (confirm(` Are you sure you want to publish this content live?\n Content Date is ${getContentDate()}`)) {
         // continue publishing
-        getStatus(this);
-        // this.click();
+        getPdfStatus(this);
       } else {
         // avoid publishing
         e.stopImmediatePropagation();
