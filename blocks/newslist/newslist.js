@@ -301,7 +301,7 @@ function updatePagination(paginationContainer, totalResults, pageOffset) {
     } catch (error) {
       if (error.message === 'Page not found') {
         // Redirect to the homepage
-        window.location.href = '/';
+        window.location.href = 'not-found';
         return;
       }
     }
