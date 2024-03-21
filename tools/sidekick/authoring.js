@@ -16,7 +16,7 @@ import {
   loadBlocks,
 } from '../../scripts/lib-franklin.js';
 // eslint-disable-next-line import/no-cycle
-import { getPlaceholder } from '../../scripts/scripts.js';
+import { getPlaceholder, getSiteFromHostName } from '../../scripts/scripts.js';
 import {
   acknowledge,
   confirm,
@@ -25,6 +25,14 @@ import {
 } from './ui.js';
 import { preview } from './admin.js';
 
+const getGeoPath = () => {
+  const sGeo = getSiteFromHostName();
+  if (sGeo === 'us') {
+    return 'en';
+  }
+  return sGeo;
+};
+
 // The Sharepoint configuration
 const SHAREPOINT_CONFIG = {
   authority: 'https://login.microsoftonline.com/e0793d39-0939-496d-b129-198edd916feb',
@@ -32,7 +40,7 @@ const SHAREPOINT_CONFIG = {
   domain: 'ts.accenture.com',
   domainId: '627f3086-805e-4a45-9800-af5f9c0cfb03', // AdobePlatformAuthor"
   siteId: '47d42eab-993d-4993-ab4f-6f4c83e5a684', // Newsroom
-  rootPath: '/sites/accenture/newsroom/en',
+  rootPath: `/sites/accenture/newsroom/${getGeoPath()}`,
 };
 
 // The path to the crontab file in the content
