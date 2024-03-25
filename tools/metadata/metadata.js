@@ -236,6 +236,16 @@ function dropdownWriter(item, categorylist) {
   }
 }
 
+function populateDropdown(data, textKey, valueKey, dropdownElement) {
+  // Sort the data array alphabetically based on the text key
+  const sortedOptions = data.sort((a, b) => a[textKey].localeCompare(b[textKey]));
+  // retructure the data array to be an array of arrays
+  const OptionsList = sortedOptions.map((item) => [item[textKey], item[valueKey]]);
+  OptionsList.forEach((item) => {
+    dropdownWriter(item, dropdownElement);
+  });
+}
+
 async function populateTags() {
   // Replace with your JSON endpoint
   const tags = '/tags.json';
@@ -244,17 +254,11 @@ async function populateTags() {
   const response = await resp.json();
   if (response) {
     const { data } = response;
-    const subjects = data.map((item) => [item['Subjects Text'], item['Subjects Value']]);
-    const industries = data.map((item) => [item['Industries Text'], item['Industries Value']]);
-
     const selectSubjects = document.getElementById('dropdown-subjects');
-    subjects.forEach((item) => {
-      dropdownWriter(item, selectSubjects);
-    });
+    populateDropdown(data, 'Subjects Text', 'Subjects Value', selectSubjects);
+
     const selectIndustries = document.getElementById('dropdown-industries');
-    industries.forEach((item) => {
-      dropdownWriter(item, selectIndustries);
-    });
+    populateDropdown(data, 'Industries Text', 'Industries Value', selectIndustries);
   }
 }
 
@@ -269,6 +273,7 @@ function getSelectedCategories(categoryDropdownList) {
   });
   return selectedCategories;
 }
+
 // Date Formatter for publishdate in medata table
 function getFormatedDate(date) {
   const year = date.getFullYear();
