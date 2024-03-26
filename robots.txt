@@ -1,3 +1,3 @@
 User-agent: *
-Allow: /
+Disallow: */archive/
 Sitemap: https://newsroom.accenture.com/sitemap.xml
