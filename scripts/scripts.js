@@ -848,6 +848,7 @@ const getContentDate = () => {
   const extractedDate = sPublishDate.split(' ')[0];
   return extractedDate;
 };
+
 // API link generator
 function getAdminUrl(url, action) {
   const testBranch = 'auto-publish-pdf--accenture-newsroom--hlxsites';
@@ -858,13 +859,12 @@ function getAdminUrl(url, action) {
 }
 
 // Publishing Asset
-async function handleLiveAction(linkPath, confirmPublish) {
+async function handleLiveAction(linkPath) {
   fetch(getAdminUrl(linkPath, 'live'), { method: 'Post' })
     .then((response) => response.json())
     .then((response) => {
-      if (response.live.status === 404) {
-        confirmPublish.click();
-        console.log('All asset is been publish');
+      if (response.live.status === 200) {
+        console.log('Asset is been published');
       }
     });
 }
@@ -873,19 +873,20 @@ async function handlePreviewAction(linkPath) {
   fetch(getAdminUrl(linkPath, 'preview'), { method: 'Post' })
     .then((response) => response.json())
     .then((response) => {
-      if (response.preview.status === 404) {
+      if (response.preview.status === 200) {
         handleLiveAction(linkPath);
+        console.log('Asset is been previewed');
       }
     });
 }
 // Asset Condition
-function pdfCondition(linkPath, response, confirmPublish) {
+function pdfCondition(linkPath, response) {
   switch (response.preview.status) {
     case 404: // Asset not been preview
       handlePreviewAction(linkPath);
       break;
     case 200: // Asset is been preview
-      handleLiveAction(linkPath, confirmPublish);
+      handleLiveAction(linkPath);
       break;
     default:
       break;
@@ -893,7 +894,7 @@ function pdfCondition(linkPath, response, confirmPublish) {
 }
 
 // Getting Asset Status
-function getPdfStatus(confirmPublish) {
+function getPdfStatus(e) {
   const link = document.querySelectorAll('a[href$=".pdf"]');
   link.forEach((pdflink) => {
     const linkPath = pdflink.getAttribute('href');
@@ -904,12 +905,16 @@ function getPdfStatus(confirmPublish) {
         console.log(`live: ${response.live.status}:${linkPath}`);
         console.log(response);
         // Condition if the pdf link is not existing
-        if (!response.edit.status === 404) {
-          pdfCondition(linkPath, response, confirmPublish);
+        if (response.edit.status === 200) {
+          pdfCondition(linkPath, response);
         } else {
+          // eslint-disable-next-line no-alert
           alert(`Not found PDF files: '${linkPath}`);
-          // confirmPublish.click();
+          e.stopImmediatePropagation();
         }
+      }).catch((error) => {
+        console.error('Error occurred while fetching PDF status:', error);
+        // Set flag to true to indicate PDF not found
       });
   });
 }
@@ -922,7 +927,7 @@ const publishConfirmationPopUp = (oPublishButtons) => {
     return;
   }
   oPublishButtons.forEach((oPublishBtn) => {
-    // eslint-disable-next-line func-names, consistent-return
+    // eslint-disable-next-line func-names, consistent-return, prefer-arrow-callback
     oPublishBtn.addEventListener('mousedown', function (e) {
       if (hasInvalidTags()) {
         // eslint-disable-next-line no-alert
@@ -933,7 +938,9 @@ const publishConfirmationPopUp = (oPublishButtons) => {
       // eslint-disable-next-line no-restricted-globals, no-alert
       if (confirm(` Are you sure you want to publish this content live?\n Content Date is ${getContentDate()}`)) {
         // continue publishing
-        getPdfStatus(this);
+        getPdfStatus(e);
+        console.log('Publishing the content');
+        this.click();
       } else {
         // avoid publishing
         e.stopImmediatePropagation();
