@@ -860,63 +860,123 @@ function getAdminUrl(url, action) {
 
 // Publishing Asset
 async function handleLiveAction(linkPath) {
-  fetch(getAdminUrl(linkPath, 'live'), { method: 'Post' })
+  console.log('handleLiveAction..');
+  await fetch(getAdminUrl(linkPath, 'live'), { method: 'Post' })
     .then((response) => response.json())
     .then((response) => {
       if (response.live.status === 200) {
         console.log('Asset is been published');
+        return true;
       }
+      console.log('Asset is not been published');
+      return false;
+    }).catch((error) => {
+      console.error('Error occurred while fetching PDF status:', error);
+      return false;
     });
 }
 // Previewing Asset
 async function handlePreviewAction(linkPath) {
-  fetch(getAdminUrl(linkPath, 'preview'), { method: 'Post' })
+  console.log('handlePreviewAction..');
+  await fetch(getAdminUrl(linkPath, 'preview'), { method: 'Post' })
     .then((response) => response.json())
     .then((response) => {
       if (response.preview.status === 200) {
-        handleLiveAction(linkPath);
         console.log('Asset is been previewed');
+        return handleLiveAction(linkPath);
       }
+      return false;
+    }).catch((error) => {
+      console.error('Error occurred while fetching PDF status:', error);
+      return false;
     });
 }
 // Asset Condition
-function pdfCondition(linkPath, response) {
-  switch (response.preview.status) {
-    case 404: // Asset not been preview
-      handlePreviewAction(linkPath);
-      break;
-    case 200: // Asset is been preview
-      handleLiveAction(linkPath);
-      break;
-    default:
-      break;
+async function pdfCondition(linkPath, response) {
+  // switch (response.preview.status) {
+  //   case 404: // Asset not been preview
+  //     return previewResponse;
+  //   case 200: // Asset is been preview
+  //     return handleLiveAction(linkPath);
+  //   default: // Preview status is not equal to 404 or 200
+  //     console.error(response.preview.status);
+  //     return false;
+  // }
+  if (response.preview.status === 404) {
+    const previewResponse = await handlePreviewAction(linkPath);
+    console.log('previewResponse..', previewResponse);
+    return previewResponse;
   }
+  if (response.preview.status === 200) {
+    const liveResponse = await handleLiveAction(linkPath);
+    console.log('liveResponse..', liveResponse);
+    return liveResponse;
+  }
+  return false;
+}
+//
+async function fetchPdfStatus(pdfLink) { // first pdf > return false
+  // let pdfStatus = true;
+  const linkPath = pdfLink.getAttribute('href');
+  await fetch(getAdminUrl(linkPath, 'status'))
+    .then((response) => response.json())
+    .then(async (response) => {
+      console.log(`preview: ${response.preview.status}:${linkPath}`);
+      console.log(`live: ${response.live.status}:${linkPath}`);
+      console.log(response);
+      // Condition if the pdf link is not existing
+      if (response.edit.status === 200) {
+        console.log('PDF link is existing..');
+        const pdfConditionResponse = await pdfCondition(linkPath, response);
+        console.log('pdfConditionResponse..', pdfConditionResponse);
+        return pdfConditionResponse;
+      }
+      // eslint-disable-next-line no-alert
+      alert(`Not found PDF files: '${linkPath}`);
+      return false;
+    }).catch((error) => {
+      console.error('Error occurred while fetching PDF status:', error);
+      // Set flag to true to indicate PDF not found
+      return false;
+    });
+
+  // return pdfStatus;
 }
 
 // Getting Asset Status
-function getPdfStatus(e) {
-  const link = document.querySelectorAll('a[href$=".pdf"]');
-  link.forEach((pdflink) => {
-    const linkPath = pdflink.getAttribute('href');
-    fetch(getAdminUrl(linkPath, 'status'))
-      .then((response) => response.json())
-      .then((response) => {
-        console.log(`preview: ${response.preview.status}:${linkPath}`);
-        console.log(`live: ${response.live.status}:${linkPath}`);
-        console.log(response);
-        // Condition if the pdf link is not existing
-        if (response.edit.status === 200) {
-          pdfCondition(linkPath, response);
-        } else {
-          // eslint-disable-next-line no-alert
-          alert(`Not found PDF files: '${linkPath}`);
-          e.stopImmediatePropagation();
-        }
-      }).catch((error) => {
-        console.error('Error occurred while fetching PDF status:', error);
-        // Set flag to true to indicate PDF not found
-      });
-  });
+async function getPdfStatusHandler() {
+  const links = document.querySelectorAll('a[href$=".pdf"]');
+  let pdfStatus = true;
+  if (links.length === 0) {
+    return true;
+  }
+
+  // eslint-disable-next-line no-restricted-syntax
+  for (let i = 0; i < links.length; i += 1) {
+    console.log('fetching..', links[i]);
+    // eslint-disable-next-line no-await-in-loop
+    const bResponse = await fetchPdfStatus(links[i]); // first PDF > return false
+    console.log('bResponse..', bResponse);
+    if (bResponse !== true) {
+      pdfStatus = false;
+      console.log('status break..');
+      // break;
+    }
+  }
+
+  // for (const pdfLink of links) {
+  //   console.log('fetching..');
+  //   // eslint-disable-next-line no-await-in-loop
+  //   const bResponse = await fetchPdfStatus(pdfLink); // first PDF > return false
+  //   console.log('bResponse..', bResponse);
+  //   if (bResponse !== true) {
+  //     pdfStatus = false;
+  //     console.log('status break..');
+  //     break;
+  //   }
+  // }
+  console.log('return pdfstatus..', pdfStatus);
+  return pdfStatus;
 }
 
 // Set event for the publish button for confirmation message
@@ -928,7 +988,7 @@ const publishConfirmationPopUp = (oPublishButtons) => {
   }
   oPublishButtons.forEach((oPublishBtn) => {
     // eslint-disable-next-line func-names, consistent-return, prefer-arrow-callback
-    oPublishBtn.addEventListener('mousedown', function (e) {
+    oPublishBtn.addEventListener('mousedown', async function (e) {
       if (hasInvalidTags()) {
         // eslint-disable-next-line no-alert
         alert(`Publishing Error: Unable to publish page. Invalid tags detected. Please review and correct the tags before attempting to publish again.\nContent Date is ${getContentDate()}\n`);
@@ -938,11 +998,18 @@ const publishConfirmationPopUp = (oPublishButtons) => {
       // eslint-disable-next-line no-restricted-globals, no-alert
       if (confirm(` Are you sure you want to publish this content live?\n Content Date is ${getContentDate()}`)) {
         // continue publishing
-        getPdfStatus(e);
-        console.log('Publishing the content');
-        this.click();
+        const result = await getPdfStatusHandler();
+        if (result) {
+          console.log('Publishing the content');
+          // this.click();
+        } else {
+          // avoid publishing
+          console.log('Stop publishing the content Due to failes API');
+          e.stopImmediatePropagation();
+        }
       } else {
         // avoid publishing
+        console.log('Cancel publishing the content');
         e.stopImmediatePropagation();
       }
     });
