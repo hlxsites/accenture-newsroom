@@ -1014,7 +1014,7 @@ const publishConfirmationPopUp = (oPublishButtons) => {
         const result = await getPdfStatusHandler();
         if (result) {
           console.log('Publishing the content');
-          // this.click();
+          this.click();
         } else {
           // avoid publishing
           console.log('Stop publishing the content Due to failes API');
