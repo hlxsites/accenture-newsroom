@@ -893,21 +893,12 @@ async function handlePreviewAction(linkPath) {
 }
 // Asset Condition
 async function pdfCondition(linkPath, response) {
-  // switch (response.preview.status) {
-  //   case 404: // Asset not been preview
-  //     return previewResponse;
-  //   case 200: // Asset is been preview
-  //     return handleLiveAction(linkPath);
-  //   default: // Preview status is not equal to 404 or 200
-  //     console.error(response.preview.status);
-  //     return false;
-  // }
   if (response.preview.status === 404) {
     const previewResponse = await handlePreviewAction(linkPath);
     console.log('previewResponse..', previewResponse);
     return previewResponse;
   }
-  if (response.preview.status === 200) {
+  if (response.preview.status === 200 && response.live.status !== 200) {
     const liveResponse = await handleLiveAction(linkPath);
     console.log('liveResponse..', liveResponse);
     return liveResponse;
@@ -916,7 +907,6 @@ async function pdfCondition(linkPath, response) {
 }
 //
 async function fetchPdfStatus(pdfLink) { // first pdf > return false
-  // let pdfStatus = true;
   const linkPath = pdfLink.getAttribute('href');
   await fetch(getAdminUrl(linkPath, 'status'))
     .then((response) => response.json())
@@ -960,21 +950,9 @@ async function getPdfStatusHandler() {
     if (bResponse !== true) {
       pdfStatus = false;
       console.log('status break..');
-      // break;
+      break;
     }
   }
-
-  // for (const pdfLink of links) {
-  //   console.log('fetching..');
-  //   // eslint-disable-next-line no-await-in-loop
-  //   const bResponse = await fetchPdfStatus(pdfLink); // first PDF > return false
-  //   console.log('bResponse..', bResponse);
-  //   if (bResponse !== true) {
-  //     pdfStatus = false;
-  //     console.log('status break..');
-  //     break;
-  //   }
-  // }
   console.log('return pdfstatus..', pdfStatus);
   return pdfStatus;
 }
