@@ -951,8 +951,15 @@ async function fetchPdfStatus(pdfLink) {
       console.log('pdfConditionResponse..', pdfConditionResponse);
       return pdfConditionResponse;
     }
-    alert(`Not found PDF files: '${linkPath}`);
-    return false;
+    // eslint-disable-next-line no-restricted-globals, no-alert
+    if (confirm(`Publishing Error: Unable to publish the page due to invalid PDF\nLink text: ${pdfLink.innerText} \nPath: ${linkPath} \n\n Do you still wish to publish the page? `)) {
+      console.log('Continue Publishing');
+      return true;
+    // eslint-disable-next-line no-else-return
+    } else {
+      console.log('Dont Continue Publishing');
+      return false;
+    }
   } catch (error) {
     console.error('Error occurred while fetching PDF status:', error);
     return false;
@@ -1007,7 +1014,7 @@ const publishConfirmationPopUp = (oPublishButtons) => {
         const result = await getPdfStatusHandler();
         if (result) {
           console.log('Publishing the content');
-          this.click();
+          // this.click();
         } else {
           // avoid publishing
           console.log('Stop publishing the content Due to failes API');
