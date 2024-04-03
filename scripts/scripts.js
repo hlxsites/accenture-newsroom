@@ -860,42 +860,73 @@ function getAdminUrl(url, action) {
 
 // Publishing Asset
 async function handleLiveAction(linkPath) {
-  console.log('handleLiveAction..');
-  await fetch(getAdminUrl(linkPath, 'live'), { method: 'Post' })
-    .then((response) => response.json())
-    .then((response) => {
-      if (response.live.status === 200) {
-        console.log('Asset is been published');
-        return true;
-      }
-      console.log('Asset is not been published');
-      return false;
-    }).catch((error) => {
-      console.error('Error occurred while fetching PDF status:', error);
-      return false;
-    });
+  // await fetch(getAdminUrl(linkPath, 'live'), { method: 'Post' })
+  //   .then((response) => response.json())
+  //   .then((response) => {
+  //     if (response.live.status === 200) {
+  //       console.log('Asset is been published');
+  //       return true;
+  //     }
+  //     console.log('Asset is not been published');
+  //     return false;
+  //   }).catch((error) => {
+  //     console.error('Error occurred while fetching PDF status:', error);
+  //     return false;
+  //   });
+  try {
+    const response = await fetch(getAdminUrl(linkPath, 'live'), { method: 'Post' });
+    const data = await response.json();
+    console.log('data.live.status:', data.live.status);
+    if (data.live.status === 200) {
+      console.log('Asset has been published');
+      return true;
+    }
+    console.log('Asset has not been published');
+    return false;
+  } catch (error) {
+    console.error('Error occurred while fetching PDF status:', error);
+    return false;
+  }
 }
+
 // Previewing Asset
 async function handlePreviewAction(linkPath) {
-  console.log('handlePreviewAction..');
-  await fetch(getAdminUrl(linkPath, 'preview'), { method: 'Post' })
-    .then((response) => response.json())
-    .then((response) => {
-      if (response.preview.status === 200) {
-        console.log('Asset is been previewed');
-        return handleLiveAction(linkPath);
-      }
-      return false;
-    }).catch((error) => {
-      console.error('Error occurred while fetching PDF status:', error);
-      return false;
-    });
+  // await fetch(getAdminUrl(linkPath, 'preview'), { method: 'Post' })
+  //   .then((response) => response.json())
+  //   .then((response) => {
+  //     if (response.preview.status === 200) {
+  //       console.log('Asset is been previewed');
+  //       return handleLiveAction(linkPath);
+  //     }
+  //     return false;
+  //   }).catch((error) => {
+  //     console.error('Error occurred while fetching PDF status:', error);
+  //     return false;
+  //   });
+  try {
+    const response = await fetch(getAdminUrl(linkPath, 'preview'), { method: 'Post' });
+    const data = await response.json();
+    console.log('data.preview.status :', data.preview.status);
+    if (data.preview.status === 200) {
+      console.log('Asset is been previewed');
+      return handleLiveAction(linkPath);
+    }
+    return false;
+  } catch (error) {
+    console.error('Error occurred while fetching PDF status:', error);
+    return false;
+  }
 }
+
 // Asset Condition
 async function pdfCondition(linkPath, response) {
+  // asset is already published and previewed
+  if (response.preview.status === 200 && response.live.status === 200) {
+    return true;
+  }
   if (response.preview.status === 404) {
     const previewResponse = await handlePreviewAction(linkPath);
-    console.log('previewResponse..', previewResponse);
+    console.log('previewResponse-status..', previewResponse);
     return previewResponse;
   }
   if (response.preview.status === 200 && response.live.status !== 200) {
@@ -905,32 +936,27 @@ async function pdfCondition(linkPath, response) {
   }
   return false;
 }
-//
-async function fetchPdfStatus(pdfLink) { // first pdf > return false
-  const linkPath = pdfLink.getAttribute('href');
-  await fetch(getAdminUrl(linkPath, 'status'))
-    .then((response) => response.json())
-    .then(async (response) => {
-      console.log(`preview: ${response.preview.status}:${linkPath}`);
-      console.log(`live: ${response.live.status}:${linkPath}`);
-      console.log(response);
-      // Condition if the pdf link is not existing
-      if (response.edit.status === 200) {
-        console.log('PDF link is existing..');
-        const pdfConditionResponse = await pdfCondition(linkPath, response);
-        console.log('pdfConditionResponse..', pdfConditionResponse);
-        return pdfConditionResponse;
-      }
-      // eslint-disable-next-line no-alert
-      alert(`Not found PDF files: '${linkPath}`);
-      return false;
-    }).catch((error) => {
-      console.error('Error occurred while fetching PDF status:', error);
-      // Set flag to true to indicate PDF not found
-      return false;
-    });
 
-  // return pdfStatus;
+async function fetchPdfStatus(pdfLink) {
+  const linkPath = pdfLink.getAttribute('href');
+  try {
+    const response = await fetch(getAdminUrl(linkPath, 'status'));
+    const json = await response.json();
+    console.log(`preview: ${json.preview.status}:${linkPath}`);
+    console.log(`live: ${json.live.status}:${linkPath}`);
+    // console.log(json);
+    if (json.edit.status === 200) {
+      console.log('PDF link is existing..');
+      const pdfConditionResponse = await pdfCondition(linkPath, json);
+      console.log('pdfConditionResponse..', pdfConditionResponse);
+      return pdfConditionResponse;
+    }
+    alert(`Not found PDF files: '${linkPath}`);
+    return false;
+  } catch (error) {
+    console.error('Error occurred while fetching PDF status:', error);
+    return false;
+  }
 }
 
 // Getting Asset Status
@@ -943,15 +969,17 @@ async function getPdfStatusHandler() {
 
   // eslint-disable-next-line no-restricted-syntax
   for (let i = 0; i < links.length; i += 1) {
-    console.log('fetching..', links[i]);
+    console.log('fetching..', links[i].getAttribute('href'));
     // eslint-disable-next-line no-await-in-loop
     const bResponse = await fetchPdfStatus(links[i]); // first PDF > return false
     console.log('bResponse..', bResponse);
+    // pdfStatus = bResponse;
     if (bResponse !== true) {
       pdfStatus = false;
       console.log('status break..');
       break;
     }
+    // eslint-disable-next-line no-plusplus
   }
   console.log('return pdfstatus..', pdfStatus);
   return pdfStatus;
@@ -979,7 +1007,7 @@ const publishConfirmationPopUp = (oPublishButtons) => {
         const result = await getPdfStatusHandler();
         if (result) {
           console.log('Publishing the content');
-          this.click();
+          // this.click();
         } else {
           // avoid publishing
           console.log('Stop publishing the content Due to failes API');
