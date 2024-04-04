@@ -860,19 +860,6 @@ function getAdminUrl(url, action) {
 
 // Publishing Asset
 async function handleLiveAction(linkPath) {
-  // await fetch(getAdminUrl(linkPath, 'live'), { method: 'Post' })
-  //   .then((response) => response.json())
-  //   .then((response) => {
-  //     if (response.live.status === 200) {
-  //       console.log('Asset is been published');
-  //       return true;
-  //     }
-  //     console.log('Asset is not been published');
-  //     return false;
-  //   }).catch((error) => {
-  //     console.error('Error occurred while fetching PDF status:', error);
-  //     return false;
-  //   });
   try {
     const response = await fetch(getAdminUrl(linkPath, 'live'), { method: 'Post' });
     const data = await response.json();
@@ -891,18 +878,6 @@ async function handleLiveAction(linkPath) {
 
 // Previewing Asset
 async function handlePreviewAction(linkPath) {
-  // await fetch(getAdminUrl(linkPath, 'preview'), { method: 'Post' })
-  //   .then((response) => response.json())
-  //   .then((response) => {
-  //     if (response.preview.status === 200) {
-  //       console.log('Asset is been previewed');
-  //       return handleLiveAction(linkPath);
-  //     }
-  //     return false;
-  //   }).catch((error) => {
-  //     console.error('Error occurred while fetching PDF status:', error);
-  //     return false;
-  //   });
   try {
     const response = await fetch(getAdminUrl(linkPath, 'preview'), { method: 'Post' });
     const data = await response.json();
@@ -944,22 +919,14 @@ async function fetchPdfStatus(pdfLink) {
     const json = await response.json();
     console.log(`preview: ${json.preview.status}:${linkPath}`);
     console.log(`live: ${json.live.status}:${linkPath}`);
-    // console.log(json);
     if (json.edit.status === 200) {
       console.log('PDF link is existing..');
       const pdfConditionResponse = await pdfCondition(linkPath, json);
       console.log('pdfConditionResponse..', pdfConditionResponse);
       return pdfConditionResponse;
     }
-    // eslint-disable-next-line no-restricted-globals, no-alert
-    if (confirm(`Publishing Error: Unable to publish the page due to invalid PDF\nLink text: ${pdfLink.innerText} \nPath: ${linkPath} \n\n Do you still wish to publish the page? `)) {
-      console.log('Continue Publishing');
-      return true;
-    // eslint-disable-next-line no-else-return
-    } else {
-      console.log('Dont Continue Publishing');
-      return false;
-    }
+    console.log('PDF link not is existing..');
+    return false;
   } catch (error) {
     console.error('Error occurred while fetching PDF status:', error);
     return false;
@@ -969,7 +936,7 @@ async function fetchPdfStatus(pdfLink) {
 // Getting Asset Status
 async function getPdfStatusHandler() {
   const links = document.querySelectorAll('a[href$=".pdf"]');
-  let pdfStatus = true;
+  const aDeffectivePDFs = [];
   if (links.length === 0) {
     return true;
   }
@@ -980,18 +947,29 @@ async function getPdfStatusHandler() {
     // eslint-disable-next-line no-await-in-loop
     const bResponse = await fetchPdfStatus(links[i]); // first PDF > return false
     console.log('bResponse..', bResponse);
-    // pdfStatus = bResponse;
     if (bResponse !== true) {
-      pdfStatus = false;
       console.log('status break..');
-      break;
+      aDeffectivePDFs.push(links);
     }
-    // eslint-disable-next-line no-plusplus
   }
-  console.log('return pdfstatus..', pdfStatus);
-  return pdfStatus;
+  return aDeffectivePDFs;
 }
-
+// Handler for the publish button to set confirmation message
+function resultConfimration(resultList, confirmPublishing, e) {
+  let confirmMessage = 'Error: Unable to publish the page due to invalid PDF link/s found \n\n';
+  for (let i = 0; i < resultList.length; i += 1) {
+    const defectivePDF = resultList[i];
+    confirmMessage += `- ${defectivePDF[i].innerText} - ${defectivePDF[i].getAttribute('href')}\n`;
+  }
+  // eslint-disable-next-line no-restricted-globals, no-alert
+  if (confirm(`${confirmMessage}\n\nContinue publishing the page?`)) {
+    console.log('Continue Publishing');
+    confirmPublishing.click();
+  } else {
+    console.log('Dont Continue Publishing');
+    e.stopImmediatePropagation();
+  }
+}
 // Set event for the publish button for confirmation message
 const publishConfirmationPopUp = (oPublishButtons) => {
   const oSidekick = document.querySelector('helix-sidekick');
@@ -1012,16 +990,16 @@ const publishConfirmationPopUp = (oPublishButtons) => {
       if (confirm(` Are you sure you want to publish this content live?\n Content Date is ${getContentDate()}`)) {
         // continue publishing
         const result = await getPdfStatusHandler();
-        if (result) {
+        console.log('Array - result..', result);
+        // Check if there are any deffective PDFs
+        if (result.length !== 0) {
           console.log('Publishing the content');
+          resultConfimration(result, this.clik, e);
+        } else { // if result no deffective PDFs
+          console.log('Continue publishing the content');
           this.click();
-        } else {
-          // avoid publishing
-          console.log('Stop publishing the content Due to failes API');
-          e.stopImmediatePropagation();
         }
-      } else {
-        // avoid publishing
+      } else { // avoid publishing
         console.log('Cancel publishing the content');
         e.stopImmediatePropagation();
       }
