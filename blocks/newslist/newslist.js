@@ -153,6 +153,12 @@ function addParam(name, value) {
  * @returns
  */
 function getPaginationGroups(totalPages, currentPage) {
+  if (currentPage > totalPages) {
+    // redirect to page not found
+    window.location.href = '/not-found';
+    return;
+  }
+  
   const MAX_ENTRIES = 7;
   if (totalPages <= MAX_ENTRIES) {
     const r = [];
