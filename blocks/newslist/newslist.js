@@ -153,9 +153,11 @@ function addParam(name, value) {
  */
 function getPaginationGroups(totalPages, currentPage) {
   if (currentPage > totalPages) {
-    throw new Error('Page not found');
+    // redirect to page not found
+    window.location.href = '/not-found';
+    return;
   }
-
+  
   const MAX_ENTRIES = 7;
   if (totalPages <= MAX_ENTRIES) {
     const r = [];
@@ -295,16 +297,7 @@ function ifArticleBelongsToCategories(article, key, value) {
 function updatePagination(paginationContainer, totalResults, pageOffset) {
   if (totalResults > 10) {
     const totalPages = Math.ceil(totalResults / 10);
-    let paginationGroups;
-    try {
-      paginationGroups = getPaginationGroups(totalPages, pageOffset);
-    } catch (error) {
-      if (error.message === 'Page not found') {
-        // Redirect to the homepage
-        window.location.href = 'not-found';
-        return;
-      }
-    }
+    const paginationGroups = getPaginationGroups(totalPages, pageOffset);
     for (let i = 0; i < paginationGroups.length; i += 1) {
       const pageGroup = paginationGroups[i];
       pageGroup.forEach((pageNumber) => {
