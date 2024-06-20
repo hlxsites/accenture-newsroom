@@ -33,6 +33,9 @@ indices:
       template:
         select: head > meta[name="template"]
         value: attribute(el, "content")
+      abstract:
+        select: head > meta[name="abstract"]
+        value: attribute(el, "content")
       robots:
         select: head > meta[name="robots"]
         value: attribute(el, "content")
